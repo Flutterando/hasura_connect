@@ -5,10 +5,12 @@ class Snapshot {
   final String document;
   dynamic value = double.infinity;
 
-  Stream stream;
+  Stream _stream;
+
+  Stream get stream => _stream;
 
   Snapshot(this.document, Stream streamInit, this.close) {
-    stream = streamInit
+    _stream = streamInit
         .map((v) {
           value = v;
           return v;
