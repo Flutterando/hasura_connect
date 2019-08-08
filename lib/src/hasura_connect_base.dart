@@ -9,7 +9,6 @@ import 'snapshot.dart';
 
 class HasuraConnect {
   final _controller = StreamController.broadcast();
-  final _redis = StreamController<String>();
   final Map<String, Snapshot> _snapmap = {};
 
   WebSocket _channelPromisse;
@@ -19,7 +18,7 @@ class HasuraConnect {
 
   final String url;
 
-  final String Function() token;
+  final Future<String> Function() token;
 
   HasuraConnect(this.url, {this.token});
 
@@ -104,7 +103,7 @@ class HasuraConnect {
       _channelPromisse = await WebSocket.connect(url.replaceFirst("http", "ws"),
           protocols: ['graphql-subscriptions']);
           if (token != null) {
-      String t = token();
+      String t = await token();
       if (t != null) (_init["payload"] as Map)["headers"]["Authorization"] = t;
     }
       
@@ -165,7 +164,7 @@ class HasuraConnect {
     request.headers.add("Accept", "application/json");
 
     if (token != null) {
-      String t = token();
+      String t = await token();
       if (t != null) request.headers.add("Authorization", t);
     }
     request.headers.set('Content-Length', bodyBytes.length.toString());
@@ -189,7 +188,6 @@ class HasuraConnect {
   void dispose() {
     _disconnect();
     _controller.close();
-    _redis.close();
     _snapmap.clear();
   }
 }

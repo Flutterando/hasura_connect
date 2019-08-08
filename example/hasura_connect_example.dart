@@ -28,7 +28,7 @@ String docSubscription = """
 String docQuery = """
   query {
     authors {
-        id2
+        id
         email
         name
       }
