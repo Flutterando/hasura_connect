@@ -182,7 +182,7 @@ class HasuraConnect {
     if (json.containsKey("errors")) {
       throw HasuraError.fromJson(json["errors"][0]);
     }
-    return json['data'];
+    return json;
   }
 
   void dispose() {

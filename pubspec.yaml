@@ -1,6 +1,6 @@
 name: hasura_connect
 description: Connect your Flutter / Dart apps to Hasura simply.
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/Flutterando/hasura_connect
 author: Team Flutterando <jacobaraujo7@gmail.com>
 
