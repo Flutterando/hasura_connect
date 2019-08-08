@@ -1,6 +1,6 @@
 # Hasura Connect Package
 
-Connect your Flutter / Dart apps to Hasura simply.
+Connect your Flutter/Dart apps to Hasura simply.
 
 ## Install
 
