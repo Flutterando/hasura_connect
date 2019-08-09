@@ -48,6 +48,10 @@ Now just add the document to the "query" method of the HasuraConnect instance.
 var r = await hasuraConnect.query(docQuery);
 print(r);
 
+//OR USE MUTATION
+var r = await hasuraConnect.mutation(docQuery);
+
+
 ```
 
 ## Subscriptions
@@ -63,6 +67,30 @@ Snapshot snap = hasuraConnect.subscription(docSubscription);
   });
 
 ```
+
+## Using variables
+
+Variables maintain the integrity of Querys, see an example:
+
+```dart
+
+String docSubscription = """
+  subscription algumaCoisa($limit:Int!){
+    users(limit: $limit, order_by: {user_id: desc}) {
+      id
+      email
+      name
+    }
+  }
+""";
+
+Snapshot snap = hasuraConnect.subscription(docSubscription, variables: {"limit": 10});
+
+//change values of variables for PAGINATIONS
+snap.changeVariable({"limit": 20});
+
+```
+
 ## Authorization (JWT Token)
 
 [View Hasura's official Authorization documentation](https://docs.hasura.io/1.0/graphql/manual/auth/index.html).
@@ -89,17 +117,18 @@ Therefore, we only connect to Hasura when we are actually using it;
 
 This is currently our roadmap, please feel free to request additions/changes.
 
-| Feature                  | Progress |
-| :----------------------- | :------: |
-| Queries                  |    ✅    |
-| Mutations                |    ✅    |
-| Subscriptions            |    ✅    |
-| Auto-Reconnect           |    ✅    |
-| Dynamic JWT Token        |    ✅    |
-| bloc_pattern Integration |    ✅    |
-| Provider Integration     |    ✅    |
-| Variables                |    ✅    |
-| Cache Intercept          |    🔜    |
+| Feature                                | Progress |
+| :------------------------------------- | :------: |
+| Queries                                |    ✅    |
+| Mutations                              |    ✅    |
+| Subscriptions                          |    ✅    |
+| Change Variable in Subscriptions       |    ✅    |
+| Auto-Reconnect                         |    ✅    |
+| Dynamic JWT Token                      |    ✅    |
+| bloc_pattern Integration               |    ✅    |
+| Provider Integration                   |    ✅    |
+| Variables                              |    ✅    |
+| Cache Intercept                        |    🔜    |
 
 ## Features and bugs
 
