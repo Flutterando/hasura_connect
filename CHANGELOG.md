@@ -1,3 +1,7 @@
+## 0.0.7
+
+- Add and Remove Headers
+
 ## 0.0.6
 
 - Added variables.
