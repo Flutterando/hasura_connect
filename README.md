@@ -29,7 +29,8 @@ HasuraConnect hasuraConnect = HasuraConnect(url);
 ```
 You can encapsulate this instance into a BLoC class or directly into a Provider.
 
-Crie um documento com a Query:
+Create a document with Query:
+
 ```dart
 //document
 String docQuery = """
@@ -41,6 +42,7 @@ String docQuery = """
       }
   }
 """;
+
 ```
 Now just add the document to the "query" method of the HasuraConnect instance.
 
@@ -50,8 +52,6 @@ print(r);
 
 //OR USE MUTATION
 var r = await hasuraConnect.mutation(docQuery);
-
-
 ```
 
 ## Subscriptions
@@ -105,7 +105,6 @@ HasuraConnect hasuraConnect = HasuraConnect(url, token: () async {
 
 ```
 
-
 ## Dispose
 
 HasuraConnect provides a dispose () method for use in Provider or BlocProvider.
@@ -132,7 +131,7 @@ This is currently our roadmap, please feel free to request additions/changes.
 
 ## Features and bugs
 
-Please file feature requests and bugs at the [issue tracker][tracker].
+Please send feature requests and bugs at the [issue tracker][tracker].
 [tracker]: http://example.com/issues/replaceme
 
 Created from templates made available by Stagehand under a BSD-style
