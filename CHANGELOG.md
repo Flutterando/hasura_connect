@@ -1,7 +1,12 @@
-## 0.0.1
+## 0.0.3
 
-- Initial version, created by Stagehand
+- Add variable;
+- Add mutation;
 
 ## 0.0.2
 
 - Query return param data;
+
+## 0.0.1
+
+- Initial version, created by Stagehand

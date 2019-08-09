@@ -92,13 +92,13 @@ This is currently our roadmap, please feel free to request additions/changes.
 | Feature                  | Progress |
 | :----------------------- | :------: |
 | Queries                  |    ✅    |
-| Mutations                |    🔜    |
+| Mutations                |    ✅    |
 | Subscriptions            |    ✅    |
 | Auto-Reconnect           |    ✅    |
 | Dynamic JWT Token        |    ✅    |
 | bloc_pattern Integration |    ✅    |
 | Provider Integration     |    ✅    |
-| Variables                |    🔜    |
+| Variables                |    ✅    |
 | Cache Intercept          |    🔜    |
 
 ## Features and bugs

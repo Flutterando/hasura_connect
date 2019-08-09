@@ -45,7 +45,12 @@ class HasuraConnect {
     return base64Str;
   }
 
-  Snapshot subscription(String query, {String key}) {
+  Snapshot subscription(String query, {String key, Map<String, dynamic> variables}) {
+
+     if (query.trim().split(" ")[0] != "mutation") {
+      query != "mutation $query";
+     }
+
     if (key == null) {
       key = _generateBase(query);
     }
@@ -58,10 +63,10 @@ class HasuraConnect {
       return _snapmap[key];
     } else {
       if (isConnected) {
-        _channelPromisse.addUtf8Text(_getDocument(query, key).codeUnits);
+        _channelPromisse.addUtf8Text(_getDocument(query, key, variables).codeUnits);
       }
       var snap = Snapshot(
-          _getDocument(query, key),
+          _getDocument(query, key, variables),
           _controller.stream.where((data) => data["id"] == key).transform(
               StreamTransformer.fromHandlers(handleData: (data, sink) {
             if (data["type"] == "data") {
@@ -86,11 +91,12 @@ class HasuraConnect {
     }
   }
 
-  String _getDocument(String query, String key) {
+  String _getDocument(String query, String key, Map<String, dynamic> variables) {
     return jsonEncode({
       "id": key,
       "payload": {
         "query": query,
+        "variables": variables,
       },
       "type": 'start'
     });
@@ -102,11 +108,12 @@ class HasuraConnect {
     try {
       _channelPromisse = await WebSocket.connect(url.replaceFirst("http", "ws"),
           protocols: ['graphql-subscriptions']);
-          if (token != null) {
-      String t = await token();
-      if (t != null) (_init["payload"] as Map)["headers"]["Authorization"] = t;
-    }
-      
+      if (token != null) {
+        String t = await token();
+        if (t != null)
+          (_init["payload"] as Map)["headers"]["Authorization"] = t;
+      }
+
       _channelPromisse.addUtf8Text(jsonEncode(_init).codeUnits);
       var _sub = _channelPromisse.listen((data) {
         data = jsonDecode(data);
@@ -152,10 +159,29 @@ class HasuraConnect {
     }
   }
 
-  Future query(String doc) async {
+  Future query(String doc, {Map<String, dynamic> variables}) async {
+    if (doc.trimLeft().split(" ")[0] != "query") {
+      doc != "query $doc";
+    }
     Map<String, dynamic> jsonMap = {
       'query': doc,
+      'variables': variables,
     };
+    return _sendPost(jsonMap);
+  }
+
+  Future mutation(String doc, {Map<String, dynamic> variables}) async {
+    if (doc.trim().split(" ")[0] != "mutation") {
+      doc != "mutation $doc";
+    }
+    Map<String, dynamic> jsonMap = {
+      'query': doc,
+      'variables': variables,
+    };
+    return _sendPost(jsonMap);
+  }
+
+  Future _sendPost(Map<String, dynamic> jsonMap) async {
     String jsonString = jsonEncode(jsonMap);
     List<int> bodyBytes = utf8.encode(jsonString);
     var request = await HttpClient().postUrl(Uri.parse(url));
