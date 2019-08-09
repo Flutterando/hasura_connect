@@ -9,11 +9,10 @@ class HasuraError implements Exception {
         json["message"], Extensions.fromJson(json["extensions"]));
   }
 
-  @override 
+  @override
   String toString() {
     return "HasuraError: $message";
   }
-
 }
 
 class Extensions {
@@ -26,9 +25,8 @@ class Extensions {
     return Extensions(json["path"], json["code"]);
   }
 
-  @override 
+  @override
   String toString() {
     return "path: $path, code: $code";
   }
-
 }

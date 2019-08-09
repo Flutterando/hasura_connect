@@ -21,7 +21,7 @@ class HasuraConnect {
 
   final Future<String> Function() token;
 
-  HasuraConnect(this.url, {this.token, this.headers} );
+  HasuraConnect(this.url, {this.token, this.headers});
 
   final _init = {
     "payload": {
@@ -140,13 +140,15 @@ class HasuraConnect {
           protocols: ['graphql-subscriptions']);
       if (token != null) {
         String t = await token();
-        if (t != null)
+        if (t != null) {
           (_init["payload"] as Map)["headers"]["Authorization"] = t;
+        }
       }
-      
-      if(headers != null)
-      for (var key in headers?.keys) {
-        (_init["payload"] as Map)["headers"][key] = headers[key];
+
+      if (headers != null) {
+        for (var key in headers?.keys) {
+          (_init["payload"] as Map)["headers"][key] = headers[key];
+        }
       }
 
       _channelPromisse.addUtf8Text(jsonEncode(_init).codeUnits);
@@ -173,7 +175,9 @@ class HasuraConnect {
       isConnected = false;
       if (!_isDisconnected) {
         await Future.delayed(Duration(milliseconds: 3000));
-        if (_onConnect.isCompleted) _onConnect = Completer<bool>();
+        if (_onConnect.isCompleted) {
+          _onConnect = Completer<bool>();
+        }
         _connect();
       }
     } catch (e) {
@@ -228,13 +232,15 @@ class HasuraConnect {
     request.headers.add("Accept", "application/json");
     if (token != null) {
       String t = await token();
-      if (t != null) request.headers.add("Authorization", t);
+      if (t != null) {
+        request.headers.add("Authorization", t);
+      }
     }
 
-    if(headers != null)
-    for (var key in headers?.keys) {
-      request.headers.add(key, headers[key]);
-    }
+    if (headers != null)
+      for (var key in headers?.keys) {
+        request.headers.add(key, headers[key]);
+      }
 
     request.headers.set('Content-Length', bodyBytes.length.toString());
     request.add(bodyBytes);

@@ -1,5 +1,4 @@
 import 'package:hasura_connect/hasura_connect.dart';
-import 'package:hasura_connect/src/snapshot.dart';
 
 main() async {
   HasuraConnect conn =

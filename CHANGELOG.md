@@ -1,3 +1,7 @@
+## 0.0.7+1
+
+- Apply Health suggestions.
+
 ## 0.0.7
 
 - Add and Remove Headers

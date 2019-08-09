@@ -13,7 +13,8 @@ class Snapshot {
 
   Stream get stream => _stream;
 
-  Snapshot(this.key, this.query, this.variables, Stream streamInit, this.close, this._renew) {
+  Snapshot(this.key, this.query, this.variables, Stream streamInit, this.close,
+      this._renew) {
     _stream = streamInit
         .map((v) {
           value = v;
@@ -23,9 +24,8 @@ class Snapshot {
         .where((v) => v != double.infinity);
   }
 
-  changeVariable(Map<String, dynamic> v){
+  changeVariable(Map<String, dynamic> v) {
     variables = v;
     _renew(this);
   }
-
 }
