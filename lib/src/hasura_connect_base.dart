@@ -45,11 +45,11 @@ class HasuraConnect {
     return base64Str;
   }
 
-  Snapshot subscription(String query, {String key, Map<String, dynamic> variables}) {
-
-     if (query.trim().split(" ")[0] != "mutation") {
+  Snapshot subscription(String query,
+      {String key, Map<String, dynamic> variables}) {
+    if (query.trim().split(" ")[0] != "subscription") {
       query = "subscription $query";
-     }
+    }
 
     if (key == null) {
       key = _generateBase(query);
@@ -63,10 +63,13 @@ class HasuraConnect {
       return _snapmap[key];
     } else {
       if (isConnected) {
-        _channelPromisse.addUtf8Text(_getDocument(query, key, variables).codeUnits);
+        _channelPromisse
+            .addUtf8Text(_getDocument(query, key, variables).codeUnits);
       }
       var snap = Snapshot(
-          _getDocument(query, key, variables),
+          key,
+          query,
+          variables,
           _controller.stream.where((data) => data["id"] == key).transform(
               StreamTransformer.fromHandlers(handleData: (data, sink) {
             if (data["type"] == "data") {
@@ -80,9 +83,16 @@ class HasuraConnect {
               }
             }
           })), () {
+        _stopStream(key);
         _snapmap.remove(key);
         if (_snapmap.keys.isEmpty) {
           _disconnect();
+        }
+      }, (snapshotInternal) {
+        _stopStream(key);
+        if (isConnected) {
+          _channelPromisse
+              .addUtf8Text(_getDocument(snapshotInternal.query, snapshotInternal.key, snapshotInternal.variables).codeUnits);
         }
       });
 
@@ -91,7 +101,14 @@ class HasuraConnect {
     }
   }
 
-  String _getDocument(String query, String key, Map<String, dynamic> variables) {
+  _stopStream(String key) {
+    var stop = {"id": key, "type": 'stop'};
+    if (isConnected)
+      _channelPromisse.addUtf8Text(jsonEncode(stop).codeUnits);
+  }
+
+  String _getDocument(
+      String query, String key, Map<String, dynamic> variables) {
     return jsonEncode({
       "id": key,
       "payload": {
@@ -123,7 +140,9 @@ class HasuraConnect {
           print("CONNECTED");
           isConnected = true;
           for (var key in _snapmap.keys) {
-            _channelPromisse.addUtf8Text(_snapmap[key].document.codeUnits);
+            _channelPromisse.addUtf8Text(_getDocument(_snapmap[key].query,
+                    _snapmap[key].key, _snapmap[key].variables)
+                .codeUnits);
           }
           //_onConnect.complete(true);
         }
