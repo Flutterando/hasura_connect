@@ -48,7 +48,7 @@ class HasuraConnect {
   Snapshot subscription(String query, {String key, Map<String, dynamic> variables}) {
 
      if (query.trim().split(" ")[0] != "mutation") {
-      query != "mutation $query";
+      query = "subscription $query";
      }
 
     if (key == null) {
@@ -161,7 +161,7 @@ class HasuraConnect {
 
   Future query(String doc, {Map<String, dynamic> variables}) async {
     if (doc.trimLeft().split(" ")[0] != "query") {
-      doc != "query $doc";
+      doc = "query $doc";
     }
     Map<String, dynamic> jsonMap = {
       'query': doc,
@@ -172,7 +172,7 @@ class HasuraConnect {
 
   Future mutation(String doc, {Map<String, dynamic> variables}) async {
     if (doc.trim().split(" ")[0] != "mutation") {
-      doc != "mutation $doc";
+      doc = "mutation $doc";
     }
     Map<String, dynamic> jsonMap = {
       'query': doc,
