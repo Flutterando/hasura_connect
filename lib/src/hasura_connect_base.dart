@@ -237,10 +237,11 @@ class HasuraConnect {
       }
     }
 
-    if (headers != null)
+    if (headers != null) {
       for (var key in headers?.keys) {
         request.headers.add(key, headers[key]);
       }
+    }
 
     request.headers.set('Content-Length', bodyBytes.length.toString());
     request.add(bodyBytes);
