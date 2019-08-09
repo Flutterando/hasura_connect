@@ -4,19 +4,19 @@ main() async {
   HasuraConnect conn =
       HasuraConnect('https://mvp-rtc-project.herokuapp.com/v1/graphql');
 
-  // var r = await conn.query(docQuery);
-  // print(r);
+  var r = await conn.query(docQuery);
+  print(r);
 
-  Snapshot snap = conn.subscription(docSubscription, variables: {"limit": 3});
-  snap.stream.listen((data) {
-    print(data);
-    print("==================");
-  }).onError((err) {
-    print(err);
-  });
+  // Snapshot snap = conn.subscription(docSubscription, variables: {"limit": 3});
+  // snap.stream.listen((data) {
+  //   print(data);
+  //   print("==================");
+  // }).onError((err) {
+  //   print(err);
+  // });
 
-  await Future.delayed(Duration(seconds: 4));
-  snap.changeVariable({"limit": 6});
+  // await Future.delayed(Duration(seconds: 4));
+  // snap.changeVariable({"limit": 6});
 }
 
 String docSubscription = """
@@ -31,10 +31,10 @@ String docSubscription = """
 
 String docQuery = """
   query {
-    authors {
-        id
-        email
-        name
+    users {
+        user_id
+        user_email
+        user_password
       }
   }
 """;

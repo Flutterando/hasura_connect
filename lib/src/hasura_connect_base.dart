@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'dart:io';
+import 'package:websocket/websocket.dart';
 import 'dart:math';
+import 'package:http/http.dart' as http;
 
 import 'hasura_error.dart';
 import 'snapshot.dart';
@@ -132,12 +133,12 @@ class HasuraConnect {
     });
   }
 
-  Future<void> _connect() async {
+  _connect() async {
     print("hasura connecting...");
 
     try {
       _channelPromisse = await WebSocket.connect(url.replaceFirst("http", "ws"),
-          protocols: ['graphql-subscriptions']);
+          protocols: ['graphql-ws']); //graphql-subscriptions
       if (token != null) {
         String t = await token();
         if (t != null) {
@@ -152,7 +153,7 @@ class HasuraConnect {
       }
 
       _channelPromisse.addUtf8Text(jsonEncode(_init).codeUnits);
-      var _sub = _channelPromisse.listen((data) {
+      var _sub = _channelPromisse.stream.listen((data) {
         data = jsonDecode(data);
         if (data["type"] == "data" || data["type"] == "error") {
           _controller.add(data);
@@ -224,42 +225,83 @@ class HasuraConnect {
   }
 
   Future _sendPost(Map<String, dynamic> jsonMap) async {
+    
     String jsonString = jsonEncode(jsonMap);
-    List<int> bodyBytes = utf8.encode(jsonString);
-    var request = await HttpClient().postUrl(Uri.parse(url));
-    request.headers.removeAll(HttpHeaders.acceptEncodingHeader);
-    request.headers.add("Content-type", "application/json");
-    request.headers.add("Accept", "application/json");
+
+    Map<String, String> headersLocal = {
+      "Content-type": "application/json",
+      "Accept": "application/json"
+    };
+
     if (token != null) {
       String t = await token();
       if (t != null) {
-        request.headers.add("Authorization", t);
+        headersLocal["Authorization"] = t;
       }
     }
 
     if (headers != null) {
       for (var key in headers?.keys) {
-        request.headers.add(key, headers[key]);
+        headersLocal[key] = headers[key];
       }
     }
 
-    request.headers.set('Content-Length', bodyBytes.length.toString());
-    request.add(bodyBytes);
-    var response = await request.close();
+    var client = http.Client();
+    try {
+      var response =
+          await client.post(url, body: jsonString, headers: headersLocal);
+      Map json = jsonDecode(response.body);
 
-    String value = "";
-
-    await for (var contents in response.transform(Utf8Decoder())) {
-      value += contents;
+      if (response.statusCode == 200) {
+        if (json.containsKey("errors")) {
+          throw HasuraError.fromJson(json["errors"][0]);
+        }
+        return json;
+      } else {
+        throw HasuraError("connection error", null);
+      }
+    } finally {
+      client.close();
     }
-
-    Map json = jsonDecode(value);
-
-    if (json.containsKey("errors")) {
-      throw HasuraError.fromJson(json["errors"][0]);
-    }
-    return json;
   }
+
+  // Future _sendPost(Map<String, dynamic> jsonMap) async {
+  //   String jsonString = jsonEncode(jsonMap);
+  //   List<int> bodyBytes = utf8.encode(jsonString);
+  //   var request = await HttpClient().postUrl(Uri.parse(url));
+  //   request.headers.removeAll(HttpHeaders.acceptEncodingHeader);
+  //   request.headers.add("Content-type", "application/json");
+  //   request.headers.add("Accept", "application/json");
+  //   if (token != null) {
+  //     String t = await token();
+  //     if (t != null) {
+  //       request.headers.add("Authorization", t);
+  //     }
+  //   }
+
+  //   if (headers != null) {
+  //     for (var key in headers?.keys) {
+  //       request.headers.add(key, headers[key]);
+  //     }
+  //   }
+
+  //   request.headers.set('Content-Length', bodyBytes.length.toString());
+  //   request.add(bodyBytes);
+  //   var response = await request.close();
+
+  //   String value = "";
+
+  //   await for (var contents in response.transform(Utf8Decoder())) {
+  //     value += contents;
+  //   }
+
+  //   Map json = jsonDecode(value);
+
+  //   if (json.containsKey("errors")) {
+  //     throw HasuraError.fromJson(json["errors"][0]);
+  //   }
+  //   return json;
+  // }
 
   void dispose() {
     _disconnect();

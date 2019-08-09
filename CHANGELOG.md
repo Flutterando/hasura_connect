@@ -1,3 +1,7 @@
+## 0.0.8
+
+- Flutter web Support.
+
 ## 0.0.7+1
 
 - Apply Health suggestions.
