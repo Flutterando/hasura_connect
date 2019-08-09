@@ -1,6 +1,8 @@
-## 0.0.5
+## 0.0.6
 
-- Change variable subscription;
+- Added variables.
+- Change Variables in subscriptions (for Reactive Pagination)
+- Mutations links
 
 ## 0.0.3
 
