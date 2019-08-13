@@ -85,18 +85,21 @@ class HasuraConnect {
           query,
           variables,
           _controller.stream.where((data) => data["id"] == key).transform(
-              StreamTransformer.fromHandlers(handleData: (data, sink) {
-            if (data["type"] == "data") {
-              sink.add(data['payload']);
-            } else if (data["type"] == "error") {
-              if ((data["payload"] as Map).containsKey("errors")) {
-                sink.addError(
-                    HasuraError.fromJson(data["payload"]["errors"][0]));
-              } else {
-                sink.addError(HasuraError.fromJson(data["payload"]));
-              }
-            }
-          })), () {
+            StreamTransformer.fromHandlers(
+              handleData: (data, sink) {
+                if (data["type"] == "data") {
+                  sink.add(data['payload']);
+                } else if (data["type"] == "error") {
+                  if ((data["payload"] as Map).containsKey("errors")) {
+                    sink.addError(
+                        HasuraError.fromJson(data["payload"]["errors"][0]));
+                  } else {
+                    sink.addError(HasuraError.fromJson(data["payload"]));
+                  }
+                }
+              },
+            ),
+          ), () {
         _stopStream(key);
         _snapmap.remove(key);
         if (_snapmap.keys.isEmpty) {
@@ -109,7 +112,9 @@ class HasuraConnect {
                   snapshotInternal.key, snapshotInternal.variables)
               .codeUnits);
         }
-      });
+      },
+      conn: this,
+      );
 
       _snapmap[key] = snap;
       return snap;
@@ -225,7 +230,6 @@ class HasuraConnect {
   }
 
   Future _sendPost(Map<String, dynamic> jsonMap) async {
-    
     String jsonString = jsonEncode(jsonMap);
 
     Map<String, String> headersLocal = {
