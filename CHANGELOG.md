@@ -1,3 +1,8 @@
+## 0.1.0
+
+- Mapped Subscriptions
+- Mutation in Snapshot
+
 ## 0.0.8
 
 - Flutter web Support.
