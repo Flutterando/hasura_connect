@@ -59,14 +59,42 @@ var r = await hasuraConnect.mutation(docQuery);
 Subscriptions will notify you each time you have a change to the searched items. Use the "hasuraConnect.subscription" method to receive a stream.
 
 ```dart
-Snapshot snap = hasuraConnect.subscription(docSubscription);
-  snap.stream.listen((data) {
+Snapshot snapshot = hasuraConnect.subscription(docSubscription);
+  snapshot.stream.listen((data) {
     print(data);
   }).onError((err) {
     print(err);
   });
 
 ```
+
+### Mutation + Subscriptions
+
+You can to use mutation directly from the subscription snapshot. This will allow you to update your local list even before it has been notified by Hasura.
+
+```dart
+Snapshot snapshot = hasuraConnect.subscription(docSubscription);
+...
+snapshot.mutation(docMutation, onNotify: (data) {
+   return data..insert(a, {"name": "next offline item" });
+}
+
+```
+
+### Mapped Subscription
+
+Use the Map operator to convert json data to a Dart object;
+
+```dart
+Snapshot<PostModel> snapshot = hasuraConnect.subscription(docSubscription).map((data) => PostModel.fromJson(data) );
+
+snapshot.stream.listen((PostModel data) {
+   print(data);
+ }).onError((err) {
+   print(err);
+ });
+```
+
 
 ## Using variables
 
@@ -84,10 +112,10 @@ String docSubscription = """
   }
 """;
 
-Snapshot snap = hasuraConnect.subscription(docSubscription, variables: {"limit": 10});
+Snapshot snapshot = hasuraConnect.subscription(docSubscription, variables: {"limit": 10});
 
 //change values of variables for PAGINATIONS
-snap.changeVariable({"limit": 20});
+snapshot.changeVariable({"limit": 20});
 
 ```
 
