@@ -25,7 +25,7 @@ class Snapshot<T> {
     _conn = conn;
 
     if (controllerTest == null) {
-      _controller = StreamController<T>();
+      _controller = StreamController<T>.broadcast();
     } else {
       _controller = controllerTest;
     }
@@ -74,7 +74,7 @@ class Snapshot<T> {
   Snapshot<S> map<S>(S Function(dynamic) convert) {
     var v = _copyWith<S>(
         streamInit: _streamInit.map<S>(convert),
-        controller: StreamController<S>());
+        controller: StreamController<S>.broadcast());
     return v;
   }
 
