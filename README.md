@@ -95,6 +95,20 @@ snapshot.stream.listen((PostModel data) {
  });
 ```
 
+### Mapped Subscription with List of results
+
+Use the Map operator to convert list of results in json data to a List of Dart object;
+
+```dart
+Snapshot<PostModel> snapshot = hasuraConnect.subscription(docSubscription).map((posts) => posts.map<Post>((post) => PostModel.fromJson(post)).toList());
+
+snapshot.stream.listen((PostModel data) {
+   print(data);
+ }).onError((err) {
+   print(err);
+ });
+```
+
 
 ## Using variables
 
