@@ -86,7 +86,8 @@ snapshot.mutation(docMutation, onNotify: (data) {
 Use the Map operator to convert json data to a Dart object;
 
 ```dart
-Snapshot<PostModel> snapshot = hasuraConnect.subscription(docSubscription).map((data) => PostModel.fromJson(data) );
+Snapshot<PostModel> snapshot = hasuraConnect.subscription(docSubscription)
+                                            .map((data) => PostModel.fromJson(data) );
 
 snapshot.stream.listen((PostModel data) {
    print(data);
@@ -100,9 +101,11 @@ snapshot.stream.listen((PostModel data) {
 Use the Map operator to convert list of results in json data to a List of Dart object;
 
 ```dart
-Snapshot<PostModel> snapshot = hasuraConnect.subscription(docSubscription).map((data) => data.map((post) => PostModel.fromJson(post)).toList());
+Snapshot<List<PostModel>> snapshot = hasuraConnect.subscription(docSubscription)
+                               .map((data) => 
+                               data.map((post) => PostModel.fromJson(post)).toList());
 
-snapshot.stream.listen((PostModel data) {
+snapshot.stream.listen(List<PostModel> data) {
    print(data);
  }).onError((err) {
    print(err);
