@@ -1,3 +1,7 @@
+## 0.1.2
+
+- fix start stream with value
+
 ## 0.1.0
 
 - Mapped Subscriptions

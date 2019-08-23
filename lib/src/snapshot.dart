@@ -17,11 +17,13 @@ class Snapshot<T> {
   StreamController<T> _controller;
   final Stream<T> _streamInit;
 
-  Stream<T> get stream => _controller.stream;
+  Stream<T> get stream => _controller.stream
+        .transform(StartWithStreamTransformer(value))
+        .where((v) => value != null);
 
   Snapshot(this.key, this.query, this.variables, this._streamInit, this._close,
       this._renew,
-      {StreamController<T> controllerTest, HasuraConnect conn}) {
+      {StreamController<T> controllerTest, HasuraConnect conn, this.value}) {
     _conn = conn;
 
     if (controllerTest == null) {
@@ -31,13 +33,8 @@ class Snapshot<T> {
     }
 
     _streamInit
-        .map((v) {
-          value = v;
-          return v;
-        })
-        .transform(StartWithStreamTransformer(value))
-        .where((v) => value != null)
         .listen((data) {
+          value = data;
           _controller.add(data);
         });
   }
@@ -59,6 +56,7 @@ class Snapshot<T> {
       Function close,
       StreamController<S> controller,
       HasuraConnect conn,
+      S value,
       Function(Snapshot) renew}) {
     return Snapshot<S>(
         key ?? this.key,
@@ -68,13 +66,19 @@ class Snapshot<T> {
         close ?? this.close,
         renew ?? this._renew,
           conn:  conn ?? this._conn,
+        value: value,
         controllerTest: controller ?? this._controller);
   }
 
   Snapshot<S> map<S>(S Function(dynamic) convert) {
+
+    var valueParse = this.value != null ? convert(this.value) : null;
+
     var v = _copyWith<S>(
         streamInit: _streamInit.map<S>(convert),
-        controller: StreamController<S>.broadcast());
+        controller: StreamController<S>.broadcast(),
+        value: valueParse,
+        );
     return v;
   }
 
