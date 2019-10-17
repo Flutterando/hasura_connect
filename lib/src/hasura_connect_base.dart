@@ -1,12 +1,22 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:http/http.dart';
+import 'package:http/io_client.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:websocket/websocket.dart';
 import 'dart:math';
-import 'package:http/http.dart' as http;
 
 import 'hasura_error.dart';
 import 'snapshot.dart';
+
+var _defaultClient = IOClient(
+  HttpClient(
+    context: SecurityContext.defaultContext,
+  ),
+);
 
 class HasuraConnect {
   final _controller = StreamController.broadcast();
@@ -21,8 +31,11 @@ class HasuraConnect {
   final String url;
 
   final Future<String> Function() token;
+  final Client httpClient;
 
-  HasuraConnect(this.url, {this.token, this.headers});
+  HasuraConnect(this.url,
+      {this.token, this.headers, Client httpClient})
+      : this.httpClient = httpClient == null ? _defaultClient : httpClient;
 
   final _init = {
     "payload": {
@@ -81,39 +94,41 @@ class HasuraConnect {
             .addUtf8Text(_getDocument(query, key, variables).codeUnits);
       }
       var snap = Snapshot(
-          key,
-          query,
-          variables,
-          _controller.stream.where((data) => data["id"] == key).transform(
-            StreamTransformer.fromHandlers(
-              handleData: (data, sink) {
-                if (data["type"] == "data") {
-                  sink.add(data['payload']);
-                } else if (data["type"] == "error") {
-                  if ((data["payload"] as Map).containsKey("errors")) {
-                    sink.addError(
-                        HasuraError.fromJson(data["payload"]["errors"][0]));
-                  } else {
-                    sink.addError(HasuraError.fromJson(data["payload"]));
-                  }
+        key,
+        query,
+        variables,
+        _controller.stream.where((data) => data["id"] == key).transform(
+          StreamTransformer.fromHandlers(
+            handleData: (data, sink) {
+              if (data["type"] == "data") {
+                sink.add(data['payload']);
+              } else if (data["type"] == "error") {
+                if ((data["payload"] as Map).containsKey("errors")) {
+                  sink.addError(
+                      HasuraError.fromJson(data["payload"]["errors"][0]));
+                } else {
+                  sink.addError(HasuraError.fromJson(data["payload"]));
                 }
-              },
-            ),
-          ), () {
-        _stopStream(key);
-        _snapmap.remove(key);
-        if (_snapmap.keys.isEmpty) {
-          _disconnect();
-        }
-      }, (snapshotInternal) {
-        _stopStream(key);
-        if (isConnected) {
-          _channelPromisse.addUtf8Text(_getDocument(snapshotInternal.query,
-                  snapshotInternal.key, snapshotInternal.variables)
-              .codeUnits);
-        }
-      },
-      conn: this,
+              }
+            },
+          ),
+        ),
+            () {
+          _stopStream(key);
+          _snapmap.remove(key);
+          if (_snapmap.keys.isEmpty) {
+            _disconnect();
+          }
+        },
+            (snapshotInternal) {
+          _stopStream(key);
+          if (isConnected) {
+            _channelPromisse.addUtf8Text(_getDocument(snapshotInternal.query,
+                snapshotInternal.key, snapshotInternal.variables)
+                .codeUnits);
+          }
+        },
+        conn: this,
       );
 
       _snapmap[key] = snap;
@@ -229,9 +244,7 @@ class HasuraConnect {
     return _sendPost(jsonMap);
   }
 
-  Future _sendPost(Map<String, dynamic> jsonMap) async {
-    String jsonString = jsonEncode(jsonMap);
-
+  Future<Map<String, dynamic>> _sendPost(Map<String, dynamic> jsonMap) async {
     Map<String, String> headersLocal = {
       "Content-type": "application/json",
       "Accept": "application/json"
@@ -250,66 +263,151 @@ class HasuraConnect {
       }
     }
 
-    var client = http.Client();
-    try {
-      var response =
-          await client.post(url, body: jsonString, headers: headersLocal);
-      Map json = jsonDecode(response.body);
+    var request = await _prepareRequest(url, jsonMap, headersLocal);
+    StreamedResponse response = await httpClient.send(request);
+    Map<String, dynamic> json = await _parseResponse(response);
 
-      if (response.statusCode == 200) {
-        if (json.containsKey("errors")) {
-          throw HasuraError.fromJson(json["errors"][0]);
-        }
-        return json;
-      } else {
-        throw HasuraError("connection error", null);
-      }
-    } finally {
-      client.close();
+    if (json.containsKey("errors")) {
+      throw HasuraError.fromJson(json["errors"]);
     }
+    return json;
   }
 
-  // Future _sendPost(Map<String, dynamic> jsonMap) async {
-  //   String jsonString = jsonEncode(jsonMap);
-  //   List<int> bodyBytes = utf8.encode(jsonString);
-  //   var request = await HttpClient().postUrl(Uri.parse(url));
-  //   request.headers.removeAll(HttpHeaders.acceptEncodingHeader);
-  //   request.headers.add("Content-type", "application/json");
-  //   request.headers.add("Accept", "application/json");
-  //   if (token != null) {
-  //     String t = await token();
-  //     if (t != null) {
-  //       request.headers.add("Authorization", t);
-  //     }
-  //   }
-
-  //   if (headers != null) {
-  //     for (var key in headers?.keys) {
-  //       request.headers.add(key, headers[key]);
-  //     }
-  //   }
-
-  //   request.headers.set('Content-Length', bodyBytes.length.toString());
-  //   request.add(bodyBytes);
-  //   var response = await request.close();
-
-  //   String value = "";
-
-  //   await for (var contents in response.transform(Utf8Decoder())) {
-  //     value += contents;
-  //   }
-
-  //   Map json = jsonDecode(value);
-
-  //   if (json.containsKey("errors")) {
-  //     throw HasuraError.fromJson(json["errors"][0]);
-  //   }
-  //   return json;
-  // }
-
   void dispose() {
+    httpClient.close();
     _disconnect();
     _controller.close();
     _snapmap.clear();
   }
+}
+
+Future<Map<String, MultipartFile>> _getFileMap(dynamic body, {
+  Map<String, MultipartFile> currentMap,
+  List<String> currentPath = const <String>[],
+}) async {
+  currentMap ??= <String, MultipartFile>{};
+  if (body is Map<String, dynamic>) {
+    final Iterable<MapEntry<String, dynamic>> entries = body.entries;
+    for (MapEntry<String, dynamic> element in entries) {
+      currentMap.addAll(await _getFileMap(
+        element.value,
+        currentMap: currentMap,
+        currentPath: List<String>.from(currentPath)
+          ..add(element.key),
+      ));
+    }
+    return currentMap;
+  }
+  if (body is List<dynamic>) {
+    for (int i = 0; i < body.length; i++) {
+      currentMap.addAll(await _getFileMap(
+        body[i],
+        currentMap: currentMap,
+        currentPath: List<String>.from(currentPath)
+          ..add(i.toString()),
+      ));
+    }
+    return currentMap;
+  }
+  if (body is MultipartFile) {
+    return currentMap
+      ..addAll(<String, MultipartFile>{currentPath.join('.'): body});
+  }
+
+  // else should only be either String, num, null; NOTHING else
+  return currentMap;
+}
+
+Future<BaseRequest> _prepareRequest(String url,
+    Map<String, dynamic> body,
+    Map<String, String> httpHeaders,) async {
+  final Map<String, MultipartFile> fileMap = await _getFileMap(body);
+  if (fileMap.isEmpty) {
+    final Request r = Request('post', Uri.parse(url));
+    r.headers.addAll(httpHeaders);
+    r.body = json.encode(body);
+    return r;
+  }
+
+  final MultipartRequest r = MultipartRequest('post', Uri.parse(url));
+  r.headers.addAll(httpHeaders);
+  r.fields['operations'] = json.encode(body, toEncodable: (dynamic object) {
+    if (object is MultipartFile) {
+      return null;
+    }
+    return object.toJson();
+  });
+
+  final Map<String, List<String>> fileMapping = <String, List<String>>{};
+  final List<MultipartFile> fileList = <MultipartFile>[];
+
+  final List<MapEntry<String, MultipartFile>> fileMapEntries =
+  fileMap.entries.toList(growable: false);
+
+  for (int i = 0; i < fileMapEntries.length; i++) {
+    final MapEntry<String, MultipartFile> entry = fileMapEntries[i];
+    final String indexString = i.toString();
+    fileMapping.addAll(<String, List<String>>{
+      indexString: <String>[entry.key],
+    });
+    final MultipartFile f = entry.value;
+    fileList.add(MultipartFile(
+      indexString,
+      f.finalize(),
+      f.length,
+      contentType: f.contentType,
+      filename: f.filename,
+    ));
+  }
+
+  r.fields['map'] = json.encode(fileMapping);
+
+  r.files.addAll(fileList);
+  return r;
+}
+
+Future<Map<String, dynamic>> _parseResponse(StreamedResponse response) async {
+  final int statusCode = response.statusCode;
+  final Encoding encoding = _determineEncodingFromResponse(response);
+  // @todo limit bodyBytes
+  final Uint8List responseByte = await response.stream.toBytes();
+  final String decodedBody = encoding.decode(responseByte);
+  final Map<String, dynamic> jsonResponse = jsonDecode(decodedBody);
+
+  if (jsonResponse['data'] == null && jsonResponse['errors']) {
+    if (statusCode < 200 || statusCode >= 400) {
+      throw HasuraError(
+        'Network Error: $statusCode $decodedBody',
+        null,
+      );
+    }
+    throw HasuraError('Invalid response body: $decodedBody', null);
+  }
+
+  return jsonResponse;
+}
+
+/// Returns the charset encoding for the given response.
+///
+/// The default fallback encoding is set to UTF-8 according to the IETF RFC4627 standard
+/// which specifies the application/json media type:
+///   "JSON text SHALL be encoded in Unicode. The default encoding is UTF-8."
+Encoding _determineEncodingFromResponse(BaseResponse response,
+    [Encoding fallback = utf8]) {
+  final String contentType = response.headers['content-type'];
+
+  if (contentType == null) {
+    return fallback;
+  }
+
+  final MediaType mediaType = MediaType.parse(contentType);
+  final String charset = mediaType.parameters['charset'];
+
+  if (charset == null) {
+    return fallback;
+  }
+
+  final Encoding encoding = Encoding.getByName(charset);
+
+  return encoding == null ? fallback : encoding;
 }

@@ -7,6 +7,10 @@ author: Team Flutterando <jacobaraujo7@gmail.com>
 dependencies:
   websocket: ^0.0.5
   http: ^0.12.0+2
+  meta: ^1.1.6
+  mime: ^0.9.6+3
+  http_parser: ^3.1.3
+  collection: 1.14.11
 
 environment:
   sdk: '>=2.1.0 <3.0.0'
