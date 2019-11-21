@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:hasura_connect/hasura_connect.dart';
+import 'package:hydrated/hydrated.dart';
 import 'startwith_stream_transformer.dart';
 
 class Snapshot<T> {
@@ -12,13 +15,15 @@ class Snapshot<T> {
   T value;
   HasuraConnect _conn;
 
-  StreamController<T> _controller;
+  HydratedSubject<T> _controller;
   final Stream<T> _streamInit;
   StreamSubscription _streamSubscription;
 
-  Stream<T> get stream => _controller.stream
-      .transform(StartWithStreamTransformer(value))
-      .where((v) => value != null);
+  Stream<T> get stream => _controller.stream.where((v) => value != null);
+
+  // Stream<T> get stream => _controller.stream
+  //     .transform(StartWithStreamTransformer(value))
+  //     .where((v) => value != null);
 
   Snapshot(this.key, this.query, this.variables, this._streamInit, this._close,
       this._renew,
@@ -26,7 +31,16 @@ class Snapshot<T> {
     _conn = conn;
 
     if (controllerTest == null) {
-      _controller = StreamController<T>.broadcast();
+      //_controller = StreamController<T>.broadcast();
+      _controller = HydratedSubject<T>(
+        key,
+        hydrate: (String i) {
+          return i == null ? null : jsonDecode(i);
+        },
+        persist: (obj) {
+          return obj == null ? null : jsonEncode(obj);
+        },
+      );
     } else {
       _controller = controllerTest;
     }
@@ -72,12 +86,23 @@ class Snapshot<T> {
         controllerTest: controller ?? this._controller);
   }
 
-  Snapshot<S> map<S>(S Function(dynamic) convert) {
+  Snapshot<S> map<S>(S Function(dynamic) convert,
+      {@required String Function(S object) cachePersist}) {
+    assert(cachePersist != null);
+
     var valueParse = this.value != null ? convert(this.value) : null;
 
     var v = _copyWith<S>(
       streamInit: _streamInit.map<S>(convert),
-      controller: StreamController<S>.broadcast(),
+      controller: HydratedSubject<S>(
+        key,
+        hydrate: (String s) {
+          return s == null ? null : convert(jsonDecode(s));
+        },
+        persist: (S obj) {
+          return obj == null ? null : cachePersist(obj);
+        },
+      ),
       value: valueParse,
     );
     return v;

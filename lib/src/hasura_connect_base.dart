@@ -179,7 +179,6 @@ class HasuraConnect {
       var _sub = _channelPromisse.stream.listen((data) async {
         data = jsonDecode(data);
         if (data["type"] == "data" || data["type"] == "error") {
-          print("REFRESH");
           _controller.add(data);
         } else if (data["type"] == "connection_ack") {
           print("HASURA CONNECT!");

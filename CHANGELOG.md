@@ -1,5 +1,6 @@
-## 0.1.5
+## 0.2.0
 
+- Added Subscription Cache.
 - fix error #9
 - fix Duplicate error
 - close streams subscriptions

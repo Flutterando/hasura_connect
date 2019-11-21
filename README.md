@@ -86,8 +86,11 @@ snapshot.mutation(docMutation, onNotify: (data) {
 Use the Map operator to convert json data to a Dart object;
 
 ```dart
-Snapshot<PostModel> snapshot = hasuraConnect.subscription(docSubscription)
-                                            .map((data) => PostModel.fromJson(data) );
+Snapshot<PostModel> snapshot = hasuraConnect
+                                  .subscription(docSubscription)
+                                  .map((data) => PostModel.fromJson(data),
+                                        cachePersist: (PostModel post) => post.toJsonString(),
+                                      );
 
 snapshot.stream.listen((PostModel data) {
    print(data);
@@ -172,7 +175,9 @@ This is currently our roadmap, please feel free to request additions/changes.
 | bloc_pattern Integration               |    ✅    |
 | Provider Integration                   |    ✅    |
 | Variables                              |    ✅    |
-| Cache Intercept                        |    🔜    |
+| Cache Subscription                     |    ✅    |
+| Cache Mutation                         |    🔜    |
+| Cache Query                            |    🔜    |
 
 ## Features and bugs
 
