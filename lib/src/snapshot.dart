@@ -2,8 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:hasura_connect/hasura_connect.dart';
-import 'package:hydrated/hydrated.dart';
-import 'startwith_stream_transformer.dart';
+import 'package:hasura_connect/src/hydrated.dart';
 
 class Snapshot<T> {
   final Function _close;

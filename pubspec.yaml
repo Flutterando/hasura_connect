@@ -5,11 +5,10 @@ homepage: https://github.com/Flutterando/hasura_connect
 author: Team Flutterando <jacobaraujo7@gmail.com>
 
 dependencies:
-  hydrated: 
-    git:
-      url: https://github.com/jacobaraujo7/hydrated
   websocket: ^0.0.5
   http: ^0.12.0+2
+  rxdart: ^0.22.6
+  shared_preferences: ^0.5.4+5
   flutter:
     sdk: flutter
 
