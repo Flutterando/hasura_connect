@@ -1,3 +1,8 @@
+## 0.1.3
+
+- fix error #9
+- Added isError in token Function
+
 ## 0.1.2
 
 - fix start stream with value

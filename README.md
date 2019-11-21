@@ -143,7 +143,7 @@ snapshot.changeVariable({"limit": 20});
 ```dart
 
   String url = 'http://localhost:8080/v1/graphql';
-HasuraConnect hasuraConnect = HasuraConnect(url, token: () async {
+HasuraConnect hasuraConnect = HasuraConnect(url, token: (isError) async {
   //sharedPreferences or other storage logic
   return "Bearer YOUR-JWT-TOKEN";
 });
