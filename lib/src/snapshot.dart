@@ -1,7 +1,5 @@
 import 'dart:async';
-
 import 'package:hasura_connect/hasura_connect.dart';
-
 import 'startwith_stream_transformer.dart';
 
 class Snapshot<T> {
@@ -16,6 +14,7 @@ class Snapshot<T> {
 
   StreamController<T> _controller;
   final Stream<T> _streamInit;
+  StreamSubscription _streamSubscription;
 
   Stream<T> get stream => _controller.stream
       .transform(StartWithStreamTransformer(value))
@@ -32,10 +31,12 @@ class Snapshot<T> {
       _controller = controllerTest;
     }
 
-    _streamInit.listen(
+    _streamSubscription = _streamInit.listen(
       (data) {
         value = data;
-        if (!_controller.isClosed) _controller.add(data);
+        if (!_controller.isClosed) {
+          _controller.add(data);
+        }
       },
     );
   }
@@ -88,7 +89,8 @@ class Snapshot<T> {
   }
 
   Future close() async {
+    await _streamSubscription.cancel();
     await _controller.close();
-    _close();
+    await _close();
   }
 }

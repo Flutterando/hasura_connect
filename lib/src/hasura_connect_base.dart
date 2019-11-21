@@ -66,6 +66,24 @@ class HasuraConnect {
     return base64Str;
   }
 
+  Stream generateStream(String key) {
+    return _controller.stream.where((data) => data["id"] == key).transform(
+      StreamTransformer.fromHandlers(
+        handleData: (data, sink) {
+          if (data["type"] == "data") {
+            sink.add(data['payload']);
+          } else if (data["type"] == "error") {
+            if ((data["payload"] as Map).containsKey("errors")) {
+              sink.addError(HasuraError.fromJson(data["payload"]["errors"][0]));
+            } else {
+              sink.addError(HasuraError.fromJson(data["payload"]));
+            }
+          }
+        },
+      ),
+    ).asBroadcastStream();
+  }
+
   Snapshot subscription(String query,
       {String key, Map<String, dynamic> variables}) {
     if (query.trim().split(" ")[0] != "subscription") {
@@ -91,27 +109,12 @@ class HasuraConnect {
         key,
         query,
         variables,
-        _controller.stream.where((data) => data["id"] == key).transform(
-          StreamTransformer.fromHandlers(
-            handleData: (data, sink) {
-              if (data["type"] == "data") {
-                sink.add(data['payload']);
-              } else if (data["type"] == "error") {
-                if ((data["payload"] as Map).containsKey("errors")) {
-                  sink.addError(
-                      HasuraError.fromJson(data["payload"]["errors"][0]));
-                } else {
-                  sink.addError(HasuraError.fromJson(data["payload"]));
-                }
-              }
-            },
-          ),
-        ),
-        () {
+        generateStream(key),
+        () async {
           _stopStream(key);
           _snapmap.remove(key);
           if (_snapmap.keys.isEmpty) {
-            _disconnect();
+            await _disconnect();
           }
         },
         (snapshotInternal) {
@@ -132,6 +135,7 @@ class HasuraConnect {
 
   _stopStream(String key) {
     var stop = {"id": key, "type": 'stop'};
+    // var stop = {"id": key, "type": 'stop'};
     if (isConnected) _channelPromisse.addUtf8Text(jsonEncode(stop).codeUnits);
   }
 
@@ -175,6 +179,7 @@ class HasuraConnect {
       var _sub = _channelPromisse.stream.listen((data) async {
         data = jsonDecode(data);
         if (data["type"] == "data" || data["type"] == "error") {
+          print("REFRESH");
           _controller.add(data);
         } else if (data["type"] == "connection_ack") {
           print("HASURA CONNECT!");
@@ -184,12 +189,14 @@ class HasuraConnect {
                     _snapmap[key].key, _snapmap[key].variables)
                 .codeUnits);
           }
-          //_onConnect.complete(true);
         } else if (data["type"] == "connection_error") {
           print("Try again...");
           await Future.delayed(Duration(seconds: 2));
           await _addToken(true);
           _channelPromisse.addUtf8Text(jsonEncode(_init).codeUnits);
+        } else if (data["type"] == "ka") {
+        } else {
+          print(data);
         }
       });
       _sub.onError((e) {
@@ -218,12 +225,16 @@ class HasuraConnect {
     }
   }
 
-  void _disconnect() {
-    print("disconnected hasura");
+  _disconnect() async {
+    var disconect = {"type": 'connection_terminate'};
+    if (isConnected)
+      _channelPromisse.addUtf8Text(jsonEncode(disconect).codeUnits);
     _isDisconnected = true;
+    await Future.delayed(Duration(milliseconds: 300));
     if (_channelPromisse?.closeCode != null) {
-      _channelPromisse.close();
+      await _channelPromisse.close();
     }
+    print("disconnected hasura");
   }
 
   Future query(String doc, {Map<String, dynamic> variables}) async {

@@ -1,6 +1,8 @@
-## 0.1.4
+## 0.1.5
 
 - fix error #9
+- fix Duplicate error
+- close streams subscriptions
 - Added isError in token Function
 
 ## 0.1.2
