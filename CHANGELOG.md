@@ -1,4 +1,4 @@
-## 0.1.3
+## 0.1.4
 
 - fix error #9
 - Added isError in token Function
