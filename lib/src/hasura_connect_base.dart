@@ -20,9 +20,16 @@ class HasuraConnect {
 
   final String url;
 
-  final Future<String> Function() token;
+  Future<String> Function(bool isError) _token;
 
-  HasuraConnect(this.url, {this.token, this.headers});
+  HasuraConnect(this.url,
+      {Future<String> Function(bool isError) token, this.headers}) {
+    _token = token;
+  }
+
+  void changeToken(Future<String> Function(bool isError) token) {
+    _token = token;
+  }
 
   final _init = {
     "payload": {
@@ -32,12 +39,12 @@ class HasuraConnect {
   };
 
   String get ramdomKey {
-    var rand = new Random();
-    var codeUnits = new List.generate(8, (index) {
+    var rand = Random();
+    var codeUnits = List.generate(8, (index) {
       return rand.nextInt(33) + 89;
     });
 
-    return new String.fromCharCodes(codeUnits);
+    return String.fromCharCodes(codeUnits);
   }
 
   void addHeader(String key, String value) {
@@ -81,39 +88,41 @@ class HasuraConnect {
             .addUtf8Text(_getDocument(query, key, variables).codeUnits);
       }
       var snap = Snapshot(
-          key,
-          query,
-          variables,
-          _controller.stream.where((data) => data["id"] == key).transform(
-            StreamTransformer.fromHandlers(
-              handleData: (data, sink) {
-                if (data["type"] == "data") {
-                  sink.add(data['payload']);
-                } else if (data["type"] == "error") {
-                  if ((data["payload"] as Map).containsKey("errors")) {
-                    sink.addError(
-                        HasuraError.fromJson(data["payload"]["errors"][0]));
-                  } else {
-                    sink.addError(HasuraError.fromJson(data["payload"]));
-                  }
+        key,
+        query,
+        variables,
+        _controller.stream.where((data) => data["id"] == key).transform(
+          StreamTransformer.fromHandlers(
+            handleData: (data, sink) {
+              if (data["type"] == "data") {
+                sink.add(data['payload']);
+              } else if (data["type"] == "error") {
+                if ((data["payload"] as Map).containsKey("errors")) {
+                  sink.addError(
+                      HasuraError.fromJson(data["payload"]["errors"][0]));
+                } else {
+                  sink.addError(HasuraError.fromJson(data["payload"]));
                 }
-              },
-            ),
-          ), () {
-        _stopStream(key);
-        _snapmap.remove(key);
-        if (_snapmap.keys.isEmpty) {
-          _disconnect();
-        }
-      }, (snapshotInternal) {
-        _stopStream(key);
-        if (isConnected) {
-          _channelPromisse.addUtf8Text(_getDocument(snapshotInternal.query,
-                  snapshotInternal.key, snapshotInternal.variables)
-              .codeUnits);
-        }
-      },
-      conn: this,
+              }
+            },
+          ),
+        ),
+        () {
+          _stopStream(key);
+          _snapmap.remove(key);
+          if (_snapmap.keys.isEmpty) {
+            _disconnect();
+          }
+        },
+        (snapshotInternal) {
+          _stopStream(key);
+          if (isConnected) {
+            _channelPromisse.addUtf8Text(_getDocument(snapshotInternal.query,
+                    snapshotInternal.key, snapshotInternal.variables)
+                .codeUnits);
+          }
+        },
+        conn: this,
       );
 
       _snapmap[key] = snap;
@@ -138,18 +147,23 @@ class HasuraConnect {
     });
   }
 
+  _addToken([bool isError = false]) async {
+    if (_token != null) {
+      String t = await _token(isError);
+      if (t != null) {
+        (_init["payload"] as Map)["headers"]["Authorization"] = t;
+      }
+    }
+  }
+
   _connect() async {
     print("hasura connecting...");
 
     try {
       _channelPromisse = await WebSocket.connect(url.replaceFirst("http", "ws"),
           protocols: ['graphql-ws']); //graphql-subscriptions
-      if (token != null) {
-        String t = await token();
-        if (t != null) {
-          (_init["payload"] as Map)["headers"]["Authorization"] = t;
-        }
-      }
+
+      await _addToken();
 
       if (headers != null) {
         for (var key in headers?.keys) {
@@ -158,7 +172,7 @@ class HasuraConnect {
       }
 
       _channelPromisse.addUtf8Text(jsonEncode(_init).codeUnits);
-      var _sub = _channelPromisse.stream.listen((data) {
+      var _sub = _channelPromisse.stream.listen((data) async {
         data = jsonDecode(data);
         if (data["type"] == "data" || data["type"] == "error") {
           _controller.add(data);
@@ -171,6 +185,11 @@ class HasuraConnect {
                 .codeUnits);
           }
           //_onConnect.complete(true);
+        } else if (data["type"] == "connection_error") {
+          print("Try again...");
+          await Future.delayed(Duration(seconds: 2));
+          await _addToken(true);
+          _channelPromisse.addUtf8Text(jsonEncode(_init).codeUnits);
         }
       });
       _sub.onError((e) {
@@ -237,8 +256,8 @@ class HasuraConnect {
       "Accept": "application/json"
     };
 
-    if (token != null) {
-      String t = await token();
+    if (_token != null) {
+      String t = await _token(false);
       if (t != null) {
         headersLocal["Authorization"] = t;
       }
