@@ -5,7 +5,9 @@ import 'package:websocket/websocket.dart';
 import 'dart:math';
 import 'package:http/http.dart' as http;
 
+import '../hasura_connect.dart';
 import 'hasura_error.dart';
+import 'local_storage.dart';
 import 'snapshot.dart';
 
 class HasuraConnect {
@@ -13,6 +15,7 @@ class HasuraConnect {
   final Map<String, Snapshot> _snapmap = {};
   final Map<String, String> headers;
 
+  LocalStorage _localStorage = LocalStorage();
   WebSocket _channelPromisse;
   bool _isDisconnected = false;
   bool isConnected = false;
@@ -25,6 +28,12 @@ class HasuraConnect {
   HasuraConnect(this.url,
       {Future<String> Function(bool isError) token, this.headers}) {
     _token = token;
+
+    // _localStorage.getAllSubscriptions().then((infoList) {
+    //   infoList.forEach((info) {
+    //     _snapmap[info.key] = _generateSnapshot(info);
+    //   });
+    // });
   }
 
   void changeToken(Future<String> Function(bool isError) token) {
@@ -93,49 +102,52 @@ class HasuraConnect {
     if (key == null) {
       key = _generateBase(query);
     }
+    final info = SnapshotInfo(key: key, query: query, variables: variables);
+    // _localStorage.addSubscription(info);
+    return _generateSnapshot(info);
+  }
 
+  Snapshot _generateSnapshot(SnapshotInfo info) {
     if (_snapmap.keys.isEmpty) {
       _connect();
     }
 
-    if (_snapmap.containsKey(key)) {
-      return _snapmap[key];
-    } else {
-      if (isConnected) {
-        _channelPromisse
-            .addUtf8Text(_getDocument(query, key, variables).codeUnits);
-      }
-      var snap = Snapshot(
-        key,
-        query,
-        variables,
-        generateStream(key),
-        () async {
-          _stopStream(key);
-          _snapmap.remove(key);
-          if (_snapmap.keys.isEmpty) {
-            await _disconnect();
-          }
-        },
-        (snapshotInternal) {
-          _stopStream(key);
-          if (isConnected) {
-            _channelPromisse.addUtf8Text(_getDocument(snapshotInternal.query,
-                    snapshotInternal.key, snapshotInternal.variables)
-                .codeUnits);
-          }
-        },
-        conn: this,
-      );
-
-      _snapmap[key] = snap;
-      return snap;
+    if (_snapmap.containsKey(info.key)) {
+      return _snapmap[info.key];
     }
+
+    if (isConnected) {
+      _channelPromisse.addUtf8Text(
+          _getDocument(info.query, info.key, info.variables).codeUnits);
+    }
+
+    var snap = Snapshot(
+      info,
+      generateStream(info.key),
+      () async {
+        _stopStream(info.key);
+        _snapmap.remove(info.key);
+        if (_snapmap.keys.isEmpty) {
+          await _disconnect();
+        }
+      },
+      (snapshotInternal) {
+        _stopStream(info.key);
+        if (isConnected) {
+          _channelPromisse.addUtf8Text(_getDocument(snapshotInternal.info.query,
+                  snapshotInternal.info.key, snapshotInternal.info.variables)
+              .codeUnits);
+        }
+      },
+      conn: this,
+    );
+
+    _snapmap[info.key] = snap;
+    return snap;
   }
 
   _stopStream(String key) {
     var stop = {"id": key, "type": 'stop'};
-    // var stop = {"id": key, "type": 'stop'};
     if (isConnected) _channelPromisse.addUtf8Text(jsonEncode(stop).codeUnits);
   }
 
@@ -162,19 +174,15 @@ class HasuraConnect {
 
   _connect() async {
     print("hasura connecting...");
-
     try {
       _channelPromisse = await WebSocket.connect(url.replaceFirst("http", "ws"),
           protocols: ['graphql-ws']); //graphql-subscriptions
-
       await _addToken();
-
       if (headers != null) {
         for (var key in headers?.keys) {
           (_init["payload"] as Map)["headers"][key] = headers[key];
         }
       }
-
       _channelPromisse.addUtf8Text(jsonEncode(_init).codeUnits);
       var _sub = _channelPromisse.stream.listen((data) async {
         data = jsonDecode(data);
@@ -183,10 +191,17 @@ class HasuraConnect {
         } else if (data["type"] == "connection_ack") {
           print("HASURA CONNECT!");
           isConnected = true;
+
           for (var key in _snapmap.keys) {
-            _channelPromisse.addUtf8Text(_getDocument(_snapmap[key].query,
-                    _snapmap[key].key, _snapmap[key].variables)
+            _channelPromisse.addUtf8Text(_getDocument(_snapmap[key].info.query,
+                    _snapmap[key].info.key, _snapmap[key].info.variables)
                 .codeUnits);
+          }
+
+          Map<String, dynamic> mutationCache =
+              await _localStorage.getAllMutation();
+          for (var key in mutationCache.keys) {
+            await _sendPost(mutationCache[key], key);
           }
         } else if (data["type"] == "connection_error") {
           print("Try again...");
@@ -226,8 +241,9 @@ class HasuraConnect {
 
   _disconnect() async {
     var disconect = {"type": 'connection_terminate'};
-    if (isConnected)
+    if (isConnected) {
       _channelPromisse.addUtf8Text(jsonEncode(disconect).codeUnits);
+    }
     _isDisconnected = true;
     await Future.delayed(Duration(milliseconds: 300));
     if (_channelPromisse?.closeCode != null) {
@@ -247,7 +263,8 @@ class HasuraConnect {
     return _sendPost(jsonMap);
   }
 
-  Future mutation(String doc, {Map<String, dynamic> variables}) async {
+  Future mutation(String doc,
+      {Map<String, dynamic> variables, bool cache = false}) async {
     if (doc.trim().split(" ")[0] != "mutation") {
       doc = "mutation $doc";
     }
@@ -255,10 +272,14 @@ class HasuraConnect {
       'query': doc,
       'variables': variables,
     };
-    return _sendPost(jsonMap);
+    String hash;
+    if (cache) {
+      hash = await _localStorage.addMutation(jsonMap);
+    }
+    return _sendPost(jsonMap, hash);
   }
 
-  Future _sendPost(Map<String, dynamic> jsonMap) async {
+  Future _sendPost(Map jsonMap, [String hash]) async {
     String jsonString = jsonEncode(jsonMap);
 
     Map<String, String> headersLocal = {
@@ -286,55 +307,28 @@ class HasuraConnect {
       Map json = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
+        if (hash != null) {
+          await _localStorage.remove(hash);
+        }
         if (json.containsKey("errors")) {
           throw HasuraError.fromJson(json["errors"][0]);
         }
         return json;
       } else {
+        if (hash != null) {
+          await _localStorage.remove(hash);
+        } else {
+          throw HasuraError("connection error", null);
+        }
+      }
+    } catch (r) {
+      if (hash == null) {
         throw HasuraError("connection error", null);
       }
     } finally {
       client.close();
     }
   }
-
-  // Future _sendPost(Map<String, dynamic> jsonMap) async {
-  //   String jsonString = jsonEncode(jsonMap);
-  //   List<int> bodyBytes = utf8.encode(jsonString);
-  //   var request = await HttpClient().postUrl(Uri.parse(url));
-  //   request.headers.removeAll(HttpHeaders.acceptEncodingHeader);
-  //   request.headers.add("Content-type", "application/json");
-  //   request.headers.add("Accept", "application/json");
-  //   if (token != null) {
-  //     String t = await token();
-  //     if (t != null) {
-  //       request.headers.add("Authorization", t);
-  //     }
-  //   }
-
-  //   if (headers != null) {
-  //     for (var key in headers?.keys) {
-  //       request.headers.add(key, headers[key]);
-  //     }
-  //   }
-
-  //   request.headers.set('Content-Length', bodyBytes.length.toString());
-  //   request.add(bodyBytes);
-  //   var response = await request.close();
-
-  //   String value = "";
-
-  //   await for (var contents in response.transform(Utf8Decoder())) {
-  //     value += contents;
-  //   }
-
-  //   Map json = jsonDecode(value);
-
-  //   if (json.containsKey("errors")) {
-  //     throw HasuraError.fromJson(json["errors"][0]);
-  //   }
-  //   return json;
-  // }
 
   void dispose() {
     _disconnect();

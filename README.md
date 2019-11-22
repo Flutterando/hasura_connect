@@ -99,23 +99,6 @@ snapshot.stream.listen((PostModel data) {
  });
 ```
 
-### Mapped Subscription with List of results
-
-Use the Map operator to convert list of results in json data to a List of Dart object;
-
-```dart
-Snapshot<List<PostModel>> snapshot = hasuraConnect.subscription(docSubscription)
-                               .map((data) => 
-                               data.map((post) => PostModel.fromJson(post)).toList());
-
-snapshot.stream.listen(List<PostModel> data) {
-   print(data);
- }).onError((err) {
-   print(err);
- });
-```
-
-
 ## Using variables
 
 Variables maintain the integrity of Querys, see an example:
@@ -153,6 +136,22 @@ HasuraConnect hasuraConnect = HasuraConnect(url, token: (isError) async {
 
 ```
 
+## CACHE OFFLINE
+
+Offline caching works with subscriptions automatically.
+To use Mutation caching, use the Snapshot object property.
+``` dart
+Snapshot snapshot = connect.subscription(...);
+
+//Mutation cache works!
+snapshot.mutation(...);
+
+//Mutation cache not works
+connect.mutation(...);
+
+
+```
+
 ## Dispose
 
 HasuraConnect provides a dispose () method for use in Provider or BlocProvider.
@@ -176,7 +175,7 @@ This is currently our roadmap, please feel free to request additions/changes.
 | Provider Integration                   |    ✅    |
 | Variables                              |    ✅    |
 | Cache Subscription                     |    ✅    |
-| Cache Mutation                         |    🔜    |
+| Cache Mutation                         |    ✅    |
 | Cache Query                            |    🔜    |
 
 ## Features and bugs

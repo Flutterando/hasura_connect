@@ -1,3 +1,7 @@
+## 0.2.1
+
+- Added Mutation Cache in Snapshot.
+
 ## 0.2.0
 
 - Added Subscription Cache.
