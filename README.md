@@ -2,6 +2,15 @@
 
 Connect your Flutter/Dart apps to Hasura simply.
 
+## What can he do
+
+  The hasura_connect is designed to facilitate Hasura's integration with Flutter applications, leveraging the full power of Graphql.
+
+- Use Query, Mutation and Subscriptions the easy way.
+- Offline cache for Subscription and Mutation made from a Snapshot.
+- Easy integration with leading dart providers (Provider, bloc_pattern).
+- Pass your JWT Token easily if you are informed when it is invalid.
+
 ## Install
 
 Add dependency in your pubspec.yaml file:
@@ -180,8 +189,7 @@ This is currently our roadmap, please feel free to request additions/changes.
 
 ## Features and bugs
 
-Please send feature requests and bugs at the [issue tracker][tracker].
-[tracker]: http://example.com/issues/replaceme
+Please send feature requests and bugs at the [issue tracker](https://github.com/Flutterando/hasura_connect/issues).
 
 Created from templates made available by Stagehand under a BSD-style
 [license](https://github.com/dart-lang/stagehand/blob/master/LICENSE).

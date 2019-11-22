@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:websocket/websocket.dart';
-import 'dart:math';
 import 'package:http/http.dart' as http;
 
 import '../hasura_connect.dart';
@@ -26,16 +25,10 @@ class HasuraConnect {
   Future<String> Function(bool isError) _token;
 
   HasuraConnect(this.url,
-      {Future<String> Function(bool isError) token, this.headers}) {
-    _token = token;
+      {Future<String> Function(bool isError) token, this.headers})
+      : _token = token;
 
-    // _localStorage.getAllSubscriptions().then((infoList) {
-    //   infoList.forEach((info) {
-    //     _snapmap[info.key] = _generateSnapshot(info);
-    //   });
-    // });
-  }
-
+  ///change function listener for token
   void changeToken(Future<String> Function(bool isError) token) {
     _token = token;
   }
@@ -47,23 +40,17 @@ class HasuraConnect {
     "type": 'connection_init'
   };
 
-  String get ramdomKey {
-    var rand = Random();
-    var codeUnits = List.generate(8, (index) {
-      return rand.nextInt(33) + 89;
-    });
-
-    return String.fromCharCodes(codeUnits);
-  }
-
+  ///add new header
   void addHeader(String key, String value) {
     headers[key] = value;
   }
 
+  ///remove new header
   void removeHeader(String key) {
     headers.remove(key);
   }
 
+  ///clear all headers
   void removeAllHeader() {
     headers.clear();
   }
@@ -75,7 +62,7 @@ class HasuraConnect {
     return base64Str;
   }
 
-  Stream generateStream(String key) {
+  Stream _generateStream(String key) {
     return _controller.stream.where((data) => data["id"] == key).transform(
       StreamTransformer.fromHandlers(
         handleData: (data, sink) {
@@ -93,6 +80,7 @@ class HasuraConnect {
     ).asBroadcastStream();
   }
 
+  ///get [Snapshot] from Subscription connection
   Snapshot subscription(String query,
       {String key, Map<String, dynamic> variables}) {
     if (query.trim().split(" ")[0] != "subscription") {
@@ -123,7 +111,7 @@ class HasuraConnect {
 
     var snap = Snapshot(
       info,
-      generateStream(info.key),
+      _generateStream(info.key),
       () async {
         _stopStream(info.key);
         _snapmap.remove(info.key);
@@ -252,6 +240,7 @@ class HasuraConnect {
     print("disconnected hasura");
   }
 
+  ///exec query in Graphql Engine
   Future query(String doc, {Map<String, dynamic> variables}) async {
     if (doc.trimLeft().split(" ")[0] != "query") {
       doc = "query $doc";
@@ -263,6 +252,7 @@ class HasuraConnect {
     return _sendPost(jsonMap);
   }
 
+  ///exec mutation in Graphql Engine
   Future mutation(String doc,
       {Map<String, dynamic> variables, bool cache = false}) async {
     if (doc.trim().split(" ")[0] != "mutation") {
@@ -330,6 +320,7 @@ class HasuraConnect {
     }
   }
 
+  ///finalize Hasura connection
   void dispose() {
     _disconnect();
     _controller.close();

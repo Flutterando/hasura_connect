@@ -11,17 +11,19 @@ class Snapshot<T> {
   final Function _close;
   final void Function(Snapshot) _renew;
 
-  T value;
   HasuraConnect _conn;
+
+  ///Info about Snapshot [query] [variables] and [key]
   final SnapshotInfo info;
   HydratedSubject<T> _controller;
   final Stream<T> _streamInit;
   StreamSubscription _streamSubscription;
 
+  ///get subscription stream for listener graphql data
   ValueObservable<T> get stream => _controller.stream;
 
   Snapshot(this.info, this._streamInit, this._close, this._renew,
-      {StreamController<T> controllerTest, HasuraConnect conn, this.value}) {
+      {StreamController<T> controllerTest, HasuraConnect conn}) {
     _conn = conn;
 
     if (controllerTest == null) {
@@ -40,7 +42,6 @@ class Snapshot<T> {
 
     _streamSubscription = _streamInit.listen(
       (data) {
-        value = data;
         if (!_controller.isClosed) {
           _controller.add(data);
         }
@@ -48,6 +49,9 @@ class Snapshot<T> {
     );
   }
 
+  ///Perform Caching Mutation
+  ///
+  ///Use [onNotify] param for custom update your method.
   Future mutation(String doc,
       {Map<String, dynamic> variables, T Function(T) onNotify}) {
     if (onNotify != null) {
@@ -63,50 +67,47 @@ class Snapshot<T> {
       Function close,
       StreamController<S> controller,
       HasuraConnect conn,
-      S value,
       Function(Snapshot) renew}) {
     return Snapshot<S>(info ?? this.info, streamInit ?? this._streamInit,
         close ?? this.close, renew ?? this._renew,
         conn: conn ?? this._conn,
-        value: value,
         controllerTest: controller ?? this._controller);
   }
 
+  ///Transform [Snapshot] in other type
   Snapshot<S> map<S>(S Function(dynamic) convert,
       {@required String Function(S object) cachePersist}) {
     assert(cachePersist != null);
 
-    var valueParse = this.value != null ? convert(this.value) : null;
-
-    final controller = HydratedSubject<S>(
-      info.key,
-      hydrate: (String s) {
-        return s == null ? null : convert(jsonDecode(s));
-      },
-      persist: (S obj) {
-        return obj == null ? null : cachePersist(obj);
-      },
-    );
-
     var v = _copyWith<S>(
       streamInit: _streamInit.map<S>(convert),
-      controller: controller,
-      value: valueParse,
+      controller: HydratedSubject<S>(
+        info.key,
+        hydrate: (String s) {
+          return s == null ? null : convert(jsonDecode(s));
+        },
+        persist: (S obj) {
+          return obj == null ? null : cachePersist(obj);
+        },
+      ),
     );
     return v;
   }
 
+  ///change variables of subscription query
   changeVariable(Map<String, dynamic> v) {
     info.variables = v;
     _renew(this);
   }
 
+  ///remove [Snapshot] local cache
   Future cleanCache() async {
     LocalStorage _localStorage = LocalStorage();
     // await _localStorage.remove("subscriptions-${info.key}");
     await _localStorage.remove("${info.key}");
   }
 
+  ///close [Snapshot]
   Future close() async {
     await _streamSubscription.cancel();
     await _controller.close();
@@ -115,12 +116,18 @@ class Snapshot<T> {
 }
 
 class SnapshotInfo {
+  ///[query] used in [Snapshot]
   final String query;
+
+  ///[key] used in [Snapshot]
   final String key;
+
+  ///[variables] used in [Snapshot]
   Map<String, dynamic> variables;
 
   SnapshotInfo({this.query, this.key, this.variables});
 
+  ///return object [SnapshotInfo] as Json
   toJson() {
     return {
       "key": key,
@@ -129,6 +136,7 @@ class SnapshotInfo {
     };
   }
 
+  ///create [SnapshotInfo] from json
   factory SnapshotInfo.fromJson(Map json) => SnapshotInfo(
         query: json['query'],
         key: json['key'],
