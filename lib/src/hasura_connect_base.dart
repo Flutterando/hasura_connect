@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:rxdart/rxdart.dart';
 import 'package:websocket/websocket.dart';
 import 'package:http/http.dart' as http;
 
@@ -80,6 +81,10 @@ class HasuraConnect {
     ).asBroadcastStream();
   }
 
+  Stream _generateFutureQueryStream(Future query) {
+    return Observable.fromFuture(query);
+  }
+
   ///get [Snapshot] from Subscription connection
   Snapshot subscription(String query,
       {String key, Map<String, dynamic> variables}) {
@@ -95,28 +100,52 @@ class HasuraConnect {
     return _generateSnapshot(info);
   }
 
-  Snapshot _generateSnapshot(SnapshotInfo info) {
-    if (_snapmap.keys.isEmpty) {
+  ///get cached query stream
+  Snapshot cachedQuery(String query,
+      {String key, Map<String, dynamic> variables}) {
+    if (query.trimLeft().split(" ")[0] != "query") {
+      query = "query $query";
+    }
+
+    if (key == null) {
+      key = _generateBase(query);
+    }
+
+    Map<String, dynamic> jsonMap = {
+      'query': query,
+      'variables': variables,
+    };
+    final info = SnapshotInfo(
+        key: key, query: query, variables: variables, isQuery: true);
+    return _generateSnapshot(info, futureQuery: _sendPost(jsonMap));
+  }
+
+  Snapshot _generateSnapshot(SnapshotInfo info, {Future futureQuery}) {
+    if (_snapmap.keys.isEmpty && futureQuery == null) {
       _connect();
     }
 
-    if (_snapmap.containsKey(info.key)) {
+    if (_snapmap.containsKey(info.key) && futureQuery == null) {
       return _snapmap[info.key];
     }
 
-    if (isConnected) {
+    if (isConnected && futureQuery == null) {
       _channelPromisse.addUtf8Text(
           _getDocument(info.query, info.key, info.variables).codeUnits);
     }
 
     var snap = Snapshot(
       info,
-      _generateStream(info.key),
+      info.isQuery
+          ? _generateFutureQueryStream(futureQuery)
+          : _generateStream(info.key),
       () async {
-        _stopStream(info.key);
-        _snapmap.remove(info.key);
-        if (_snapmap.keys.isEmpty) {
-          await _disconnect();
+        if (futureQuery != null) {
+          _stopStream(info.key);
+          _snapmap.remove(info.key);
+          if (_snapmap.keys.isEmpty) {
+            await _disconnect();
+          }
         }
       },
       (snapshotInternal) {
@@ -130,7 +159,9 @@ class HasuraConnect {
       conn: this,
     );
 
-    _snapmap[info.key] = snap;
+    if (futureQuery == null) {
+      _snapmap[info.key] = snap;
+    }
     return snap;
   }
 
@@ -215,7 +246,6 @@ class HasuraConnect {
         _connect();
       }
     } catch (e) {
-      print(e);
       if (!_isDisconnected) {
         await Future.delayed(Duration(milliseconds: 3000));
 
@@ -249,7 +279,8 @@ class HasuraConnect {
       'query': doc,
       'variables': variables,
     };
-    return _sendPost(jsonMap);
+
+    return await _sendPost(jsonMap);
   }
 
   ///exec mutation in Graphql Engine

@@ -16,6 +16,11 @@ class Snapshot<T> {
   ///Info about Snapshot [query] [variables] and [key]
   final SnapshotInfo info;
   HydratedSubject<T> _controller;
+  T Function(String) _hydrated;
+  String Function(T) _persist;
+
+  T get value => _controller.value;
+
   final Stream<T> _streamInit;
   StreamSubscription _streamSubscription;
 
@@ -23,30 +28,33 @@ class Snapshot<T> {
   ValueObservable<T> get stream => _controller.stream;
 
   Snapshot(this.info, this._streamInit, this._close, this._renew,
-      {StreamController<T> controllerTest, HasuraConnect conn}) {
+      {HasuraConnect conn,
+      T Function(String) hydrated,
+      String Function(T) persist}) {
     _conn = conn;
-
-    if (controllerTest == null) {
-      _controller = HydratedSubject<T>(
-        info.key,
-        hydrate: (String i) {
+    _hydrated = hydrated ??
+        (String i) {
           return i == null ? null : jsonDecode(i);
-        },
-        persist: (obj) {
+        };
+    _persist = persist ??
+        (obj) {
           return obj == null ? null : jsonEncode(obj);
-        },
-      );
-    } else {
-      _controller = controllerTest;
-    }
+        };
 
-    _streamSubscription = _streamInit.listen(
-      (data) {
-        if (!_controller.isClosed) {
-          _controller.add(data);
-        }
-      },
+    _controller = HydratedSubject<T>(
+      info.key,
+      hydrate: _hydrated,
+      persist: _persist,
     );
+
+    _streamSubscription = _streamInit.listen((data) {
+      if (!_controller.isClosed) {
+        _controller.add(data);
+      }
+    }, onError: (e) {
+      print("ERRO");
+      //_controller.addError(e);
+    });
   }
 
   ///Perform Caching Mutation
@@ -65,13 +73,19 @@ class Snapshot<T> {
       {SnapshotInfo info,
       Stream streamInit,
       Function close,
-      StreamController<S> controller,
       HasuraConnect conn,
+      S Function(String) hydrated,
+      String Function(S) persist,
       Function(Snapshot) renew}) {
-    return Snapshot<S>(info ?? this.info, streamInit ?? this._streamInit,
-        close ?? this.close, renew ?? this._renew,
-        conn: conn ?? this._conn,
-        controllerTest: controller ?? this._controller);
+    return Snapshot<S>(
+      info ?? this.info,
+      streamInit ?? this._streamInit,
+      close ?? this.close,
+      renew ?? this._renew,
+      conn: conn ?? this._conn,
+      hydrated: hydrated ?? this._hydrated,
+      persist: persist ?? this._persist,
+    );
   }
 
   ///Transform [Snapshot] in other type
@@ -79,25 +93,32 @@ class Snapshot<T> {
       {@required String Function(S object) cachePersist}) {
     assert(cachePersist != null);
 
+    var _h = (String s) {
+      return s == null ? null : convert(jsonDecode(s));
+    };
+
+    var _p = (S obj) {
+      return obj == null ? null : cachePersist(obj);
+    };
+
     var v = _copyWith<S>(
-      streamInit: _streamInit.map<S>(convert),
-      controller: HydratedSubject<S>(
-        info.key,
-        hydrate: (String s) {
-          return s == null ? null : convert(jsonDecode(s));
-        },
-        persist: (S obj) {
-          return obj == null ? null : cachePersist(obj);
-        },
-      ),
-    );
+        streamInit: _streamInit.map<S>(convert), hydrated: _h, persist: _p);
     return v;
   }
 
   ///change variables of subscription query
   changeVariable(Map<String, dynamic> v) {
     info.variables = v;
-    _renew(this);
+    if (info.isQuery) {
+      _sendNewQuery();
+    } else {
+      _renew(this);
+    }
+  }
+
+  _sendNewQuery() async {
+    final data = await _conn.query(info.query, variables: info.variables);
+    _controller.add(data);
   }
 
   ///remove [Snapshot] local cache
@@ -122,10 +143,13 @@ class SnapshotInfo {
   ///[key] used in [Snapshot]
   final String key;
 
+  ///[isQuery] used in [Snapshot]
+  final bool isQuery;
+
   ///[variables] used in [Snapshot]
   Map<String, dynamic> variables;
 
-  SnapshotInfo({this.query, this.key, this.variables});
+  SnapshotInfo({this.query, this.key, this.variables, this.isQuery = false});
 
   ///return object [SnapshotInfo] as Json
   toJson() {
@@ -133,6 +157,7 @@ class SnapshotInfo {
       "key": key,
       "query": query,
       "variables": variables,
+      "isQuery": isQuery,
     };
   }
 
@@ -141,5 +166,6 @@ class SnapshotInfo {
         query: json['query'],
         key: json['key'],
         variables: json['variables'],
+        isQuery: json['isQuery'],
       );
 }
