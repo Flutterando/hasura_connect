@@ -2,9 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:hasura_connect/src/snapshot_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../hasura_connect.dart';
 
 class LocalStorage {
   Completer<SharedPreferences> _completer = Completer<SharedPreferences>();
@@ -48,7 +47,9 @@ class LocalStorage {
     try {
       var shared = await _completer.future;
       await shared.remove(key);
-    } catch (e) {}
+    } catch (e) {
+      //erro
+    }
   }
 
   Future<List<SnapshotInfo>> getAllSubscriptions() async {

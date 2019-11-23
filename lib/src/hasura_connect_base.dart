@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:hasura_connect/src/snapshot_data.dart';
+import 'package:hasura_connect/src/snapshot_info.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:websocket/websocket.dart';
 import 'package:http/http.dart' as http;
@@ -12,7 +14,7 @@ import 'snapshot.dart';
 
 class HasuraConnect {
   final _controller = StreamController.broadcast();
-  final Map<String, Snapshot> _snapmap = {};
+  final Map<String, SnapshotData> _snapmap = {};
   final Map<String, String> headers;
 
   LocalStorage _localStorage = LocalStorage();
@@ -100,7 +102,7 @@ class HasuraConnect {
     return _generateSnapshot(info);
   }
 
-  ///get cached query stream
+  ///get cached query [Snapshot]
   Snapshot cachedQuery(String query,
       {String key, Map<String, dynamic> variables}) {
     if (query.trimLeft().split(" ")[0] != "query") {
@@ -134,7 +136,7 @@ class HasuraConnect {
           _getDocument(info.query, info.key, info.variables).codeUnits);
     }
 
-    var snap = Snapshot(
+    var snap = SnapshotData(
       info,
       info.isQuery
           ? _generateFutureQueryStream(futureQuery)

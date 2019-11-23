@@ -64,7 +64,7 @@ class HydratedSubject<T> extends Subject<T> implements ValueObservable<T> {
     void onHydrate(),
     void onListen(),
     void onCancel(),
-    bool sync: false,
+    bool sync = false,
   }) {
     // assert that T is a type compatible with shared_preferences,
     // or that we have hydrate and persist mapping functions
@@ -76,25 +76,25 @@ class HydratedSubject<T> extends Subject<T> implements ValueObservable<T> {
         (hydrate != null && persist != null));
 
     // ignore: close_sinks
-    final controller = new StreamController<T>.broadcast(
+    final controller = StreamController<T>.broadcast(
       onListen: onListen,
       onCancel: onCancel,
       sync: sync,
     );
 
-    final wrapper = new _Wrapper<T>(seedValue);
+    final wrapper = _Wrapper<T>(seedValue);
 
-    return new HydratedSubject<T>._(
+    return HydratedSubject<T>._(
         key,
         seedValue,
         hydrate,
         persist,
         onHydrate,
         controller,
-        new Observable<T>.defer(
+        Observable<T>.defer(
             () => wrapper.latestValue == null
                 ? controller.stream
-                : new Observable<T>(controller.stream)
+                : Observable<T>(controller.stream)
                     .startWith(wrapper.latestValue),
             reusable: true),
         wrapper);
@@ -144,8 +144,6 @@ class HydratedSubject<T> extends Subject<T> implements ValueObservable<T> {
       );
     }
 
-    // do not hydrate if the store is empty or matches the seed value
-    // TODO: allow writing of seedValue if it is intentional
     if (val != null && val != _seedValue) {
       add(val);
     }
