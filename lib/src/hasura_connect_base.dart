@@ -1,23 +1,25 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:hasura_connect/src/snapshot_data.dart';
-import 'package:hasura_connect/src/snapshot_info.dart';
+import 'package:hasura_connect/src/snapshot/snapshot_data.dart';
+import 'package:hasura_connect/src/snapshot/snapshot_info.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:websocket/websocket.dart';
 import 'package:http/http.dart' as http;
 
 import '../hasura_connect.dart';
 import 'hasura_error.dart';
-import 'local_storage.dart';
-import 'snapshot.dart';
+import 'services/local_storage_hasura.dart';
+import 'snapshot/snapshot.dart';
 
 class HasuraConnect {
   final _controller = StreamController.broadcast();
   final Map<String, SnapshotData> _snapmap = {};
   final Map<String, String> headers;
 
-  LocalStorage _localStorage = LocalStorage();
+  LocalStorageHasura _localStorageMutation =
+      LocalStorageHasura("hasura_mutations");
+  LocalStorageHasura _localStorageCache = LocalStorageHasura("hasura_cache");
   WebSocket _channelPromisse;
   bool _isDisconnected = false;
   bool isConnected = false;
@@ -137,29 +139,25 @@ class HasuraConnect {
     }
 
     var snap = SnapshotData(
-      info,
-      info.isQuery
-          ? _generateFutureQueryStream(futureQuery)
-          : _generateStream(info.key),
-      () async {
-        if (futureQuery != null) {
-          _stopStream(info.key);
-          _snapmap.remove(info.key);
-          if (_snapmap.keys.isEmpty) {
-            await _disconnect();
-          }
-        }
-      },
-      (snapshotInternal) {
+        info,
+        info.isQuery
+            ? _generateFutureQueryStream(futureQuery)
+            : _generateStream(info.key), () async {
+      if (futureQuery != null) {
         _stopStream(info.key);
-        if (isConnected) {
-          _channelPromisse.addUtf8Text(_getDocument(snapshotInternal.info.query,
-                  snapshotInternal.info.key, snapshotInternal.info.variables)
-              .codeUnits);
+        _snapmap.remove(info.key);
+        if (_snapmap.keys.isEmpty) {
+          await _disconnect();
         }
-      },
-      conn: this,
-    );
+      }
+    }, (snapshotInternal) {
+      _stopStream(info.key);
+      if (isConnected) {
+        _channelPromisse.addUtf8Text(_getDocument(snapshotInternal.info.query,
+                snapshotInternal.info.key, snapshotInternal.info.variables)
+            .codeUnits);
+      }
+    }, conn: this, localStorageCache: _localStorageCache);
 
     if (futureQuery == null) {
       _snapmap[info.key] = snap;
@@ -220,7 +218,7 @@ class HasuraConnect {
           }
 
           Map<String, dynamic> mutationCache =
-              await _localStorage.getAllMutation();
+              await _localStorageMutation.getAll();
           for (var key in mutationCache.keys) {
             await _sendPost(mutationCache[key], key);
           }
@@ -297,7 +295,7 @@ class HasuraConnect {
     };
     String hash;
     if (cache) {
-      hash = await _localStorage.addMutation(jsonMap);
+      hash = await _localStorageMutation.add(jsonMap);
     }
     return _sendPost(jsonMap, hash);
   }
@@ -331,7 +329,7 @@ class HasuraConnect {
 
       if (response.statusCode == 200) {
         if (hash != null) {
-          await _localStorage.remove(hash);
+          await _localStorageMutation.remove(hash);
         }
         if (json.containsKey("errors")) {
           throw HasuraError.fromJson(json["errors"][0]);
@@ -339,7 +337,7 @@ class HasuraConnect {
         return json;
       } else {
         if (hash != null) {
-          await _localStorage.remove(hash);
+          await _localStorageMutation.remove(hash);
         } else {
           throw HasuraError("connection error", null);
         }
@@ -354,9 +352,11 @@ class HasuraConnect {
   }
 
   ///finalize Hasura connection
-  void dispose() {
+  void dispose() async {
     _disconnect();
-    _controller.close();
     _snapmap.clear();
+    await _localStorageMutation.close();
+    await _localStorageCache.close();
+    await _controller.close();
   }
 }

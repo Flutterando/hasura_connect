@@ -1,12 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:hasura_connect/src/hasura_connect_base.dart';
-import 'package:hasura_connect/src/snapshot_info.dart';
+import 'package:hasura_connect/src/snapshot/snapshot_info.dart';
 
-import 'hydrated.dart';
-import 'local_storage.dart';
+import '../hydrated.dart';
+import '../services/local_storage_hasura.dart';
 import 'snapshot.dart';
 
 class SnapshotData<T> extends Snapshot<T> {
@@ -18,8 +17,9 @@ class SnapshotData<T> extends Snapshot<T> {
   ///Info about Snapshot [query] [variables] and [key]
   final SnapshotInfo info;
   HydratedSubject<T> _controller;
-  T Function(String) _hydrated;
-  String Function(T) _persist;
+  T Function(Map) _hydrated;
+  Map Function(T) _persist;
+  LocalStorageHasura _localStorageCache;
 
   @override
   T get value => _controller.value;
@@ -28,24 +28,17 @@ class SnapshotData<T> extends Snapshot<T> {
   StreamSubscription _streamSubscription;
 
   SnapshotData(this.info, this._streamInit, this._close, this._renew,
-      {HasuraConnect conn,
-      T Function(String) hydrated,
-      String Function(T) persist}) {
+      {LocalStorageHasura localStorageCache,
+      HasuraConnect conn,
+      T Function(Map) hydrated,
+      Map Function(T) persist}) {
+    _localStorageCache = localStorageCache;
     _conn = conn;
-    _hydrated = hydrated ??
-        (String i) {
-          return i == null ? null : jsonDecode(i);
-        };
-    _persist = persist ??
-        (obj) {
-          return obj == null ? null : jsonEncode(obj);
-        };
+    _hydrated = hydrated;
+    _persist = persist;
 
-    _controller = HydratedSubject<T>(
-      info.key,
-      hydrate: _hydrated,
-      persist: _persist,
-    );
+    _controller = HydratedSubject<T>(info.key,
+        hydrate: _hydrated, persist: _persist, cacheLocal: _localStorageCache);
 
     _streamSubscription = _streamInit.listen((data) {
       if (!_controller.isClosed) {
@@ -69,11 +62,12 @@ class SnapshotData<T> extends Snapshot<T> {
 
   SnapshotData<S> _copyWith<S>(
       {SnapshotInfo info,
+      LocalStorageHasura localStorageCache,
       Stream streamInit,
       Function close,
       HasuraConnect conn,
-      S Function(String) hydrated,
-      String Function(S) persist,
+      S Function(Map) hydrated,
+      Map Function(S) persist,
       Function(Snapshot) renew}) {
     return SnapshotData<S>(
       info ?? this.info,
@@ -83,16 +77,17 @@ class SnapshotData<T> extends Snapshot<T> {
       conn: conn ?? this._conn,
       hydrated: hydrated ?? this._hydrated,
       persist: persist ?? this._persist,
+      localStorageCache: localStorageCache ?? this._localStorageCache,
     );
   }
 
   @override
   Snapshot<S> convert<S>(S Function(dynamic) convert,
-      {@required String Function(S object) cachePersist}) {
+      {@required Map Function(S object) cachePersist}) {
     assert(cachePersist != null);
 
-    var _h = (String s) {
-      return s == null ? null : convert(jsonDecode(s));
+    var _h = (Map s) {
+      return s == null ? null : convert(s);
     };
 
     var _p = (S obj) {
@@ -121,8 +116,7 @@ class SnapshotData<T> extends Snapshot<T> {
 
   @override
   Future cleanCache() async {
-    LocalStorage _localStorage = LocalStorage();
-    await _localStorage.remove("${info.key}");
+    await _localStorageCache.remove(info.key);
   }
 
   @override

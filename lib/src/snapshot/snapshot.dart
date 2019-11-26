@@ -9,7 +9,7 @@ abstract class Snapshot<T> extends Stream<T> {
 
   ///Transform [Snapshot] in other type
   Snapshot<S> convert<S>(S Function(dynamic) convert,
-      {@required String Function(S object) cachePersist});
+      {@required Map Function(S object) cachePersist});
 
   ///change variables of subscription query
   void changeVariable(Map<String, dynamic> v);
