@@ -1,18 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:hasura_connect/src/core/hasura.dart';
+import 'package:hasura_connect/src/exceptions/hasura_error.dart';
+import 'package:hasura_connect/src/services/local_storage_hasura.dart';
+import 'package:hasura_connect/src/snapshot/snapshot.dart';
 import 'package:hasura_connect/src/snapshot/snapshot_data.dart';
 import 'package:hasura_connect/src/snapshot/snapshot_info.dart';
+import 'package:hasura_connect/src/utils/utils.dart' as utils;
 import 'package:rxdart/rxdart.dart';
 import 'package:websocket/websocket.dart';
 import 'package:http/http.dart' as http;
 
-import '../hasura_connect.dart';
-import 'hasura_error.dart';
-import 'services/local_storage_hasura.dart';
-import 'snapshot/snapshot.dart';
-
-class HasuraConnect {
+class HasuraConnectBase implements HasuraConnect {
   final _controller = StreamController.broadcast();
   final Map<String, SnapshotData> _snapmap = {};
   final Map<String, String> headers;
@@ -29,14 +29,9 @@ class HasuraConnect {
 
   Future<String> Function(bool isError) _token;
 
-  HasuraConnect(this.url,
+  HasuraConnectBase(this.url,
       {Future<String> Function(bool isError) token, this.headers})
       : _token = token;
-
-  ///change function listener for token
-  void changeToken(Future<String> Function(bool isError) token) {
-    _token = token;
-  }
 
   final _init = {
     "payload": {
@@ -45,17 +40,22 @@ class HasuraConnect {
     "type": 'connection_init'
   };
 
-  ///add new header
+  @override
+  void changeToken(Future<String> Function(bool isError) token) {
+    _token = token;
+  }
+
+  @override
   void addHeader(String key, String value) {
     headers[key] = value;
   }
 
-  ///remove new header
+  @override
   void removeHeader(String key) {
     headers.remove(key);
   }
 
-  ///clear all headers
+  @override
   void removeAllHeader() {
     headers.clear();
   }
@@ -89,7 +89,7 @@ class HasuraConnect {
     return Observable.fromFuture(query);
   }
 
-  ///get [Snapshot] from Subscription connection
+  @override
   Snapshot subscription(String query,
       {String key, Map<String, dynamic> variables}) {
     if (query.trim().split(" ")[0] != "subscription") {
@@ -104,7 +104,7 @@ class HasuraConnect {
     return _generateSnapshot(info);
   }
 
-  ///get cached query [Snapshot]
+  @override
   Snapshot cachedQuery(String query,
       {String key, Map<String, dynamic> variables}) {
     if (query.trimLeft().split(" ")[0] != "query") {
@@ -270,7 +270,7 @@ class HasuraConnect {
     print("disconnected hasura");
   }
 
-  ///exec query in Graphql Engine
+  @override
   Future query(String doc, {Map<String, dynamic> variables}) async {
     if (doc.trimLeft().split(" ")[0] != "query") {
       doc = "query $doc";
@@ -283,9 +283,9 @@ class HasuraConnect {
     return await _sendPost(jsonMap);
   }
 
-  ///exec mutation in Graphql Engine
+  @override
   Future mutation(String doc,
-      {Map<String, dynamic> variables, bool cache = false}) async {
+      {Map<String, dynamic> variables, bool tryAgain = true}) async {
     if (doc.trim().split(" ")[0] != "mutation") {
       doc = "mutation $doc";
     }
@@ -293,10 +293,8 @@ class HasuraConnect {
       'query': doc,
       'variables': variables,
     };
-    String hash;
-    if (cache) {
-      hash = await _localStorageMutation.add(jsonMap);
-    }
+    String hash = utils.randomString(15);
+    await _localStorageMutation.put(hash, jsonMap);
     return _sendPost(jsonMap, hash);
   }
 
@@ -336,16 +334,10 @@ class HasuraConnect {
         }
         return json;
       } else {
-        if (hash != null) {
-          await _localStorageMutation.remove(hash);
-        } else {
-          throw HasuraError("connection error", null);
-        }
-      }
-    } catch (r) {
-      if (hash == null) {
         throw HasuraError("connection error", null);
       }
+    } catch (r) {
+      throw HasuraError("connection error", null);
     } finally {
       client.close();
     }

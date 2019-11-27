@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:hasura_connect/src/hasura_connect_base.dart';
+import 'package:hasura_connect/src/core/hasura.dart';
 import 'package:hasura_connect/src/snapshot/snapshot_info.dart';
+import 'package:hasura_connect/src/utils/hydrated.dart';
 
-import '../hydrated.dart';
 import '../services/local_storage_hasura.dart';
 import 'snapshot.dart';
 
@@ -45,19 +45,8 @@ class SnapshotData<T> extends Snapshot<T> {
         _controller.add(data);
       }
     }, onError: (e) {
-      print("ERRO");
-      //_controller.addError(e);
+      _controller.addError(e);
     });
-  }
-
-  @override
-  Future mutation(String doc,
-      {Map<String, dynamic> variables, T Function(T) onNotify}) {
-    if (onNotify != null) {
-      T data = onNotify(_controller.value);
-      _controller.add(data);
-    }
-    return _conn.mutation(doc, variables: variables, cache: true);
   }
 
   SnapshotData<S> _copyWith<S>(
@@ -131,5 +120,10 @@ class SnapshotData<T> extends Snapshot<T> {
     await _streamSubscription.cancel();
     await _controller.close();
     await _close();
+  }
+
+  @override
+  void add(T newValue) {
+    _controller.add(newValue);
   }
 }

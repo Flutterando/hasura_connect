@@ -1,9 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:math';
 import 'dart:io' show Platform;
 import 'dart:typed_data';
-
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 
@@ -45,25 +42,9 @@ class LocalStorageHasura {
     return box.get(key);
   }
 
-  Future<String> add(Map query) async {
-    var box = await _completer.future;
-    String key = _randomString(15);
-    await box.put(key, query);
-    return "localstorage-$key";
-  }
-
   Future put(String key, Map query) async {
     var box = await _completer.future;
     await box.put(key, query);
-  }
-
-  String _randomString(int length) {
-    var rand = Random();
-    var codeUnits = List.generate(length, (index) {
-      return rand.nextInt(33) + 89;
-    });
-
-    return String.fromCharCodes(codeUnits);
   }
 
   Future<bool> remove(String key) async {
