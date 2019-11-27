@@ -1,10 +1,9 @@
-## 1.0.0
+## 1.0.0+1
 
-- Added Mutation Cache in Snapshot.
-
-## 0.2.1+2
-
-- Added Mutation Cache in Snapshot.
+- Cache offline for Subscription and Query (CachedQuery).
+- When mutation fails due to no connection, HasuraConnect will retry when you have internet.
+- Refactored Snapshot.
+- Error Handling.
 
 ## 0.2.0
 
