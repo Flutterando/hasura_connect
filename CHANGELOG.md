@@ -1,3 +1,7 @@
+## 1.0.0-dev.1
+
+- Added Mutation Cache in Snapshot.
+
 ## 0.2.1+2
 
 - Added Mutation Cache in Snapshot.

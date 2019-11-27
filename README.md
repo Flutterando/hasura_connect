@@ -56,8 +56,11 @@ String docQuery = """
 Now just add the document to the "query" method of the HasuraConnect instance.
 
 ```dart
+//get query
 var r = await hasuraConnect.query(docQuery);
-print(r);
+
+//get query with cache
+var r = await hasuraConnect.cachedQuery(docQuery);
 
 //OR USE MUTATION
 var r = await hasuraConnect.mutation(docQuery);
@@ -74,19 +77,6 @@ Snapshot snapshot = hasuraConnect.subscription(docSubscription);
   }).onError((err) {
     print(err);
   });
-
-```
-
-### Mutation + Subscriptions
-
-You can to use mutation directly from the subscription snapshot. This will allow you to update your local list even before it has been notified by Hasura.
-
-```dart
-Snapshot snapshot = hasuraConnect.subscription(docSubscription);
-...
-snapshot.mutation(docMutation, onNotify: (data) {
-   return data..insert(a, {"name": "next offline item" });
-}
 
 ```
 
@@ -137,7 +127,7 @@ snapshot.changeVariable({"limit": 20});
 
 ```dart
 
-  String url = 'http://localhost:8080/v1/graphql';
+String url = 'http://localhost:8080/v1/graphql';
 HasuraConnect hasuraConnect = HasuraConnect(url, token: (isError) async {
   //sharedPreferences or other storage logic
   return "Bearer YOUR-JWT-TOKEN";
@@ -147,23 +137,27 @@ HasuraConnect hasuraConnect = HasuraConnect(url, token: (isError) async {
 
 ## CACHE OFFLINE
 
-Offline caching works with subscriptions automatically.
-To use Mutation caching, use the Snapshot object property.
+- Offline caching works with subscriptions automatically.
+- A good strategy for mutation caching is to add the offline object to the snapshot with the add parameter with what will be the change, then perform the mutation.
+- When a mutation internet error occurs, HasuraConnect will attempt to mutate again when the device reconnects to the internet.
+- Use this information to promote your offline persistence rules.
+
 ``` dart
 Snapshot snapshot = connect.subscription(...);
 
-//Mutation cache works!
-snapshot.mutation(...);
+//Add object to cache of snapshot
+var list = snapshot.value;
+list.add(newItem);
+snapshot.add(newItem);
 
-//Mutation cache not works
-connect.mutation(...);
-
+//exec asinc mutation
+conn.mutation(...);
 
 ```
 
 ## Dispose
 
-HasuraConnect provides a dispose () method for use in Provider or BlocProvider.
+HasuraConnect provides a dispose() method for use in Provider or BlocProvider.
 Subscription will start only when someone is listening, and when all listeners are closed HasuraConnect automatically disconnects.
 
 Therefore, we only connect to Hasura when we are actually using it;
@@ -185,7 +179,7 @@ This is currently our roadmap, please feel free to request additions/changes.
 | Variables                              |    ✅    |
 | Cache Subscription                     |    ✅    |
 | Cache Mutation                         |    ✅    |
-| Cache Query                            |    🔜    |
+| Cache Query                            |    ✅    |
 
 ## Features and bugs
 
