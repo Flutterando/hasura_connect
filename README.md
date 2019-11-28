@@ -80,15 +80,15 @@ Snapshot snapshot = hasuraConnect.subscription(docSubscription);
 
 ```
 
-### Mapped Subscription
+### Subscription Converter
 
 Use the Map operator to convert json data to a Dart object;
 
 ```dart
 Snapshot<PostModel> snapshot = hasuraConnect
                                   .subscription(docSubscription)
-                                  .map((data) => PostModel.fromJson(data),
-                                        cachePersist: (PostModel post) => post.toJsonString(),
+                                  .convert((data) => PostModel.fromJson(data),
+                                        cachePersist: (PostModel post) => post.toJson(),
                                       );
 
 snapshot.stream.listen((PostModel data) {
