@@ -1,3 +1,7 @@
+## 1.0.1
+
+- Added Flutter Web Cache offline for PWA.
+
 ## 1.0.0+2
 
 - Cache offline for Subscription and Query (CachedQuery).

@@ -11,12 +11,25 @@ class LocalStorageHasura {
     _init(boxName, isTest);
   }
 
+  Future<String> _getPath() async {
+    try {
+      if (Platform.isAndroid || Platform.isIOS) {
+        var dir = await path_provider.getApplicationDocumentsDirectory();
+        return dir.path;
+      } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+        return ".hasuradb";
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
   _init(String boxName, bool isTest) async {
-    if (Platform.isAndroid || Platform.isIOS) {
-      var dir = await path_provider.getApplicationDocumentsDirectory();
-      Hive.init(dir.path);
-    } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      Hive.init(".hasuradb");
+    String path = await _getPath();
+    if (path != null) {
+      Hive.init(path);
     }
 
     Box box;
@@ -25,6 +38,7 @@ class LocalStorageHasura {
     } else {
       box = await Hive.openBox(boxName);
     }
+
     _completer.complete(box);
   }
 
