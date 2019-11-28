@@ -1,4 +1,4 @@
-## 1.0.0+1
+## 1.0.0+2
 
 - Cache offline for Subscription and Query (CachedQuery).
 - When mutation fails due to no connection, HasuraConnect will retry when you have internet.
