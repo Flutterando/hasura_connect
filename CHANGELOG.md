@@ -1,6 +1,7 @@
-## 1.0.1
+## 1.0.2
 
 - Added Flutter Web Cache offline for PWA.
+- added request with variable cache.
 
 ## 1.0.0+2
 
