@@ -111,6 +111,12 @@ class HydratedSubject<T> extends Subject<T> implements ValueObservable<T> {
     }
   }
 
+  Future changeKey(String newKey) async {
+    this._key = newKey;
+    _wrapper.latestValue = null;
+    await _hydrateSubject();
+  }
+
   _persistValue(T val) async {
     if (this._persist != null) {
       await _cacheLocal.put(_key, this._persist(val));

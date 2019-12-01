@@ -1,3 +1,5 @@
+import 'package:hasura_connect/src/utils/utils.dart' as utils;
+
 class SnapshotInfo {
   ///[query] used in [Snapshot]
   final String query;
@@ -10,6 +12,9 @@ class SnapshotInfo {
 
   ///[variables] used in [Snapshot]
   Map<String, dynamic> variables;
+
+  ///[keyCache] used in [Snapshot]
+  String get keyCache => "$key.${utils.generateBaseJson(variables)}";
 
   SnapshotInfo({this.query, this.key, this.variables, this.isQuery = false});
 

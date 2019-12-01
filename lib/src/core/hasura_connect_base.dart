@@ -60,13 +60,6 @@ class HasuraConnectBase implements HasuraConnect {
     headers.clear();
   }
 
-  String _generateBase(String query) {
-    query = query.replaceAll(RegExp("[^a-zA-Z0-9 -]"), "").replaceAll(" ", "");
-    var bytes = utf8.encode(query);
-    var base64Str = base64.encode(bytes);
-    return base64Str;
-  }
-
   Stream _generateStream(String key) {
     return _controller.stream.where((data) => data["id"] == key).transform(
       StreamTransformer.fromHandlers(
@@ -97,7 +90,7 @@ class HasuraConnectBase implements HasuraConnect {
     }
 
     if (key == null) {
-      key = _generateBase(query);
+      key = utils.generateBase(query);
     }
     final info = SnapshotInfo(key: key, query: query, variables: variables);
     // _localStorage.addSubscription(info);
@@ -112,7 +105,7 @@ class HasuraConnectBase implements HasuraConnect {
     }
 
     if (key == null) {
-      key = _generateBase(query);
+      key = utils.generateBase(query);
     }
 
     Map<String, dynamic> jsonMap = {
@@ -246,6 +239,7 @@ class HasuraConnectBase implements HasuraConnect {
         _connect();
       }
     } catch (e) {
+      print(e);
       if (!_isDisconnected) {
         await Future.delayed(Duration(milliseconds: 3000));
 

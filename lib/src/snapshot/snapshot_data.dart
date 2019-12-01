@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:hasura_connect/src/core/hasura.dart';
+import 'package:hasura_connect/src/exceptions/hasura_error.dart';
 import 'package:hasura_connect/src/snapshot/snapshot_info.dart';
 import 'package:hasura_connect/src/utils/hydrated.dart';
 
@@ -37,7 +38,7 @@ class SnapshotData<T> extends Snapshot<T> {
     _hydrated = hydrated;
     _persist = persist;
 
-    _controller = HydratedSubject<T>(info.key,
+    _controller = HydratedSubject<T>(info.keyCache,
         hydrate: _hydrated, persist: _persist, cacheLocal: _localStorageCache);
 
     _streamSubscription = _streamInit.listen((data) {
@@ -89,8 +90,9 @@ class SnapshotData<T> extends Snapshot<T> {
   }
 
   @override
-  void changeVariable(Map<String, dynamic> v) {
+  Future changeVariable(Map<String, dynamic> v) async {
     info.variables = v;
+    await _controller.changeKey(info.keyCache);
     if (info.isQuery) {
       _sendNewQuery();
     } else {
@@ -99,8 +101,15 @@ class SnapshotData<T> extends Snapshot<T> {
   }
 
   _sendNewQuery() async {
-    final data = await _conn.query(info.query, variables: info.variables);
-    _controller.add(data);
+    try {
+      final data = await _conn.query(info.query, variables: info.variables);
+      var newData = _hydrated != null ? _hydrated(data) : data;
+      _controller.add(newData);
+    } on HasuraError catch (e) {
+      if (value == null) {
+        _controller.addError(e);
+      }
+    }
   }
 
   @override
