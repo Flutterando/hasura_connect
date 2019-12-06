@@ -136,7 +136,7 @@ class HasuraConnectBase implements HasuraConnect {
         info.isQuery
             ? _generateFutureQueryStream(futureQuery)
             : _generateStream(info.key), () async {
-      if (futureQuery != null) {
+      if (futureQuery == null) {
         _stopStream(info.key);
         _snapmap.remove(info.key);
         if (_snapmap.keys.isEmpty) {

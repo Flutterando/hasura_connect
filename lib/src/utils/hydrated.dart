@@ -96,10 +96,11 @@ class HydratedSubject<T> extends Subject<T> implements ValueObservable<T> {
   /// Must be called to retreive values stored on the device.
   Future<void> _hydrateSubject() async {
     var val;
+    var value = await _cacheLocal.getValue(this._key); 
     if (this._hydrate != null) {
-      val = this._hydrate(await _cacheLocal.getValue(this._key));
+      val = this._hydrate(value);
     } else {
-      val = await _cacheLocal.getValue(this._key);
+      val = value;
     }
 
     if (val != null && val != _seedValue) {

@@ -21,6 +21,7 @@ class SnapshotData<T> extends Snapshot<T> {
   T Function(Map) _hydrated;
   Map Function(T) _persist;
   LocalStorageHasura _localStorageCache;
+  Completer<bool> _initHydrated = Completer<bool>();
 
   @override
   T get value => _controller.value;
@@ -39,9 +40,14 @@ class SnapshotData<T> extends Snapshot<T> {
     _persist = persist;
 
     _controller = HydratedSubject<T>(info.keyCache,
-        hydrate: _hydrated, persist: _persist, cacheLocal: _localStorageCache);
+        hydrate: _hydrated,
+        persist: _persist,
+        cacheLocal: _localStorageCache, onHydrate: () {
+      if (!_initHydrated.isCompleted) _initHydrated.complete(true);
+    });
 
-    _streamSubscription = _streamInit.listen((data) {
+    _streamSubscription = _streamInit.listen((data) async {
+      await _initHydrated.future;
       if (!_controller.isClosed) {
         _controller.add(data);
       }
@@ -75,7 +81,6 @@ class SnapshotData<T> extends Snapshot<T> {
   Snapshot<S> convert<S>(S Function(dynamic) convert,
       {@required Map Function(S object) cachePersist}) {
     assert(cachePersist != null);
-
     var _h = (Map s) {
       return s == null ? null : convert(s);
     };

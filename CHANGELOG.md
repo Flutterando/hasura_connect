@@ -1,3 +1,8 @@
+## 1.0.3
+
+- Fix not close snapshot error
+- improve cache.
+
 ## 1.0.2
 
 - Added Flutter Web Cache offline for PWA.

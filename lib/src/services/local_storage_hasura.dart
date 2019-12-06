@@ -36,7 +36,11 @@ class LocalStorageHasura {
     if (isTest) {
       box = await Hive.openBoxFromBytes(boxName, Uint8List(0));
     } else {
-      box = await Hive.openBox(boxName);
+        if(Hive.isBoxOpen(boxName)){
+          box = await Hive.box(boxName);
+        } else {
+          box = await Hive.openBox(boxName);
+        }
     }
 
     _completer.complete(box);
