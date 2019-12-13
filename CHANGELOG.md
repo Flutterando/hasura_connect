@@ -1,4 +1,4 @@
-## 1.0.3
+## 1.0.4
 
 - Update RXDART to v0.23.x
 
