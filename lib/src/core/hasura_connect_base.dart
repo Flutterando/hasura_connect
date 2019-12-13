@@ -79,7 +79,7 @@ class HasuraConnectBase implements HasuraConnect {
   }
 
   Stream _generateFutureQueryStream(Future query) {
-    return Observable.fromFuture(query);
+    return Stream.fromFuture(query);
   }
 
   @override
