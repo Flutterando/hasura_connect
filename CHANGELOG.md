@@ -1,3 +1,8 @@
+## 1.0.5
+
+- Change cache engine (hive to Sharepreferences)
+- Fix id snapshot errors (uuid)
+
 ## 1.0.4
 
 - Update RXDART to v0.23.x

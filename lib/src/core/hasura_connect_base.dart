@@ -8,7 +8,6 @@ import 'package:hasura_connect/src/snapshot/snapshot.dart';
 import 'package:hasura_connect/src/snapshot/snapshot_data.dart';
 import 'package:hasura_connect/src/snapshot/snapshot_info.dart';
 import 'package:hasura_connect/src/utils/utils.dart' as utils;
-import 'package:rxdart/rxdart.dart';
 import 'package:websocket/websocket.dart';
 import 'package:http/http.dart' as http;
 

@@ -1,4 +1,5 @@
 import 'package:hasura_connect/src/utils/utils.dart' as utils;
+import 'package:uuid/uuid.dart';
 
 class SnapshotInfo {
   ///[query] used in [Snapshot]
@@ -14,7 +15,7 @@ class SnapshotInfo {
   Map<String, dynamic> variables;
 
   ///[keyCache] used in [Snapshot]
-  String get keyCache => "$key.${utils.generateBaseJson(variables)}";
+  String get keyCache => _generateKeyCache();
 
   SnapshotInfo({this.query, this.key, this.variables, this.isQuery = false});
 
@@ -26,6 +27,11 @@ class SnapshotInfo {
       "variables": variables,
       "isQuery": isQuery,
     };
+  }
+
+  String _generateKeyCache(){
+    var uuid = Uuid();
+    return uuid.v5(Uuid.NAMESPACE_URL, "$key.${utils.generateBaseJson(variables)}");
   }
 
   ///create [SnapshotInfo] from json

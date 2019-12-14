@@ -1,78 +1,62 @@
 import 'dart:async';
-import 'dart:io' show Platform;
-import 'dart:typed_data';
-import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart' as path_provider;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorageHasura {
-  Completer<Box> _completer = Completer<Box>();
+  Completer<SharedPreferences> _completer = Completer<SharedPreferences>();
+  final String boxName;
 
-  LocalStorageHasura(String boxName, {bool isTest = false}) {
-    _init(boxName, isTest);
+  LocalStorageHasura(this.boxName, {bool isTest = false}) {
+    _init(isTest);
   }
 
-  Future<String> _getPath() async {
-    try {
-      if (Platform.isAndroid || Platform.isIOS) {
-        var dir = await path_provider.getApplicationDocumentsDirectory();
-        return dir.path;
-      } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-        return ".hasuradb";
-      } else {
-        return null;
-      }
-    } catch (e) {
-      return null;
-    }
-  }
+  // Future<String> _getPath() async {
+  //   try {
+  //     if (Platform.isAndroid || Platform.isIOS) {
+  //       var dir = await path_provider.getApplicationDocumentsDirectory();
+  //       return dir.path;
+  //     } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+  //       return ".hasuradb";
+  //     } else {
+  //       return null;
+  //     }
+  //   } catch (e) {
+  //     return null;
+  //   }
+  // }
 
-  _init(String boxName, bool isTest) async {
-    String path = await _getPath();
-    if (path != null) {
-      Hive.init(path);
-    }
-
-    Box box;
-    if (isTest) {
-      box = await Hive.openBoxFromBytes(boxName, Uint8List(0));
-    } else {
-        if(Hive.isBoxOpen(boxName)){
-          box = await Hive.box(boxName);
-        } else {
-          box = await Hive.openBox(boxName);
-        }
-    }
-
-    _completer.complete(box);
+  _init(bool isTest) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    _completer.complete(sharedPreferences);
   }
 
   Future<Map<String, dynamic>> getAll() async {
     var box = await _completer.future;
     Map<String, dynamic> map = {};
-    box.keys.forEach((key) {
-      map[key] = box.get(key);
+    box.getKeys().where((key) => key.startsWith('$boxName.')).forEach((key) {
+      map[key.replaceFirst('$boxName.', '')] = jsonDecode(box.getString(key));
     });
     return map;
   }
 
   Future<Map> getValue(String key) async {
     var box = await _completer.future;
-    return box.get(key);
+    key = '$boxName.$key';
+    if (box.containsKey(key)) {
+      return jsonDecode(box.getString(key));
+    } else {
+      return null;
+    }
   }
 
   Future put(String key, Map query) async {
     var box = await _completer.future;
-    await box.put(key, query);
+    await box.setString('$boxName.$key', jsonEncode(query));
   }
 
   Future<bool> remove(String key) async {
-    try {
-      var box = await _completer.future;
-      await box.delete(key);
-      return true;
-    } catch (e) {
-      return false;
-    }
+    var box = await _completer.future;
+    return box.remove('$boxName.$key');
   }
 
   Future clear() async {
@@ -85,8 +69,6 @@ class LocalStorageHasura {
     }
   }
 
-  Future close() async {
-    var box = await _completer.future;
-    await box.close();
-  }
+  @deprecated
+  Future close() async {}
 }
