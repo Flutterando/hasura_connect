@@ -72,7 +72,7 @@ Subscriptions will notify you each time you have a change to the searched items.
 
 ```dart
 Snapshot snapshot = hasuraConnect.subscription(docSubscription);
-  snapshot.stream.listen((data) {
+  snapshot.listen((data) {
     print(data);
   }).onError((err) {
     print(err);
@@ -91,7 +91,7 @@ Snapshot<PostModel> snapshot = hasuraConnect
                                         cachePersist: (PostModel post) => post.toJson(),
                                       );
 
-snapshot.stream.listen((PostModel data) {
+snapshot.listen((PostModel data) {
    print(data);
  }).onError((err) {
    print(err);
