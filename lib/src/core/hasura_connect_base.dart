@@ -324,6 +324,7 @@ class HasuraConnectBase implements HasuraConnect {
         }
         if (json.containsKey("errors")) {
           throw HasuraError.fromJson(json["errors"][0]);
+          return json["errors"][0];
         }
         return json;
       } else {
