@@ -288,7 +288,7 @@ class HasuraConnectBase implements HasuraConnect {
     };
     String hash = utils.randomString(15);
     await _localStorageMutation.put(hash, jsonMap);
-    return _sendPost(jsonMap, hash);
+    return await _sendPost(jsonMap, hash);
   }
 
   Future _sendPost(Map jsonMap, [String hash]) async {
