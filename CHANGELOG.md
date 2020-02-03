@@ -1,3 +1,7 @@
+## 1.1.0
+
+- fix errors.
+
 ## 1.0.5
 
 - Change cache engine (hive to Sharepreferences)
