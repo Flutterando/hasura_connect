@@ -78,7 +78,7 @@ class HasuraConnectBase implements HasuraConnect {
   }
 
   Stream _generateFutureQueryStream(Future query) {
-    return Stream.fromFuture(query);
+    return Stream.fromFuture(query).asBroadcastStream();
   }
 
   @override
