@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:hasura_connect/src/core/hasura.dart';
 import 'package:hasura_connect/src/exceptions/hasura_error.dart';
@@ -14,14 +16,14 @@ import 'package:http/http.dart' as http;
 class HasuraConnectBase implements HasuraConnect {
   final _controller = StreamController.broadcast();
   final Map<String, SnapshotData> _snapmap = {};
-  final Map<String, String> headers;
+  final Map<String, String> _headers;
 
   LocalStorageHasura _localStorageMutation =
       LocalStorageHasura("hasura_mutations");
   LocalStorageHasura _localStorageCache = LocalStorageHasura("hasura_cache");
   WebSocket _channelPromisse;
   bool _isDisconnected = false;
-  bool isConnected = false;
+  bool _isConnected = false;
   Completer<bool> _onConnect = Completer<bool>();
 
   final String url;
@@ -29,8 +31,10 @@ class HasuraConnectBase implements HasuraConnect {
   Future<String> Function(bool isError) _token;
 
   HasuraConnectBase(this.url,
-      {Future<String> Function(bool isError) token, this.headers})
-      : _token = token;
+      {Map<String, dynamic> headers,
+      Future<String> Function(bool isError) token})
+      : _token = token,
+        _headers = headers ?? <String, String>{};
 
   final _init = {
     "payload": {
@@ -39,6 +43,10 @@ class HasuraConnectBase implements HasuraConnect {
     "type": 'connection_init'
   };
 
+  bool get isConnected => _isConnected;
+
+  Map<String, String> get headers => UnmodifiableMapView(_headers);
+
   @override
   void changeToken(Future<String> Function(bool isError) token) {
     _token = token;
@@ -46,17 +54,17 @@ class HasuraConnectBase implements HasuraConnect {
 
   @override
   void addHeader(String key, String value) {
-    headers[key] = value;
+    _headers[key] = value;
   }
 
   @override
   void removeHeader(String key) {
-    headers.remove(key);
+    _headers.remove(key);
   }
 
   @override
   void removeAllHeader() {
-    headers.clear();
+    _headers.clear();
   }
 
   Stream _generateStream(String key) {
@@ -125,7 +133,7 @@ class HasuraConnectBase implements HasuraConnect {
       return _snapmap[info.key];
     }
 
-    if (isConnected && futureQuery == null) {
+    if (_isConnected && futureQuery == null) {
       _channelPromisse.addUtf8Text(
           _getDocument(info.query, info.key, info.variables).codeUnits);
     }
@@ -144,7 +152,7 @@ class HasuraConnectBase implements HasuraConnect {
       }
     }, (snapshotInternal) {
       _stopStream(info.key);
-      if (isConnected) {
+      if (_isConnected) {
         _channelPromisse.addUtf8Text(_getDocument(snapshotInternal.info.query,
                 snapshotInternal.info.key, snapshotInternal.info.variables)
             .codeUnits);
@@ -159,7 +167,7 @@ class HasuraConnectBase implements HasuraConnect {
 
   _stopStream(String key) {
     var stop = {"id": key, "type": 'stop'};
-    if (isConnected) _channelPromisse.addUtf8Text(jsonEncode(stop).codeUnits);
+    if (_isConnected) _channelPromisse.addUtf8Text(jsonEncode(stop).codeUnits);
   }
 
   String _getDocument(
@@ -189,9 +197,9 @@ class HasuraConnectBase implements HasuraConnect {
       _channelPromisse = await WebSocket.connect(url.replaceFirst("http", "ws"),
           protocols: ['graphql-ws']); //graphql-subscriptions
       await _addToken();
-      if (headers != null) {
-        for (var key in headers?.keys) {
-          (_init["payload"] as Map)["headers"][key] = headers[key];
+      if (_headers != null) {
+        for (var key in _headers?.keys) {
+          (_init["payload"] as Map)["headers"][key] = _headers[key];
         }
       }
       _channelPromisse.addUtf8Text(jsonEncode(_init).codeUnits);
@@ -201,7 +209,7 @@ class HasuraConnectBase implements HasuraConnect {
           _controller.add(data);
         } else if (data["type"] == "connection_ack") {
           print("HASURA CONNECT!");
-          isConnected = true;
+          _isConnected = true;
 
           for (var key in _snapmap.keys) {
             _channelPromisse.addUtf8Text(_getDocument(_snapmap[key].info.query,
@@ -229,7 +237,7 @@ class HasuraConnectBase implements HasuraConnect {
       });
       await _channelPromisse.done;
       await _sub.cancel();
-      isConnected = false;
+      _isConnected = false;
       if (!_isDisconnected) {
         await Future.delayed(Duration(milliseconds: 3000));
         if (_onConnect.isCompleted) {
@@ -252,7 +260,7 @@ class HasuraConnectBase implements HasuraConnect {
 
   _disconnect() async {
     var disconect = {"type": 'connection_terminate'};
-    if (isConnected) {
+    if (_isConnected) {
       _channelPromisse.addUtf8Text(jsonEncode(disconect).codeUnits);
     }
     _isDisconnected = true;
@@ -306,32 +314,29 @@ class HasuraConnectBase implements HasuraConnect {
       }
     }
 
-    if (headers != null) {
-      for (var key in headers?.keys) {
-        headersLocal[key] = headers[key];
+    if (_headers != null) {
+      for (var key in _headers?.keys) {
+        headersLocal[key] = _headers[key];
       }
     }
 
-    var client = http.Client();
+    final client = http.Client();
     try {
       var response =
           await client.post(url, body: jsonString, headers: headersLocal);
       Map json = jsonDecode(response.body);
 
-      if (response.statusCode == 200) {
-        if (hash != null) {
-          await _localStorageMutation.remove(hash);
-        }
-        if (json.containsKey("errors")) {
-          throw HasuraError.fromJson(json["errors"][0]);
-          return json["errors"][0];
-        }
-        return json;
-      } else {
-        throw HasuraError("connection error", null);
+      if (hash != null) {
+        await _localStorageMutation.remove(hash);
       }
-    } catch (r) {
+      if (json.containsKey("errors")) {
+        throw HasuraError.fromJson(json["errors"][0]);
+      }
+      return json;
+    } on SocketException catch (e) {
       throw HasuraError("connection error", null);
+    } catch (e) {
+      rethrow;
     } finally {
       client.close();
     }
@@ -346,3 +351,9 @@ class HasuraConnectBase implements HasuraConnect {
     await _controller.close();
   }
 }
+
+/*
+
+
+
+*/
