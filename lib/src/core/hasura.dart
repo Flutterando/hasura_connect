@@ -15,6 +15,10 @@ abstract class HasuraConnect {
       token: token,
     );
   }
+  
+  bool get isConnected;
+
+  Map<String,String> get headers;
 
   ///change function listener for token
   void changeToken(Future<String> Function(bool isError) token);
