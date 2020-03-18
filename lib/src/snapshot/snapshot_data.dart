@@ -131,9 +131,9 @@ class SnapshotData<T> extends Snapshot<T> {
 
   @override
   Future close() async {
+    await _close();
     await _streamSubscription.cancel();
     await _controller.close();
-    await _close();
   }
 
   @override
