@@ -20,18 +20,19 @@ class SnapshotInfo {
   SnapshotInfo({this.query, this.key, this.variables, this.isQuery = false});
 
   ///return object [SnapshotInfo] as Json
-  toJson() {
+  Map<String, dynamic> toJson() {
     return {
-      "key": key,
-      "query": query,
-      "variables": variables,
-      "isQuery": isQuery,
+      'key': key,
+      'query': query,
+      'variables': variables,
+      'isQuery': isQuery,
     };
   }
 
-  String _generateKeyCache(){
+  String _generateKeyCache() {
     var uuid = Uuid();
-    return uuid.v5(Uuid.NAMESPACE_URL, "$key.${utils.generateBaseJson(variables)}");
+    return uuid.v5(
+        Uuid.NAMESPACE_URL, '$key.${utils.generateBaseJson(variables)}');
   }
 
   ///create [SnapshotInfo] from json

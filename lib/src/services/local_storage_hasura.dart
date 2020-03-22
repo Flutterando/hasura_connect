@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorageHasura {
-  Completer<SharedPreferences> _completer = Completer<SharedPreferences>();
+  final _completer = Completer<SharedPreferences>();
   final String boxName;
 
   LocalStorageHasura(this.boxName, {bool isTest = false}) {
@@ -25,14 +25,14 @@ class LocalStorageHasura {
   //   }
   // }
 
-  _init(bool isTest) async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  void _init(bool isTest) async {
+    var sharedPreferences = await SharedPreferences.getInstance();
     _completer.complete(sharedPreferences);
   }
 
   Future<Map<String, dynamic>> getAll() async {
     var box = await _completer.future;
-    Map<String, dynamic> map = {};
+    var map = {};
     box.getKeys().where((key) => key.startsWith('$boxName.')).forEach((key) {
       map[key.replaceFirst('$boxName.', '')] = jsonDecode(box.getString(key));
     });

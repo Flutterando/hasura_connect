@@ -1,18 +1,18 @@
 class HasuraError implements Exception {
   final String message;
   final Extensions extensions;
+  final Exception exception;
 
-  HasuraError(this.message, this.extensions);
+  HasuraError(this.message, this.extensions, [this.exception]);
 
-  factory HasuraError.fromJson(Map json) {
-    return HasuraError(
-        json["message"], Extensions.fromJson(json["extensions"]));
-  }
+  factory HasuraError.fromException(String message, Exception _exception) =>
+      HasuraError(message, null, _exception);
+
+  factory HasuraError.fromJson(Map json) =>
+      HasuraError(json['message'], Extensions.fromJson(json['extensions']));
 
   @override
-  String toString() {
-    return "HasuraError: $message";
-  }
+  String toString() => 'HasuraError: $message';
 }
 
 class Extensions {
@@ -22,11 +22,11 @@ class Extensions {
   Extensions(this.path, this.code);
 
   factory Extensions.fromJson(Map json) {
-    return Extensions(json["path"], json["code"]);
+    return Extensions(json['path'], json['code']);
   }
 
   @override
   String toString() {
-    return "path: $path, code: $code";
+    return 'path: $path, code: $code';
   }
 }

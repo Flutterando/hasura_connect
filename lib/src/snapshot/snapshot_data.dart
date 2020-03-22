@@ -21,7 +21,7 @@ class SnapshotData<T> extends Snapshot<T> {
   T Function(Map) _hydrated;
   Map Function(T) _persist;
   LocalStorageHasura _localStorageCache;
-  Completer<bool> _initHydrated = Completer<bool>();
+  final _initHydrated = Completer<bool>();
 
   @override
   T get value => _controller.value;
@@ -67,13 +67,13 @@ class SnapshotData<T> extends Snapshot<T> {
       Function(Snapshot) renew}) {
     return SnapshotData<S>(
       info ?? this.info,
-      streamInit ?? this._streamInit,
-      close ?? this.close,
-      renew ?? this._renew,
-      conn: conn ?? this._conn,
-      hydrated: hydrated ?? this._hydrated,
-      persist: persist ?? this._persist,
-      localStorageCache: localStorageCache ?? this._localStorageCache,
+      streamInit ?? _streamInit,
+      close ?? close,
+      renew ?? _renew,
+      conn: conn ?? _conn,
+      hydrated: hydrated ?? _hydrated,
+      persist: persist ?? _persist,
+      localStorageCache: localStorageCache ?? _localStorageCache,
     );
   }
 
@@ -105,7 +105,7 @@ class SnapshotData<T> extends Snapshot<T> {
     }
   }
 
-  _sendNewQuery() async {
+  void _sendNewQuery() async {
     try {
       final data = await _conn.query(info.query, variables: info.variables);
       var newData = _hydrated != null ? _hydrated(data) : data;
