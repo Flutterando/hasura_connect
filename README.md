@@ -155,6 +155,21 @@ conn.mutation(...);
 
 ```
 
+## Custom Database by Delegate
+
+You can add others database to work with cache using **localStorageDelegate** param in **HasuraConnect** construct.
+
+This library have two delegates:
+- **LocalStorageSharedPreferences** (default) 
+- **LocalStorageHive** (Using Hive Database for Desktops)
+
+Implements **LocalStorage** interface and use any Database:
+
+```dart
+HasuraConnect hasuraConnect = HasuraConnect(url,
+            localStorageDelegate: () => LocalStorageHive(),);
+```
+
 ## Dispose
 
 HasuraConnect provides a dispose() method for use in Provider or BlocProvider.

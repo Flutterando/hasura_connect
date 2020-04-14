@@ -2,13 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class LocalStorageHasura {
-  Completer<SharedPreferences> _completer = Completer<SharedPreferences>();
-  final String boxName;
+import 'local_storage.dart';
 
-  LocalStorageHasura(this.boxName, {bool isTest = false}) {
-    _init(isTest);
-  }
+class LocalStorageSharedPreferences extends LocalStorage {
+  Completer<SharedPreferences> _completer = Completer<SharedPreferences>();
+  String name;
 
   // Future<String> _getPath() async {
   //   try {
@@ -25,23 +23,27 @@ class LocalStorageHasura {
   //   }
   // }
 
-  _init(bool isTest) async {
+  @override
+  Future init(String name) async {
+    this.name = name;
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     _completer.complete(sharedPreferences);
   }
 
+  @override
   Future<Map<String, dynamic>> getAll() async {
     var box = await _completer.future;
     Map<String, dynamic> map = {};
-    box.getKeys().where((key) => key.startsWith('$boxName.')).forEach((key) {
-      map[key.replaceFirst('$boxName.', '')] = jsonDecode(box.getString(key));
+    box.getKeys().where((key) => key.startsWith('$name.')).forEach((key) {
+      map[key.replaceFirst('$name.', '')] = jsonDecode(box.getString(key));
     });
     return map;
   }
 
+  @override
   Future<Map> getValue(String key) async {
     var box = await _completer.future;
-    key = '$boxName.$key';
+    key = '$name.$key';
     if (box.containsKey(key)) {
       return jsonDecode(box.getString(key));
     } else {
@@ -49,16 +51,19 @@ class LocalStorageHasura {
     }
   }
 
+  @override
   Future put(String key, Map query) async {
     var box = await _completer.future;
-    await box.setString('$boxName.$key', jsonEncode(query));
+    await box.setString('$name.$key', jsonEncode(query));
   }
 
+  @override
   Future<bool> remove(String key) async {
     var box = await _completer.future;
-    return box.remove('$boxName.$key');
+    return box.remove('$name.$key');
   }
 
+  @override
   Future clear() async {
     try {
       var box = await _completer.future;
@@ -69,6 +74,6 @@ class LocalStorageHasura {
     }
   }
 
-  @deprecated
+  @override
   Future close() async {}
 }

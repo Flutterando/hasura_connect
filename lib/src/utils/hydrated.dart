@@ -1,12 +1,13 @@
 import 'dart:async';
-import 'package:hasura_connect/src/services/local_storage_hasura.dart';
 import 'package:rxdart/rxdart.dart';
+
+import '../../hasura_connect.dart';
 
 class HydratedSubject<T> extends Subject<T> implements ValueStream<T> {
   String _key;
   T _seedValue;
   _Wrapper<T> _wrapper;
-  LocalStorageHasura _cacheLocal;
+  LocalStorage _cacheLocal;
 
   T Function(Map value) _hydrate;
   Map Function(T value) _persist;
@@ -29,7 +30,7 @@ class HydratedSubject<T> extends Subject<T> implements ValueStream<T> {
   factory HydratedSubject(
     String key, {
     T seedValue,
-    LocalStorageHasura cacheLocal,
+    LocalStorage cacheLocal,
     T Function(Map value) hydrate,
     Map Function(T value) persist,
     void onHydrate(),
@@ -65,8 +66,7 @@ class HydratedSubject<T> extends Subject<T> implements ValueStream<T> {
         Rx.defer<T>(
             () => wrapper.latestValue == null
                 ? controller.stream
-                : controller.stream
-                    .startWith(wrapper.latestValue),
+                : controller.stream.startWith(wrapper.latestValue),
             reusable: true),
         wrapper,
         cacheLocal);
@@ -96,7 +96,7 @@ class HydratedSubject<T> extends Subject<T> implements ValueStream<T> {
   /// Must be called to retreive values stored on the device.
   Future<void> _hydrateSubject() async {
     var val;
-    var value = await _cacheLocal.getValue(this._key); 
+    var value = await _cacheLocal.getValue(this._key);
     if (this._hydrate != null) {
       val = this._hydrate(value);
     } else {

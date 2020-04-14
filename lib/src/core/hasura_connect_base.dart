@@ -5,7 +5,7 @@ import 'dart:io';
 
 import 'package:hasura_connect/src/core/hasura.dart';
 import 'package:hasura_connect/src/exceptions/hasura_error.dart';
-import 'package:hasura_connect/src/services/local_storage_hasura.dart';
+import 'package:hasura_connect/src/services/local_storage.dart';
 import 'package:hasura_connect/src/snapshot/snapshot.dart';
 import 'package:hasura_connect/src/snapshot/snapshot_data.dart';
 import 'package:hasura_connect/src/snapshot/snapshot_info.dart';
@@ -13,14 +13,16 @@ import 'package:hasura_connect/src/utils/utils.dart' as utils;
 import 'package:websocket/websocket.dart';
 import 'package:http/http.dart' as http;
 
+import '../../hasura_connect.dart';
+
 class HasuraConnectBase implements HasuraConnect {
   final _controller = StreamController.broadcast();
   final Map<String, SnapshotData> _snapmap = {};
-  final Map<String, String> _headers;
+  Map<String, String> _headers;
+  final LocalStorage Function() localStorageDelegate;
 
-  LocalStorageHasura _localStorageMutation =
-      LocalStorageHasura("hasura_mutations");
-  LocalStorageHasura _localStorageCache = LocalStorageHasura("hasura_cache");
+  LocalStorage _localStorageMutation;
+  LocalStorage _localStorageCache;
   WebSocket _channelPromisse;
   bool _isDisconnected = false;
   bool _isConnected = false;
@@ -32,9 +34,15 @@ class HasuraConnectBase implements HasuraConnect {
 
   HasuraConnectBase(this.url,
       {Map<String, dynamic> headers,
-      Future<String> Function(bool isError) token})
-      : _token = token,
-        _headers = headers ?? <String, String>{};
+      this.localStorageDelegate,
+      Future<String> Function(bool isError) token}) {
+    _token = token;
+    _headers = headers ?? <String, String>{};
+    _localStorageMutation = localStorageDelegate();
+    _localStorageCache = localStorageDelegate();
+    _localStorageMutation.init("hasura_mutations");
+    _localStorageCache.init("hasura_cache");
+  }
 
   final _init = {
     "payload": {
@@ -333,7 +341,7 @@ class HasuraConnectBase implements HasuraConnect {
         throw HasuraError.fromJson(json["errors"][0]);
       }
       return json;
-    } on SocketException catch (e) {
+    } on SocketException catch (_) {
       throw HasuraError("connection error", null);
     } catch (e) {
       rethrow;

@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:hasura_connect/src/core/hasura.dart';
 import 'package:hasura_connect/src/exceptions/hasura_error.dart';
+import 'package:hasura_connect/src/services/local_storage.dart';
 import 'package:hasura_connect/src/snapshot/snapshot_info.dart';
 import 'package:hasura_connect/src/utils/hydrated.dart';
 
-import '../services/local_storage_hasura.dart';
+import '../../hasura_connect.dart';
 import 'snapshot.dart';
 
 class SnapshotData<T> extends Snapshot<T> {
@@ -20,7 +21,7 @@ class SnapshotData<T> extends Snapshot<T> {
   HydratedSubject<T> _controller;
   T Function(Map) _hydrated;
   Map Function(T) _persist;
-  LocalStorageHasura _localStorageCache;
+  LocalStorage _localStorageCache;
   Completer<bool> _initHydrated = Completer<bool>();
 
   @override
@@ -30,7 +31,7 @@ class SnapshotData<T> extends Snapshot<T> {
   StreamSubscription _streamSubscription;
 
   SnapshotData(this.info, this._streamInit, this._close, this._renew,
-      {LocalStorageHasura localStorageCache,
+      {LocalStorage localStorageCache,
       HasuraConnect conn,
       T Function(Map) hydrated,
       Map Function(T) persist}) {
@@ -58,7 +59,7 @@ class SnapshotData<T> extends Snapshot<T> {
 
   SnapshotData<S> _copyWith<S>(
       {SnapshotInfo info,
-      LocalStorageHasura localStorageCache,
+      LocalStorage localStorageCache,
       Stream streamInit,
       Function close,
       HasuraConnect conn,
