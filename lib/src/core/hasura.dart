@@ -1,4 +1,3 @@
-import 'package:hasura_connect/src/services/local_storage_hive.dart';
 import 'package:hasura_connect/src/snapshot/snapshot.dart';
 
 import '../../hasura_connect.dart';

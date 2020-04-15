@@ -40,8 +40,8 @@ class HasuraConnectBase implements HasuraConnect {
     _headers = headers ?? <String, String>{};
     _localStorageMutation = localStorageDelegate();
     _localStorageCache = localStorageDelegate();
-    _localStorageMutation.init("hasura_mutations");
-    _localStorageCache.init("hasura_cache");
+    _localStorageMutation.init('hasura_mutations');
+    _localStorageCache.init('hasura_cache');
   }
 
   final _init = {
@@ -331,7 +331,7 @@ class HasuraConnectBase implements HasuraConnect {
       }
       return json;
     } on SocketException catch (_) {
-      throw HasuraError("connection error", null);
+      throw HasuraError('connection error', null);
     } catch (e) {
       rethrow;
     } finally {

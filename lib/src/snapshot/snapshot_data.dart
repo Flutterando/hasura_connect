@@ -22,7 +22,7 @@ class SnapshotData<T> extends Snapshot<T> {
   T Function(Map) _hydrated;
   Map Function(T) _persist;
   LocalStorage _localStorageCache;
-  Completer<bool> _initHydrated = Completer<bool>();
+  final _initHydrated = Completer<bool>();
 
   @override
   T get value => _controller.value;

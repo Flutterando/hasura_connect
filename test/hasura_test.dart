@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hasura_connect/hasura_connect.dart';
 import 'package:uuid/uuid.dart';
 
 void main() {

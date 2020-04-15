@@ -96,9 +96,9 @@ class HydratedSubject<T> extends Subject<T> implements ValueStream<T> {
   /// Must be called to retreive values stored on the device.
   Future<void> _hydrateSubject() async {
     var val;
-    var value = await _cacheLocal.getValue(this._key);
-    if (this._hydrate != null) {
-      val = this._hydrate(value);
+    var value = await _cacheLocal.getValue(_key);
+    if (_hydrate != null) {
+      val = _hydrate(value);
     } else {
       val = value;
     }
