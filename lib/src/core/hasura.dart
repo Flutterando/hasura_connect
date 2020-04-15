@@ -1,5 +1,7 @@
+import 'package:hasura_connect/src/services/local_storage_hive.dart';
 import 'package:hasura_connect/src/snapshot/snapshot.dart';
 
+import '../../hasura_connect.dart';
 import 'hasura_connect_base.dart';
 
 abstract class HasuraConnect {
@@ -8,17 +10,18 @@ abstract class HasuraConnect {
   ///[token] -> change token jwt
   factory HasuraConnect(String url,
       {Future<String> Function(bool isError) token,
+      LocalStorage Function() localStorageDelegate,
       Map<String, String> headers}) {
-    return HasuraConnectBase(
-      url,
-      headers: headers,
-      token: token,
-    );
+    return HasuraConnectBase(url,
+        headers: headers,
+        token: token,
+        localStorageDelegate:
+            localStorageDelegate ?? () => LocalStorageSharedPreferences());
   }
-  
+
   bool get isConnected;
 
-  Map<String,String> get headers;
+  Map<String, String> get headers;
 
   ///change function listener for token
   void changeToken(Future<String> Function(bool isError) token);

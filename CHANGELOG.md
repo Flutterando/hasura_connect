@@ -1,3 +1,7 @@
+## 1.2.0
+
+- Added LocalStorage Delegates (LocalStorageSharedPreferences, LocalStorageHive)
+
 ## 1.1.1
 
 - fix errors.
