@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'local_storage.dart';
 
 class LocalStorageSharedPreferences extends LocalStorage {
-  Completer<SharedPreferences> _completer = Completer<SharedPreferences>();
+  final _completer = Completer<SharedPreferences>();
   String name;
 
   // Future<String> _getPath() async {
@@ -26,14 +27,14 @@ class LocalStorageSharedPreferences extends LocalStorage {
   @override
   Future init(String name) async {
     this.name = name;
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    final sharedPreferences = await SharedPreferences.getInstance();
     _completer.complete(sharedPreferences);
   }
 
   @override
   Future<Map<String, dynamic>> getAll() async {
     var box = await _completer.future;
-    Map<String, dynamic> map = {};
+    final map = {};
     box.getKeys().where((key) => key.startsWith('$name.')).forEach((key) {
       map[key.replaceFirst('$name.', '')] = jsonDecode(box.getString(key));
     });

@@ -33,9 +33,9 @@ class HydratedSubject<T> extends Subject<T> implements ValueStream<T> {
     LocalStorage cacheLocal,
     T Function(Map value) hydrate,
     Map Function(T value) persist,
-    void onHydrate(),
-    void onListen(),
-    void onCancel(),
+    void Function() onHydrate,
+    void Function() onListen,
+    void Function() onCancel,
     bool sync = false,
   }) {
     // assert that T is a type compatible with shared_preferences,
@@ -44,7 +44,7 @@ class HydratedSubject<T> extends Subject<T> implements ValueStream<T> {
         T == double ||
         T == bool ||
         T == String ||
-        [""] is T ||
+        [''] is T ||
         (hydrate != null && persist != null));
 
     // ignore: close_sinks
@@ -96,9 +96,9 @@ class HydratedSubject<T> extends Subject<T> implements ValueStream<T> {
   /// Must be called to retreive values stored on the device.
   Future<void> _hydrateSubject() async {
     var val;
-    var value = await _cacheLocal.getValue(this._key);
-    if (this._hydrate != null) {
-      val = this._hydrate(value);
+    var value = await _cacheLocal.getValue(_key);
+    if (_hydrate != null) {
+      val = _hydrate(value);
     } else {
       val = value;
     }
@@ -108,26 +108,26 @@ class HydratedSubject<T> extends Subject<T> implements ValueStream<T> {
     }
 
     if (_onHydrate != null) {
-      this._onHydrate();
+      _onHydrate();
     }
   }
 
   Future changeKey(String newKey) async {
-    this._key = newKey;
+    _key = newKey;
     _wrapper.latestValue = null;
     await _hydrateSubject();
   }
 
-  _persistValue(T val) async {
-    if (this._persist != null) {
-      await _cacheLocal.put(_key, this._persist(val));
+  void _persistValue(T val) async {
+    if (_persist != null) {
+      await _cacheLocal.put(_key, _persist(val));
     } else if (val is Map) {
       await _cacheLocal.put(_key, val);
     }
   }
 
   /// A unique key that references a storage container for a value persisted on the device.
-  String get key => this._key;
+  String get key => _key;
 }
 
 class _Wrapper<T> {
