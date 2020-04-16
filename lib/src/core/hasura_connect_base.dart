@@ -40,19 +40,21 @@ class HasuraConnectBase implements HasuraConnect {
     _headers = headers ?? <String, String>{};
     _localStorageMutation = localStorageDelegate();
     _localStorageCache = localStorageDelegate();
-    _localStorageMutation.init("hasura_mutations");
-    _localStorageCache.init("hasura_cache");
+    _localStorageMutation.init('hasura_mutations');
+    _localStorageCache.init('hasura_cache');
   }
 
   final _init = {
-    "payload": {
-      "headers": {"content-type": "application/json"}
+    'payload': {
+      'headers': {'content-type': 'application/json'}
     },
-    "type": 'connection_init'
+    'type': 'connection_init'
   };
 
+  @override
   bool get isConnected => _isConnected;
 
+  @override
   Map<String, String> get headers => UnmodifiableMapView(_headers);
 
   @override
@@ -76,16 +78,16 @@ class HasuraConnectBase implements HasuraConnect {
   }
 
   Stream _generateStream(String key) {
-    return _controller.stream.where((data) => data["id"] == key).transform(
+    return _controller.stream.where((data) => data['id'] == key).transform(
       StreamTransformer.fromHandlers(
         handleData: (data, sink) {
-          if (data["type"] == "data") {
+          if (data['type'] == 'data') {
             sink.add(data['payload']);
-          } else if (data["type"] == "error") {
-            if ((data["payload"] as Map).containsKey("errors")) {
-              sink.addError(HasuraError.fromJson(data["payload"]["errors"][0]));
+          } else if (data['type'] == 'error') {
+            if ((data['payload'] as Map).containsKey('errors')) {
+              sink.addError(HasuraError.fromJson(data['payload']['errors'][0]));
             } else {
-              sink.addError(HasuraError.fromJson(data["payload"]));
+              sink.addError(HasuraError.fromJson(data['payload']));
             }
           }
         },
@@ -100,13 +102,12 @@ class HasuraConnectBase implements HasuraConnect {
   @override
   Snapshot subscription(String query,
       {String key, Map<String, dynamic> variables}) {
-    if (query.trim().split(" ")[0] != "subscription") {
-      query = "subscription $query";
+    if (query.trim().split(' ')[0] != 'subscription') {
+      query = 'subscription $query';
     }
 
-    if (key == null) {
-      key = utils.generateBase(query);
-    }
+    key = key ?? utils.generateBase(query);
+
     final info = SnapshotInfo(key: key, query: query, variables: variables);
     // _localStorage.addSubscription(info);
     return _generateSnapshot(info);
@@ -115,18 +116,13 @@ class HasuraConnectBase implements HasuraConnect {
   @override
   Snapshot cachedQuery(String query,
       {String key, Map<String, dynamic> variables}) {
-    if (query.trimLeft().split(" ")[0] != "query") {
-      query = "query $query";
+    if (query.trimLeft().split(' ')[0] != 'query') {
+      query = 'query $query';
     }
 
-    if (key == null) {
-      key = utils.generateBase(query);
-    }
+    key = key ?? utils.generateBase(query);
 
-    Map<String, dynamic> jsonMap = {
-      'query': query,
-      'variables': variables,
-    };
+    var jsonMap = {'query': query, 'variables': variables};
     final info = SnapshotInfo(
         key: key, query: query, variables: variables, isQuery: true);
     return _generateSnapshot(info, futureQuery: _sendPost(jsonMap));
@@ -173,50 +169,50 @@ class HasuraConnectBase implements HasuraConnect {
     return snap;
   }
 
-  _stopStream(String key) {
-    var stop = {"id": key, "type": 'stop'};
+  void _stopStream(String key) {
+    var stop = {'id': key, 'type': 'stop'};
     if (_isConnected) _channelPromisse.addUtf8Text(jsonEncode(stop).codeUnits);
   }
 
   String _getDocument(
       String query, String key, Map<String, dynamic> variables) {
     return jsonEncode({
-      "id": key,
-      "payload": {
-        "query": query,
-        "variables": variables,
+      'id': key,
+      'payload': {
+        'query': query,
+        'variables': variables,
       },
-      "type": 'start'
+      'type': 'start'
     });
   }
 
-  _addToken([bool isError = false]) async {
+  void _addToken([bool isError = false]) async {
     if (_token != null) {
-      String t = await _token(isError);
+      var t = await _token(isError);
       if (t != null) {
-        (_init["payload"] as Map)["headers"]["Authorization"] = t;
+        (_init['payload'] as Map)['headers']['Authorization'] = t;
       }
     }
   }
 
-  _connect() async {
-    print("hasura connecting...");
+  void _connect() async {
+    print('hasura connecting...');
     try {
-      _channelPromisse = await WebSocket.connect(url.replaceFirst("http", "ws"),
+      _channelPromisse = await WebSocket.connect(url.replaceFirst('http', 'ws'),
           protocols: ['graphql-ws']); //graphql-subscriptions
       await _addToken();
       if (_headers != null) {
         for (var key in _headers?.keys) {
-          (_init["payload"] as Map)["headers"][key] = _headers[key];
+          (_init['payload'] as Map)['headers'][key] = _headers[key];
         }
       }
       _channelPromisse.addUtf8Text(jsonEncode(_init).codeUnits);
       var _sub = _channelPromisse.stream.listen((data) async {
         data = jsonDecode(data);
-        if (data["type"] == "data" || data["type"] == "error") {
+        if (data['type'] == 'data' || data['type'] == 'error') {
           _controller.add(data);
-        } else if (data["type"] == "connection_ack") {
-          print("HASURA CONNECT!");
+        } else if (data['type'] == 'connection_ack') {
+          print('HASURA CONNECT!');
           _isConnected = true;
 
           for (var key in _snapmap.keys) {
@@ -225,17 +221,16 @@ class HasuraConnectBase implements HasuraConnect {
                 .codeUnits);
           }
 
-          Map<String, dynamic> mutationCache =
-              await _localStorageMutation.getAll();
+          var mutationCache = await _localStorageMutation.getAll();
           for (var key in mutationCache.keys) {
             await _sendPost(mutationCache[key], key);
           }
-        } else if (data["type"] == "connection_error") {
-          print("Try again...");
+        } else if (data['type'] == 'connection_error') {
+          print('Try again...');
           await Future.delayed(Duration(seconds: 2));
           await _addToken(true);
           _channelPromisse.addUtf8Text(jsonEncode(_init).codeUnits);
-        } else if (data["type"] == "ka") {
+        } else if (data['type'] == 'ka') {
         } else {
           print(data);
         }
@@ -266,8 +261,8 @@ class HasuraConnectBase implements HasuraConnect {
     }
   }
 
-  _disconnect() async {
-    var disconect = {"type": 'connection_terminate'};
+  void _disconnect() async {
+    var disconect = {'type': 'connection_terminate'};
     if (_isConnected) {
       _channelPromisse.addUtf8Text(jsonEncode(disconect).codeUnits);
     }
@@ -276,18 +271,15 @@ class HasuraConnectBase implements HasuraConnect {
     if (_channelPromisse?.closeCode != null) {
       await _channelPromisse.close();
     }
-    print("disconnected hasura");
+    print('disconnected hasura');
   }
 
   @override
   Future query(String doc, {Map<String, dynamic> variables}) async {
-    if (doc.trimLeft().split(" ")[0] != "query") {
-      doc = "query $doc";
+    if (doc.trimLeft().split(' ')[0] != 'query') {
+      doc = 'query $doc';
     }
-    Map<String, dynamic> jsonMap = {
-      'query': doc,
-      'variables': variables,
-    };
+    var jsonMap = {'query': doc, 'variables': variables};
 
     return await _sendPost(jsonMap);
   }
@@ -295,30 +287,27 @@ class HasuraConnectBase implements HasuraConnect {
   @override
   Future mutation(String doc,
       {Map<String, dynamic> variables, bool tryAgain = true}) async {
-    if (doc.trim().split(" ")[0] != "mutation") {
-      doc = "mutation $doc";
+    if (doc.trim().split(' ')[0] != 'mutation') {
+      doc = 'mutation $doc';
     }
-    Map<String, dynamic> jsonMap = {
-      'query': doc,
-      'variables': variables,
-    };
-    String hash = utils.randomString(15);
+    var jsonMap = {'query': doc, 'variables': variables};
+    var hash = utils.randomString(15);
     await _localStorageMutation.put(hash, jsonMap);
     return await _sendPost(jsonMap, hash);
   }
 
   Future _sendPost(Map jsonMap, [String hash]) async {
-    String jsonString = jsonEncode(jsonMap);
+    var jsonString = jsonEncode(jsonMap);
 
-    Map<String, String> headersLocal = {
-      "Content-type": "application/json",
-      "Accept": "application/json"
+    var headersLocal = {
+      'Content-type': 'application/json',
+      'Accept': 'application/json'
     };
 
     if (_token != null) {
-      String t = await _token(false);
+      var t = await _token(false);
       if (t != null) {
-        headersLocal["Authorization"] = t;
+        headersLocal['Authorization'] = t;
       }
     }
 
@@ -337,12 +326,12 @@ class HasuraConnectBase implements HasuraConnect {
       if (hash != null) {
         await _localStorageMutation.remove(hash);
       }
-      if (json.containsKey("errors")) {
-        throw HasuraError.fromJson(json["errors"][0]);
+      if (json.containsKey('errors')) {
+        throw HasuraError.fromJson(json['errors'][0]);
       }
       return json;
     } on SocketException catch (_) {
-      throw HasuraError("connection error", null);
+      throw HasuraError('connection error', null);
     } catch (e) {
       rethrow;
     } finally {

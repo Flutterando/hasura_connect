@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart' as path_provider;
 import 'local_storage.dart';
 
 class LocalStorageHive extends LocalStorage {
-  Completer<Box> _completer = Completer<Box>();
+  final Completer<Box> _completer = Completer<Box>();
   String name;
 
   Future<String> _getPath() async {
@@ -15,7 +15,7 @@ class LocalStorageHive extends LocalStorage {
         var dir = await path_provider.getApplicationDocumentsDirectory();
         return dir.path;
       } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-        return ".hasuradb";
+        return '.hasuradb';
       } else {
         return null;
       }
