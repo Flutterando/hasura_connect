@@ -1,7 +1,11 @@
 import 'dart:async';
-import 'package:rxdart/rxdart.dart';
+
+import 'package:hasura_connect/src/utils/subject.dart';
+import 'package:hasura_connect/src/utils/value_stream.dart';
 
 import '../../hasura_connect.dart';
+import 'defer.dart';
+import 'startwith_stream_transformer.dart';
 
 class HydratedSubject<T> extends Subject<T> implements ValueStream<T> {
   String _key;
@@ -63,10 +67,11 @@ class HydratedSubject<T> extends Subject<T> implements ValueStream<T> {
         persist,
         onHydrate,
         controller,
-        Rx.defer<T>(
+        DeferStream<T>(
             () => wrapper.latestValue == null
                 ? controller.stream
-                : controller.stream.startWith(wrapper.latestValue),
+                : controller.stream
+                    .transform(StartWithStreamTransformer(wrapper.latestValue)),
             reusable: true),
         wrapper,
         cacheLocal);

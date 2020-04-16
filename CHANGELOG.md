@@ -1,6 +1,6 @@
-## 1.2.0
-
+## 1.2.1
 - Added LocalStorage Delegates (LocalStorageSharedPreferences, LocalStorageHive)
+- Remove RXDART
 
 ## 1.1.1
 
