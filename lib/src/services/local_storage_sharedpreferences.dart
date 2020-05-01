@@ -34,7 +34,7 @@ class LocalStorageSharedPreferences extends LocalStorage {
   @override
   Future<Map<String, dynamic>> getAll() async {
     var box = await _completer.future;
-    final map = {};
+    final map = <String, dynamic>{};
     box.getKeys().where((key) => key.startsWith('$name.')).forEach((key) {
       map[key.replaceFirst('$name.', '')] = jsonDecode(box.getString(key));
     });
