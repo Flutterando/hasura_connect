@@ -102,7 +102,7 @@ class HasuraConnectBase implements HasuraConnect {
   @override
   Snapshot subscription(String query,
       {String key, Map<String, dynamic> variables}) {
-    if (query.trim().split(' ')[0] != 'subscription') {
+    if (!RegExp(r"^(?:\s+)?subscription(?:\s|\{)").hasMatch(query)]) {
       query = 'subscription $query';
     }
 
@@ -116,7 +116,7 @@ class HasuraConnectBase implements HasuraConnect {
   @override
   Snapshot cachedQuery(String query,
       {String key, Map<String, dynamic> variables}) {
-    if (query.trimLeft().split(' ')[0] != 'query') {
+    if (!RegExp(r"^(?:\s+)?query(?:\s|\{)").hasMatch(query)]) {
       query = 'query $query';
     }
 
@@ -276,7 +276,7 @@ class HasuraConnectBase implements HasuraConnect {
 
   @override
   Future query(String doc, {Map<String, dynamic> variables}) async {
-    if (doc.trimLeft().split(' ')[0] != 'query') {
+    if (!RegExp(r"^(?:\s+)?query(?:\s|\{)").hasMatch(query)]) {
       doc = 'query $doc';
     }
     var jsonMap = {'query': doc, 'variables': variables};
@@ -287,7 +287,7 @@ class HasuraConnectBase implements HasuraConnect {
   @override
   Future mutation(String doc,
       {Map<String, dynamic> variables, bool tryAgain = true}) async {
-    if (doc.trim().split(' ')[0] != 'mutation') {
+    if (!RegExp(r"^(?:\s+)?mutation(?:\s|\{)").hasMatch(query)]) {
       doc = 'mutation $doc';
     }
     var jsonMap = {'query': doc, 'variables': variables};
