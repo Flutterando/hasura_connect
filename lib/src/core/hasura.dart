@@ -7,18 +7,23 @@ abstract class HasuraConnect {
   ///[url] -> url to graph client
   ///[header] -> set header elements for request
   ///[token] -> change token jwt
+  ///[reconnectionAttemp] -> Default is 0 = unlimited connection attempt;
   factory HasuraConnect(String url,
       {Future<String> Function(bool isError) token,
       LocalStorage Function() localStorageDelegate,
-      Map<String, String> headers}) {
+      Map<String, String> headers,
+      int reconnectionAttempt = 0}) {
     return HasuraConnectBase(url,
         headers: headers,
         token: token,
+        reconnectionAttemp: reconnectionAttempt,
         localStorageDelegate:
             localStorageDelegate ?? () => LocalStorageSharedPreferences());
   }
 
   bool get isConnected;
+
+  Stream<bool> get isConnectedStream;
 
   Map<String, String> get headers;
 
@@ -33,6 +38,12 @@ abstract class HasuraConnect {
 
   ///clear all headers
   void removeAllHeader();
+
+  ///try to reconnect
+  void reconnect();
+
+    ///try to reconnect
+  void disconnect();
 
   ///get [Snapshot] from Subscription connection
   Snapshot subscription(String query,

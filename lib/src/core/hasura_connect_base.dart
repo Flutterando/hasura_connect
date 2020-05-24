@@ -21,6 +21,8 @@ class HasuraConnectBase implements HasuraConnect {
   Map<String, String> _headers;
   final LocalStorage Function() localStorageDelegate;
 
+  int _reconnectionAttemp;
+  int _numbersOfConnectionAttempts = 0;
   LocalStorage _localStorageMutation;
   LocalStorage _localStorageCache;
   WebSocket _channelPromisse;
@@ -35,13 +37,15 @@ class HasuraConnectBase implements HasuraConnect {
   HasuraConnectBase(this.url,
       {Map<String, dynamic> headers,
       this.localStorageDelegate,
-      Future<String> Function(bool isError) token}) {
+      Future<String> Function(bool isError) token,
+      int reconnectionAttemp}) {
     _token = token;
     _headers = headers ?? <String, String>{};
     _localStorageMutation = localStorageDelegate();
     _localStorageCache = localStorageDelegate();
     _localStorageMutation.init('hasura_mutations');
     _localStorageCache.init('hasura_cache');
+    this._reconnectionAttemp = reconnectionAttemp;
   }
 
   final _init = {
@@ -53,6 +57,11 @@ class HasuraConnectBase implements HasuraConnect {
 
   @override
   bool get isConnected => _isConnected;
+
+  StreamController<bool> _isConnectedController = StreamController<bool>.broadcast();
+
+  @override
+  Stream<bool> get isConnectedStream => this._isConnectedController.stream;
 
   @override
   Map<String, String> get headers => UnmodifiableMapView(_headers);
@@ -195,7 +204,27 @@ class HasuraConnectBase implements HasuraConnect {
     }
   }
 
+  @override
+  void reconnect() {
+      this._numbersOfConnectionAttempts = 0;
+      this._connect();
+  }
+
+  @override
+  void disconnect() {
+    this._disconnect();
+  }
+
   void _connect() async {
+    if (this._reconnectionAttemp != null && this._reconnectionAttemp > 0) {
+        if (this._numbersOfConnectionAttempts >= this._reconnectionAttemp) {
+          print('maximum connection attempt numbers reached');
+          this._isConnected = false;
+          this._disconnect();
+          return;
+        } 
+        this._numbersOfConnectionAttempts++;
+    }
     print('hasura connecting...');
     try {
       _channelPromisse = await WebSocket.connect(url.replaceFirst('http', 'ws'),
@@ -214,7 +243,7 @@ class HasuraConnectBase implements HasuraConnect {
         } else if (data['type'] == 'connection_ack') {
           print('HASURA CONNECT!');
           _isConnected = true;
-
+          this._isConnectedController.add(true);
           for (var key in _snapmap.keys) {
             _channelPromisse.addUtf8Text(_getDocument(_snapmap[key].info.query,
                     _snapmap[key].info.key, _snapmap[key].info.variables)
@@ -241,6 +270,8 @@ class HasuraConnectBase implements HasuraConnect {
       await _channelPromisse.done;
       await _sub.cancel();
       _isConnected = false;
+      this._isConnectedController.add(false);
+
       if (!_isDisconnected) {
         await Future.delayed(Duration(milliseconds: 3000));
         if (_onConnect.isCompleted) {
@@ -267,6 +298,7 @@ class HasuraConnectBase implements HasuraConnect {
       _channelPromisse.addUtf8Text(jsonEncode(disconect).codeUnits);
     }
     _isDisconnected = true;
+    this._isConnectedController.add(false);
     await Future.delayed(Duration(milliseconds: 300));
     if (_channelPromisse?.closeCode != null) {
       await _channelPromisse.close();
@@ -347,6 +379,7 @@ class HasuraConnectBase implements HasuraConnect {
     await _localStorageCache.close();
     await _controller.close();
   }
+
 }
 
 /*
