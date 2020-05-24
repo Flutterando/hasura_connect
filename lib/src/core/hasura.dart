@@ -42,7 +42,7 @@ abstract class HasuraConnect {
   ///try to reconnect
   void reconnect();
 
-    ///try to reconnect
+  ///disconnects and activates the disposer
   void disconnect();
 
   ///get [Snapshot] from Subscription connection
