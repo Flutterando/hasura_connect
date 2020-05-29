@@ -69,7 +69,7 @@ class SnapshotData<T> extends Snapshot<T> {
     return SnapshotData<S>(
       info ?? this.info,
       streamInit ?? _streamInit,
-      close ?? close,
+      close ?? _close,
       renew ?? _renew,
       conn: conn ?? _conn,
       hydrated: hydrated ?? _hydrated,
