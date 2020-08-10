@@ -31,7 +31,6 @@ void main() {
   test('should return DatasourceError when datasource failed', () async {
     when(datasource.post(request: anyNamed('request'))).thenThrow(Exception());
     final result = await repository.sendRequest(request: tRequest);
-    expect(
-        result.fold(id, id), equals(const DatasourceError('Datasource Error')));
+    expect(result.fold(id, id), isA<DatasourceError>());
   });
 }

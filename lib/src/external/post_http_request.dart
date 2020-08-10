@@ -8,12 +8,13 @@ import 'package:hasura_connect/src/infra/datasources/request_datasource.dart';
 import 'package:http/http.dart' as http;
 
 class PostHttpRequest implements RequestDatasource {
-  final http.Client client;
+  final http.Client Function() clientFactory;
 
-  PostHttpRequest(this.client);
+  PostHttpRequest(this.clientFactory);
 
   @override
   Future<Response> post({Request request}) async {
+    final client = clientFactory();
     try {
       var response = await client.post(request.url,
           body: request.query.toString(), headers: request.headers);

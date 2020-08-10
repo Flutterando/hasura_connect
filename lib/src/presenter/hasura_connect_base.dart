@@ -206,7 +206,7 @@ class HasuraConnect {
     var stop = {'id': snapshot.query.key, 'type': 'stop'};
     _snapmap.remove(snapshot.query.key);
     _sendToWebSocketServer(jsonEncode(stop));
-    if (_snapmap.keys.isEmpty) _disconnect();
+    if (_snapmap.keys.isEmpty) disconnect();
   }
 
   void _sendToWebSocketServer(String input) {
@@ -232,21 +232,39 @@ class HasuraConnect {
     if (_connector == null) {
       return;
     }
+    _disconnectionFlag = false;
 
     if (reconnectionAttemp != null && reconnectionAttemp > 0) {
       if (_numbersOfConnectionAttempts >= reconnectionAttemp) {
         print('maximum connection attempt numbers reached');
         _isConnected = false;
         // ignore: unawaited_futures
-        _disconnect();
+        disconnect();
         _numbersOfConnectionAttempts = 0;
         return;
       }
       _numbersOfConnectionAttempts++;
     }
 
+    final request = Request(
+      url: url,
+      headers: headers,
+      type: RequestType.subscription,
+      query: Query(key: 'key', document: 'document'),
+    );
+
+    final interceptedValue = await _interceptorExecutor(
+      ClientResolver.request(request),
+    );
+
     try {
+      if (interceptedValue is Request) {
+        request.headers?.addAll(interceptedValue.headers);
+      } else if (interceptedValue is HasuraError) {
+        throw interceptedValue;
+      }
       final subscriptionStream = _connector.listen(_normalizeStreamValue);
+      (_init['payload'] as Map)['headers'] = request.headers;
       _sendToWebSocketServer(jsonEncode(_init));
       subscriptionStream.onError(print);
       await _connector.done;
@@ -297,7 +315,9 @@ class HasuraConnect {
     }
   }
 
-  Future<void> _disconnect() async {
+  Future<void> disconnect() async {
+    _disconnectionFlag = true;
+    _snapmap.clear();
     var disconect = {'type': 'connection_terminate'};
     if (_isConnected) {
       _sendToWebSocketServer(jsonEncode(disconect));
@@ -307,16 +327,14 @@ class HasuraConnect {
       await _connector.close();
     }
     await _interceptorExecutor.onDisconnect();
+    _connector = null;
   }
 
   @mustCallSuper
   Future dispose() async {
     // ignore: unawaited_futures
-    _disconnect();
+    await disconnect();
     await _controller.close();
-    _snapmap.clear();
-    sl.cleanModule();
-    _disconnectionFlag = true;
     await _subscription.cancel();
   }
 }

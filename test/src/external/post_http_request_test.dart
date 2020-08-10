@@ -15,7 +15,7 @@ class ClientMock extends Mock implements http.Client {}
 
 void main() {
   final client = ClientMock();
-  final datasource = PostHttpRequest(client);
+  final datasource = PostHttpRequest(() => client);
   final tRequest =
       Request(url: '', query: Query(document: 'query', key: 'dadas'));
 

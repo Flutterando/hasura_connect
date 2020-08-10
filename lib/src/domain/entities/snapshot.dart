@@ -6,25 +6,25 @@ import 'package:meta/meta.dart';
 class Snapshot<T> extends Stream<T> implements EventSink<T> {
   final _controller = StreamController.broadcast();
   final Query query;
+  final _WrapperStartWith<T> _wrapper = _WrapperStartWith<T>();
   final void Function(Snapshot) closeConnection;
-  T _value;
 
   Snapshot({@required this.query, this.closeConnection, T defaultValue}) {
-    _value = defaultValue;
+    _wrapper.value = defaultValue;
   }
 
   @override
   StreamSubscription<T> listen(void Function(T event) onData,
       {Function onError, void Function() onDone, bool cancelOnError}) {
     return _controller.stream
-        .transform(StartWithStreamTransformer(_value))
+        .transform(StartWithStreamTransformer(_wrapper))
         .listen(onData,
             onError: onError, onDone: onDone, cancelOnError: cancelOnError);
   }
 
   @override
   void add(T event) {
-    _value = event;
+    _wrapper.value = event;
     _controller.add(event);
   }
 
@@ -45,13 +45,14 @@ class Snapshot<T> extends Stream<T> implements EventSink<T> {
 class StartWithStreamTransformer<T> extends StreamTransformerBase<T, T> {
   final StreamTransformer<T, T> transformer;
 
-  StartWithStreamTransformer(T startValue)
-      : transformer = _buildTransformer(startValue);
+  StartWithStreamTransformer(_WrapperStartWith wrapper)
+      : transformer = _buildTransformer(wrapper);
 
   @override
   Stream<T> bind(Stream<T> stream) => transformer.bind(stream);
 
-  static StreamTransformer<T, T> _buildTransformer<T>(T startValue) {
+  static StreamTransformer<T, T> _buildTransformer<T>(
+      _WrapperStartWith wrapper) {
     return StreamTransformer<T, T>((Stream<T> input, bool cancelOnError) {
       StreamController<T> controller;
       StreamSubscription<T> subscription;
@@ -60,7 +61,9 @@ class StartWithStreamTransformer<T> extends StreamTransformerBase<T, T> {
           sync: true,
           onListen: () {
             try {
-              controller.add(startValue);
+              if (wrapper.value != null) {
+                controller.add(wrapper.value);
+              }
             } catch (e, s) {
               controller.addError(e, s);
             }
@@ -78,4 +81,8 @@ class StartWithStreamTransformer<T> extends StreamTransformerBase<T, T> {
       return controller.stream.listen(null);
     });
   }
+}
+
+class _WrapperStartWith<T> {
+  T value;
 }

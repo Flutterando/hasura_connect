@@ -34,11 +34,11 @@ void main() {
 
     when(wrapper.connect(any)).thenAnswer((_) async => WebSocketMock());
     cleanModule();
-    startModule(client, wrapper);
+    startModule(() => client, wrapper);
   });
 
-  tearDown(() async {
-    await connect.dispose();
+  tearDownAll(() {
+    connect.disconnect();
   });
 
   group('Query | ', () {
@@ -67,6 +67,8 @@ void main() {
       expect(snapshot, isA<Snapshot>());
       final snapshot2 = await connect.subscription('subscription');
       expect(snapshot2 == snapshot, true);
+      await snapshot.close();
+      await snapshot2.close();
     });
 
     test('should execute with error', () {

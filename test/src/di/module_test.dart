@@ -35,7 +35,7 @@ void main() {
       query: Query(document: 'mutation', key: 'jfslfj'));
 
   setUpAll(() {
-    startModule(client, wrapper);
+    startModule(() => client, wrapper);
     when(client.post(
       any,
       body: anyNamed('body'),
