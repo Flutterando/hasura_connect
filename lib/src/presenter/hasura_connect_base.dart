@@ -317,6 +317,10 @@ class HasuraConnect {
 
   Future<void> disconnect() async {
     _disconnectionFlag = true;
+    final keys = List<String>.from(_snapmap.keys);
+    for (var key in keys) {
+      await _snapmap[key].close();
+    }
     _snapmap.clear();
     var disconect = {'type': 'connection_terminate'};
     if (_isConnected) {
