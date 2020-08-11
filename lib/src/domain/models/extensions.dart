@@ -7,9 +7,4 @@ class Extensions {
   factory Extensions.fromJson(Map json) {
     return Extensions(json['path'], json['code']);
   }
-
-  @override
-  String toString() {
-    return 'path: $path, code: $code';
-  }
 }

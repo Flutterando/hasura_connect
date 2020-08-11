@@ -1,3 +1,5 @@
+![image](coverage_badge.svg)
+
 # Hasura Connect Package
 
 Connect your Flutter/Dart apps to Hasura simply.

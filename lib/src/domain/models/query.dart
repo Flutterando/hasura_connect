@@ -7,8 +7,7 @@ class Query {
   final Map<String, dynamic> variables;
   final String key;
 
-  const Query({@required this.document, this.variables, this.key})
-      : assert(document != null);
+  const Query({@required this.document, this.variables, this.key});
 
   bool get isValid {
     return document.startsWith('query') ||

@@ -66,9 +66,24 @@ class HasuraConnect {
       } else if (data['type'] == 'error') {
         if ((data['payload'] as Map).containsKey('errors')) {
           snapshot.addError(
-              HasuraRequestError.fromJson(data['payload']['errors'][0]));
+            HasuraRequestError.fromJson(
+              data['payload']['errors'][0],
+              request: Request(
+                url: '',
+                query: Query(document: ''),
+              ),
+            ),
+          );
         } else {
-          snapshot.addError(HasuraRequestError.fromJson(data['payload']));
+          snapshot.addError(
+            HasuraRequestError.fromJson(
+              data['payload'],
+              request: Request(
+                url: '',
+                query: Query(document: ''),
+              ),
+            ),
+          );
         }
       }
     });

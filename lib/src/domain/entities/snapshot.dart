@@ -86,12 +86,8 @@ class StartWithStreamTransformer<T> extends StreamTransformerBase<T, T> {
       controller = StreamController<T>(
           sync: true,
           onListen: () {
-            try {
-              if (wrapper.value != null) {
-                controller.add(wrapper.value);
-              }
-            } catch (e, s) {
-              controller.addError(e, s);
+            if (wrapper.value != null) {
+              controller.add(wrapper.value);
             }
 
             subscription = input.listen(controller.add,

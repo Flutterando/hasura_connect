@@ -40,7 +40,7 @@ void main() {
       expect(
         datasource.post(request: tRequest),
         throwsA(
-          const ConnectionError('Connection Rejected'),
+          isA<ConnectionError>(),
         ),
       );
     });

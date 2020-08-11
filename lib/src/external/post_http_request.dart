@@ -20,11 +20,14 @@ class PostHttpRequest implements RequestDatasource {
       if (response.statusCode == 200) {
         Map json = jsonDecode(response.body);
         if (json.containsKey('errors')) {
-          throw HasuraRequestError.fromJson((json['errors'][0]));
+          throw HasuraRequestError.fromJson(
+            (json['errors'][0]),
+            request: request,
+          );
         }
         return Response(data: json, statusCode: response.statusCode);
       } else {
-        throw const ConnectionError('Connection Rejected');
+        throw ConnectionError('Connection Rejected', request: request);
       }
     } finally {
       client.close();

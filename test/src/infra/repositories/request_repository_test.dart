@@ -33,4 +33,11 @@ void main() {
     final result = await repository.sendRequest(request: tRequest);
     expect(result.fold(id, id), isA<DatasourceError>());
   });
+
+  test('should return error from datasource', () async {
+    when(datasource.post(request: anyNamed('request')))
+        .thenThrow(InvalidRequestError('Error'));
+    final result = await repository.sendRequest(request: tRequest);
+    expect(result.fold(id, id), isA<InvalidRequestError>());
+  });
 }

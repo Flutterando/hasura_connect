@@ -1,5 +1,7 @@
+import 'package:hasura_connect/hasura_connect.dart';
 import 'package:hasura_connect/src/domain/errors/errors.dart';
 import 'package:hasura_connect/src/domain/entities/connector.dart';
+import 'package:hasura_connect/src/domain/models/query.dart';
 import 'package:hasura_connect/src/infra/datasources/connector_datasource.dart';
 import 'package:websocket/websocket.dart';
 
@@ -21,7 +23,13 @@ class WebsocketConnector implements ConnectorDatasource {
         done: _channelPromisse.done,
       );
     } catch (e) {
-      throw ConnectionError('Websocket Error');
+      throw ConnectionError(
+        'Websocket Error',
+        request: Request(
+          url: url,
+          query: Query(document: ''),
+        ),
+      );
     }
   }
 }

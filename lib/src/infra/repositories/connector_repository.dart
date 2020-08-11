@@ -1,6 +1,8 @@
 import 'package:hasura_connect/src/domain/entities/connector.dart';
 import 'package:hasura_connect/src/domain/errors/errors.dart';
 import 'package:dartz/dartz.dart';
+import 'package:hasura_connect/src/domain/models/query.dart';
+import 'package:hasura_connect/src/domain/models/request.dart';
 import 'package:hasura_connect/src/domain/repositories/connector_repository.dart';
 import 'package:hasura_connect/src/infra/datasources/connector_datasource.dart';
 
@@ -17,7 +19,15 @@ class ConnectorRepositoryImpl implements ConnectorRepository {
     } on HasuraError catch (e) {
       return Left(e);
     } catch (e) {
-      return Left(const DatasourceError('Datasource Error'));
+      return Left(
+        DatasourceError(
+          'Datasource Error',
+          request: Request(
+            url: url,
+            query: Query(document: ''),
+          ),
+        ),
+      );
     }
   }
 }

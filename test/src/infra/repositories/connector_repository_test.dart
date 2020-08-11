@@ -27,7 +27,13 @@ void main() {
   test('should return DatasourceError when datasource failed', () async {
     when(datasource.websocketConnector('')).thenThrow(Exception());
     final result = await repository.getConnector('');
-    expect(
-        result.fold(id, id), equals(const DatasourceError('Datasource Error')));
+    expect(result.fold(id, id), isA<DatasourceError>());
+  });
+
+  test('should return error from datasource', () async {
+    when(datasource.websocketConnector(''))
+        .thenThrow(InvalidRequestError('error'));
+    final result = await repository.getConnector('');
+    expect(result.fold(id, id), isA<InvalidRequestError>());
   });
 }

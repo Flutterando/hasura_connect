@@ -18,7 +18,10 @@ class RequestRepositoryImpl implements RequestRepository {
     } on HasuraError catch (e) {
       return Left(e);
     } catch (e) {
-      return Left(DatasourceError('DatasourceError: ${e.toString()}'));
+      return Left(DatasourceError(
+        'DatasourceError: ${e.toString()}',
+        request: request,
+      ));
     }
   }
 }

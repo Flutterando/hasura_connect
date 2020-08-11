@@ -8,4 +8,7 @@ void main() {
     expect(sl.get<String>(), 'teste');
     expect(sl.get<int>(), 0);
   });
+  test('should return null', () {
+    expect(sl.get<bool>(), null);
+  });
 }

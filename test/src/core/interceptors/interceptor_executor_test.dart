@@ -11,7 +11,14 @@ import 'package:test/test.dart';
 void main() async {
   final request = Request(url: '', query: Query(document: 'query'));
   final response = Response();
-  final error = HasuraRequestError('test', null);
+  final error = HasuraRequestError(
+    'test',
+    null,
+    request: Request(
+      url: '',
+      query: Query(document: ''),
+    ),
+  );
 
   test('should return same object if interceptor list be empty or null', () {
     var exec = InterceptorExecutor(null);
@@ -19,31 +26,6 @@ void main() async {
     expect(exec(resolver), completion(request));
     exec = InterceptorExecutor([]);
     expect(exec(resolver), completion(request));
-  });
-
-  group('onRequest || ', () {
-    test('should exec interceptor request', () async {
-      final exec = InterceptorExecutor(
-          [InterceptorMock(onRequestF: (r) async => r.copyWith(url: 'test'))]);
-      final resolver = ClientResolver.request(request);
-      final result = await exec(resolver);
-      expect(result, isA<Request>());
-      expect(result.url, 'test');
-    });
-
-    test('should exec interceptor returning other type', () async {
-      final exec = InterceptorExecutor(
-          [InterceptorMock(onRequestF: (r) async => Response())]);
-      final resolver = ClientResolver.request(request);
-      final result = await exec(resolver);
-      expect(result, isA<Response>());
-    });
-    test('should exec interceptor throw InterceptorError', () async {
-      final exec = InterceptorExecutor(
-          [InterceptorMock(onRequestF: (r) async => throw Exception('error'))]);
-      final resolver = ClientResolver.request(request);
-      expect(exec(resolver), throwsA(isA<InterceptorError>()));
-    });
   });
 
   group('onRequest || ', () {
@@ -83,7 +65,15 @@ void main() async {
     test('should exec interceptor returning other type', () async {
       final exec = InterceptorExecutor([
         InterceptorMock(
-            onResponseF: (r) async => HasuraRequestError('test', null))
+          onResponseF: (r) async => HasuraRequestError(
+            'test',
+            null,
+            request: Request(
+              url: '',
+              query: Query(document: ''),
+            ),
+          ),
+        )
       ]);
       final resolver = ClientResolver.response(response);
       final result = await exec(resolver);

@@ -59,4 +59,35 @@ void main() {
     expect(map['query'], isNotNull);
     expect(map['variables'], isA<Map>());
   });
+
+  test('should change variable', () {
+    var query = Query(document: '''subscription {
+        author(
+          where: {name: {_eq: "Sidney"}}
+        ) {
+          id
+          name
+        }
+      }
+    ''', key: 'fdsfds');
+    expect(query.variables, null);
+    query = query.copyWith(variables: {'test': 'test'});
+    expect(query.variables, isA<Map>());
+    query = query.copyWith(variables: {});
+    expect(query.variables.length, 0);
+  });
+
+  test('copywith', () {
+    var query = Query(document: '''subscription {
+        author(
+          where: {name: {_eq: "Sidney"}}
+        ) {
+          id
+          name
+        }
+      }
+    ''', key: 'fdsfds');
+    expect(query, query);
+    expect(query.copyWith() != query, true);
+  });
 }
