@@ -101,7 +101,7 @@ class HasuraConnect {
     }
 
     final result = await usecase(request: request);
-    return await result.fold(_interceptError, _interceptResponse);
+    return (await result.fold(_interceptError, _interceptResponse)).data;
   }
 
   Future<Response> _interceptError(HasuraError error) async {
@@ -159,7 +159,7 @@ class HasuraConnect {
     }
 
     final result = await usecase(request: request);
-    return await result.fold(_interceptError, _interceptResponse);
+    return (await result.fold(_interceptError, _interceptResponse)).data;
   }
 
   Future<Snapshot> subscription(String document,
@@ -184,6 +184,7 @@ class HasuraConnect {
       );
       final result = await usecase(
         closeConnection: _removeSnapshot,
+        changeVariables: _changeVariables,
         request: request,
       );
       final snapshot = result.fold((l) => throw l, id);
@@ -205,8 +206,14 @@ class HasuraConnect {
   void _removeSnapshot(Snapshot snapshot) {
     var stop = {'id': snapshot.query.key, 'type': 'stop'};
     _snapmap.remove(snapshot.query.key);
-    _sendToWebSocketServer(jsonEncode(stop));
+    if (isConnected) _sendToWebSocketServer(jsonEncode(stop));
     if (_snapmap.keys.isEmpty) disconnect();
+  }
+
+  Future _changeVariables(Snapshot snapshot) async {
+    var stop = {'id': snapshot.query.key, 'type': 'stop'};
+    if (isConnected) _sendToWebSocketServer(jsonEncode(stop));
+    if (isConnected) _sendToWebSocketServer(querySubscription(snapshot.query));
   }
 
   void _sendToWebSocketServer(String input) {

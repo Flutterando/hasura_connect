@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:hasura_connect/src/domain/errors/errors.dart';
 import 'package:hasura_connect/src/domain/models/query.dart';
@@ -51,9 +50,8 @@ void main() {
         any,
         body: anyNamed('body'),
         headers: anyNamed('headers'),
-      )).thenThrow(SocketException('error'));
-      expect(datasource.post(request: tRequest),
-          throwsA(const ConnectionError('Verify your internet connection')));
+      )).thenThrow(Exception('error'));
+      expect(datasource.post(request: tRequest), throwsA(isA<Exception>()));
     });
 
     test('should throw HasuraRequestError when server reject connection',
