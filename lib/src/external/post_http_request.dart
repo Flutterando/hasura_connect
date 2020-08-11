@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:hasura_connect/src/domain/errors/errors.dart';
 import 'package:hasura_connect/src/domain/models/request.dart';
@@ -27,10 +26,6 @@ class PostHttpRequest implements RequestDatasource {
       } else {
         throw const ConnectionError('Connection Rejected');
       }
-    } on SocketException {
-      throw const ConnectionError('Verify your internet connection');
-    } catch (e) {
-      rethrow;
     } finally {
       client.close();
     }

@@ -5,14 +5,19 @@ import '../entities/snapshot.dart';
 import '../errors/errors.dart';
 
 abstract class GetSnapshotSubscription {
-  Future<Either<HasuraError, Snapshot>> call(
-      {Request request, void Function(Snapshot) closeConnection});
+  Future<Either<HasuraError, Snapshot>> call({
+    Request request,
+    void Function(Snapshot) closeConnection,
+    void Function(Snapshot) changeVariables,
+  });
 }
 
 class GetSnapshotSubscriptionImpl implements GetSnapshotSubscription {
   @override
   Future<Either<HasuraError, Snapshot>> call(
-      {Request request, void Function(Snapshot) closeConnection}) async {
+      {Request request,
+      void Function(Snapshot) closeConnection,
+      void Function(Snapshot) changeVariables}) async {
     if (!request.query.isValid) {
       return Left(const InvalidRequestError('Invalid Query document'));
     } else if (!request.query.document.startsWith('subscription')) {
@@ -26,6 +31,11 @@ class GetSnapshotSubscriptionImpl implements GetSnapshotSubscription {
       return Left(const InvalidRequestError('Invalid url'));
     }
     return Right(
-        Snapshot(query: request.query, closeConnection: closeConnection));
+      Snapshot(
+        query: request.query,
+        closeConnection: closeConnection,
+        changeVariablesF: changeVariables,
+      ),
+    );
   }
 }
