@@ -22,9 +22,11 @@ import '../di/module.dart';
 import '../di/injection.dart' as sl;
 
 class HasuraConnect {
-  final _controller = StreamController.broadcast();
+  @visibleForTesting
+  final controller = StreamController.broadcast();
   final String url;
-  final Map<String, Snapshot> _snapmap = {};
+  @visibleForTesting
+  final Map<String, Snapshot> snapmap = {};
   final KeyGenerator _keyGenerator = KeyGenerator();
   InterceptorExecutor _interceptorExecutor;
   bool _isConnected = false;
@@ -54,39 +56,44 @@ class HasuraConnect {
     startModule();
     _interceptorExecutor = InterceptorExecutor(interceptors);
 
-    _subscription = _controller.stream.listen((data) {
-      if (!_snapmap.containsKey(data['id'])) {
-        return;
-      }
+    _subscription = controller.stream
+        .where((data) => data is Map)
+        .map((data) => data as Map)
+        .where((data) => data.containsKey('id'))
+        .where((data) => !snapmap.containsKey(data['id']))
+        .map((data) => null)
+        .listen(rootStreamListener);
+  }
 
-      final snapshot = _snapmap[data['id']];
+  @visibleForTesting
+  void rootStreamListener(data) {
+    final snapshot = snapmap[data['id']];
 
-      if (data['type'] == 'data') {
-        snapshot.add(data['payload']);
-      } else if (data['type'] == 'error') {
-        if ((data['payload'] as Map).containsKey('errors')) {
-          snapshot.addError(
-            HasuraRequestError.fromJson(
-              data['payload']['errors'][0],
-              request: Request(
-                url: '',
-                query: Query(document: ''),
-              ),
+    if (data['type'] == 'data') {
+      snapshot.add(data['payload']);
+    } else if (data['type'] == 'error') {
+      if ((data['payload'] as Map).containsKey('errors')) {
+        snapshot.addError(
+          HasuraRequestError.fromJson(
+            data['payload']['errors'][0],
+            request: Request(
+              url: '',
+              query: Query(document: ''),
             ),
-          );
-        } else {
-          snapshot.addError(
-            HasuraRequestError.fromJson(
-              data['payload'],
-              request: Request(
-                url: '',
-                query: Query(document: ''),
-              ),
+          ),
+        );
+      } else {
+        snapshot.addError(
+          HasuraRequestError.fromJson(
+            data['payload'],
+            request: Request(
+              url: '',
+              query: Query(document: ''),
             ),
-          );
-        }
+          ),
+        );
       }
-    });
+    }
   }
 
   Future query(String document,
@@ -182,8 +189,8 @@ class HasuraConnect {
     document = document.trim();
     key = key ?? _keyGenerator.generateBase(document);
     Snapshot snapshot;
-    if (_snapmap.containsKey(key)) {
-      snapshot = _snapmap[key];
+    if (snapmap.containsKey(key)) {
+      snapshot = snapmap[key];
     }
 
     snapshot = await optionOf(snapshot).fold(() async {
@@ -203,36 +210,37 @@ class HasuraConnect {
         request: request,
       );
       final snapshot = result.fold((l) => throw l, id);
-      _snapmap[key] = snapshot;
+      snapmap[key] = snapshot;
       await _interceptorExecutor.onSubscription(request, snapshot);
 
       return snapshot;
     }, (a) async => a);
 
-    if (_snapmap.keys.isNotEmpty) {
+    if (snapmap.keys.isNotEmpty) {
       // ignore: unawaited_futures
       _connect();
     } else if (_isConnected) {
-      _sendToWebSocketServer(querySubscription(snapshot.query));
+      sendToWebSocketServer(querySubscription(snapshot.query));
     }
     return snapshot;
   }
 
   void _removeSnapshot(Snapshot snapshot) {
     var stop = {'id': snapshot.query.key, 'type': 'stop'};
-    _snapmap.remove(snapshot.query.key);
-    if (isConnected) _sendToWebSocketServer(jsonEncode(stop));
-    if (_snapmap.keys.isEmpty) disconnect();
+    snapmap.remove(snapshot.query.key);
+    if (isConnected) sendToWebSocketServer(jsonEncode(stop));
+    if (snapmap.keys.isEmpty) disconnect();
   }
 
   Future _changeVariables(Snapshot snapshot) async {
     var stop = {'id': snapshot.query.key, 'type': 'stop'};
-    if (isConnected) _sendToWebSocketServer(jsonEncode(stop));
-    if (isConnected) _sendToWebSocketServer(querySubscription(snapshot.query));
+    if (isConnected) sendToWebSocketServer(jsonEncode(stop));
+    if (isConnected) sendToWebSocketServer(querySubscription(snapshot.query));
   }
 
-  void _sendToWebSocketServer(String input) {
-    _connector.add(utf8.encode(input));
+  @visibleForTesting
+  void sendToWebSocketServer(String input) {
+    _connector?.add(utf8.encode(input));
   }
 
   Future<void> _renewConnector() async {
@@ -245,11 +253,7 @@ class HasuraConnect {
   }
 
   Future<void> _connect() async {
-    try {
-      await _renewConnector();
-    } catch (e) {
-      print(e);
-    }
+    await _renewConnector();
 
     if (_connector == null) {
       return;
@@ -285,9 +289,11 @@ class HasuraConnect {
       } else if (interceptedValue is HasuraError) {
         throw interceptedValue;
       }
-      final subscriptionStream = _connector.listen(_normalizeStreamValue);
+      final subscriptionStream = _connector
+          .map<Map>((event) => jsonDecode(event))
+          .listen(normalizeStreamValue);
       (_init['payload'] as Map)['headers'] = request.headers;
-      _sendToWebSocketServer(jsonEncode(_init));
+      sendToWebSocketServer(jsonEncode(_init));
       subscriptionStream.onError(print);
       await _connector.done;
       await subscriptionStream.cancel();
@@ -308,6 +314,7 @@ class HasuraConnect {
     }
   }
 
+  @visibleForTesting
   String querySubscription(Query query) {
     return jsonEncode({
       'id': query.key,
@@ -319,21 +326,21 @@ class HasuraConnect {
     });
   }
 
-  Future<void> _normalizeStreamValue(event) async {
-    final data = jsonDecode(event);
+  @visibleForTesting
+  Future<void> normalizeStreamValue(Map data) async {
     if (data['type'] == 'data' || data['type'] == 'error') {
-      _controller.add(data);
+      controller.add(data);
     } else if (data['type'] == 'connection_ack') {
       await _interceptorExecutor.onConnected(this);
       _numbersOfConnectionAttempts = 0;
       _isConnected = true;
-      for (var snap in _snapmap.values) {
-        _sendToWebSocketServer(querySubscription(snap.query));
+      for (var snap in snapmap.values) {
+        sendToWebSocketServer(querySubscription(snap.query));
       }
     } else if (data['type'] == 'connection_error') {
       await Future.delayed(Duration(seconds: 2));
       await _interceptorExecutor.onTryAgain(this);
-      _sendToWebSocketServer(jsonEncode(_init));
+      sendToWebSocketServer(jsonEncode(_init));
     }
   }
 
@@ -342,18 +349,14 @@ class HasuraConnect {
       return;
     }
     _disconnectionFlag = true;
-    final keys = List<String>.from(_snapmap.keys);
+    final keys = List<String>.from(snapmap.keys);
     for (var key in keys) {
-      try {
-        await _snapmap[key].close();
-      } catch (e) {
-        print(e);
-      }
+      await snapmap[key].close();
     }
-    _snapmap.clear();
+    snapmap.clear();
     var disconect = {'type': 'connection_terminate'};
     if (_isConnected) {
-      _sendToWebSocketServer(jsonEncode(disconect));
+      sendToWebSocketServer(jsonEncode(disconect));
     }
     await Future.delayed(Duration(milliseconds: 300));
     if (_connector?.closeCode != null) {
@@ -367,7 +370,7 @@ class HasuraConnect {
   Future dispose() async {
     // ignore: unawaited_futures
     await disconnect();
-    await _controller.close();
+    await controller.close();
     await _subscription.cancel();
   }
 }

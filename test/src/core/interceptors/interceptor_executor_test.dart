@@ -129,6 +129,24 @@ void main() async {
       expect(exec(resolver), throwsA(isA<InterceptorError>()));
     });
   });
+
+  test('onSubscription || should return error after fail', () {
+    var exec = InterceptorExecutor([InterceptorMock()]);
+    expect(
+        exec.onSubscription(request, null), throwsA(isA<InterceptorError>()));
+  });
+  test('onConnected || should return error after fail', () {
+    var exec = InterceptorExecutor([InterceptorMock()]);
+    expect(exec.onConnected(null), throwsA(isA<InterceptorError>()));
+  });
+  test('onTryAgain || should return error after fail', () {
+    var exec = InterceptorExecutor([InterceptorMock()]);
+    expect(exec.onTryAgain(null), throwsA(isA<InterceptorError>()));
+  });
+  test('onDisconnect || should return error after fail', () {
+    var exec = InterceptorExecutor([InterceptorMock()]);
+    expect(exec.onDisconnect(), throwsA(isA<InterceptorError>()));
+  });
 }
 
 class InterceptorMock extends Interceptor {

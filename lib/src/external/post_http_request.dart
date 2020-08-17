@@ -25,7 +25,11 @@ class PostHttpRequest implements RequestDatasource {
             request: request,
           );
         }
-        return Response(data: json, statusCode: response.statusCode);
+        return Response(
+          data: json,
+          statusCode: response.statusCode,
+          request: request,
+        );
       } else {
         throw ConnectionError('Connection Rejected', request: request);
       }
