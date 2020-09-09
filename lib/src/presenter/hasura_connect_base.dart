@@ -17,6 +17,7 @@ import 'package:hasura_connect/src/domain/usecases/query_to_server.dart';
 
 import '../domain/entities/snapshot.dart';
 import 'package:meta/meta.dart';
+import 'package:http/http.dart' as http;
 
 import '../di/module.dart';
 import '../di/injection.dart' as sl;
@@ -52,8 +53,9 @@ class HasuraConnect {
     this.reconnectionAttemp,
     List<Interceptor> interceptors,
     this.headers,
+    http.Client httpClient,
   }) {
-    startModule();
+    startModule(() => httpClient);
     _interceptorExecutor = InterceptorExecutor(interceptors);
 
     _subscription = controller.stream
