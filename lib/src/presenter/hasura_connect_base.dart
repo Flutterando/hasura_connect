@@ -55,7 +55,7 @@ class HasuraConnect {
     this.headers,
     http.Client httpClient,
   }) {
-    startModule(() => httpClient);
+    startModule(httpClient == null ? null : () => httpClient);
     _interceptorExecutor = InterceptorExecutor(interceptors);
 
     _subscription = controller.stream
