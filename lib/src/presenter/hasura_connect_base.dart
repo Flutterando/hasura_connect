@@ -62,8 +62,7 @@ class HasuraConnect {
         .where((data) => data is Map)
         .map((data) => data as Map)
         .where((data) => data.containsKey('id'))
-        .where((data) => !snapmap.containsKey(data['id']))
-        .map((data) => null)
+        .where((data) => snapmap.containsKey(data['id']))
         .listen(rootStreamListener);
   }
 
