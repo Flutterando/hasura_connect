@@ -61,9 +61,6 @@ Now just add the document to the "query" method of the HasuraConnect instance.
 //get query
 var r = await hasuraConnect.query(docQuery);
 
-//get query with cache
-var r = await hasuraConnect.cachedQuery(docQuery);
-
 //OR USE MUTATION
 var r = await hasuraConnect.mutation(docQuery);
 ```
@@ -73,31 +70,13 @@ var r = await hasuraConnect.mutation(docQuery);
 Subscriptions will notify you each time you have a change to the searched items. Use the "hasuraConnect.subscription" method to receive a stream.
 
 ```dart
-Snapshot snapshot = hasuraConnect.subscription(docSubscription);
+Snapshot snapshot = await hasuraConnect.subscription(docSubscription);
   snapshot.listen((data) {
     print(data);
   }).onError((err) {
     print(err);
   });
 
-```
-
-### Subscription Converter
-
-Use the Map operator to convert json data to a Dart object;
-
-```dart
-Snapshot<PostModel> snapshot = hasuraConnect
-                                  .subscription(docSubscription)
-                                  .convert((data) => PostModel.fromJson(data),
-                                        cachePersist: (PostModel post) => post.toJson(),
-                                      );
-
-snapshot.listen((PostModel data) {
-   print(data);
- }).onError((err) {
-   print(err);
- });
 ```
 
 ## Using variables
@@ -116,61 +95,23 @@ String docSubscription = """
   }
 """;
 
-Snapshot snapshot = hasuraConnect.subscription(docSubscription, variables: {"limit": 10});
+Snapshot snapshot = await hasuraConnect.subscription(docSubscription, variables: {"limit": 10});
 
 //change values of variables for PAGINATIONS
 snapshot.changeVariable({"limit": 20});
 
 ```
 
-## Authorization (JWT Token)
+## INTERCEPTORS
 
-[View Hasura's official Authorization documentation](https://docs.hasura.io/1.0/graphql/manual/auth/index.html).
+This is a good strategy to control the flow of requests. With that we can create interceptors for logs or cache for example.
+The community has already provided some interceptors for caching. Interceptors are highly customizable.
 
-```dart
+* [hive_cache_interceptor](https://pub.dev/packages/hive_cache_interceptor)
+* [shared_preferences_cache_interceptor](https://pub.dev/packages/shared_preferences_cache_interceptor)
+* [hasura_cache_interceptor](https://pub.dev/packages/hasura_cache_interceptor)
 
-String url = 'http://localhost:8080/v1/graphql';
-HasuraConnect hasuraConnect = HasuraConnect(url, token: (isError) async {
-  //sharedPreferences or other storage logic
-  return "Bearer YOUR-JWT-TOKEN";
-});
 
-```
-
-## CACHE OFFLINE
-
-- Offline caching works with subscriptions automatically.
-- A good strategy for mutation caching is to add the offline object to the snapshot with the add parameter with what will be the change, then perform the mutation.
-- When a mutation internet error occurs, HasuraConnect will attempt to mutate again when the device reconnects to the internet.
-- Use this information to promote your offline persistence rules.
-
-``` dart
-Snapshot snapshot = connect.subscription(...);
-
-//Add object to cache of snapshot
-var list = snapshot.value;
-list.add(newItem);
-snapshot.add(newItem);
-
-//exec asinc mutation
-conn.mutation(...);
-
-```
-
-## Custom Database by Delegate
-
-You can add others database to work with cache using **localStorageDelegate** param in **HasuraConnect** construct.
-
-This library have two delegates:
-- **LocalStorageSharedPreferences** (default) 
-- **LocalStorageHive** (Using Hive Database for Desktops)
-
-Implements **LocalStorage** interface and use any Database:
-
-```dart
-HasuraConnect hasuraConnect = HasuraConnect(url,
-            localStorageDelegate: () => LocalStorageHive(),);
-```
 
 ## Dispose
 
