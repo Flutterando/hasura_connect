@@ -127,49 +127,108 @@ snapshot.changeVariable({"limit": 20});
 
 [View Hasura's official Authorization documentation](https://docs.hasura.io/1.0/graphql/manual/auth/index.html).
 
+
 ```dart
+class TokenInterceptor extends Interceptor {
+  final FirebaseAuth auth;
+  TokenInterceptor(this.auth);
 
-String url = 'http://localhost:8080/v1/graphql';
-HasuraConnect hasuraConnect = HasuraConnect(url, token: (isError) async {
-  //sharedPreferences or other storage logic
-  return "Bearer YOUR-JWT-TOKEN";
-});
+  @override
+  Future<void> onConnected(HasuraConnect connect) {}
 
+  @override
+  Future<void> onDisconnected() {}
+
+  @override
+  Future onError(HasuraError request) async {
+    return request;
+  }
+
+  @override
+  Future<Request> onRequest(Request request) async {
+    var user = await auth.currentUser();
+    var token = await user.getIdToken(refresh: true);
+    if (token != null) {
+      try {
+        request.headers["Authorization"] = "Bearer ${token.token}";
+        return request;
+      } catch (e) {
+        return null;
+      }
+    } else {
+      Modular.to.pushReplacementNamed("/login");
+    }
+  }
+
+  @override
+  Future onResponse(Response data) async {
+    return data;
+  }
+
+  @override
+  Future<void> onSubscription(Request request, Snapshot snapshot) {}
+
+  @override
+  Future<void> onTryAgain(HasuraConnect connect) {}
+}
 ```
+
+## INTERCEPTOR
+Now you can intercept all requests, erros, subscritions.... all states of your hasura_connect connection.
+
+- onConnected
+- onDisconnected
+- onError
+- onRequest
+- onResponse
+- onSubscription
+- onTryAgain
+
+
 
 ## CACHE OFFLINE
 
-- Offline caching works with subscriptions automatically.
-- A good strategy for mutation caching is to add the offline object to the snapshot with the add parameter with what will be the change, then perform the mutation.
-- When a mutation internet error occurs, HasuraConnect will attempt to mutate again when the device reconnects to the internet.
-- Use this information to promote your offline persistence rules.
+Now you will need to create a Interceptor ou use a Cache Interceptor Package made to help you like: [InMemory](https://pub.dev/packages/hasura_cache_interceptor) , [Hive](https://pub.dev/packages/hive_cache_interceptor) or [SharedPreference](https://pub.dev/packages/shared_preferences_cache_interceptor) 
 
 ``` dart
-Snapshot snapshot = connect.subscription(...);
+//In Memory
+import 'package:hasura_cache_interceptor/hasura_hive_cache_interceptor.dart';
 
-//Add object to cache of snapshot
-var list = snapshot.value;
-list.add(newItem);
-snapshot.add(newItem);
-
-//exec asinc mutation
-conn.mutation(...);
-
+final storage = MemoryStorageService();
+final cacheInterceptor = CacheInterceptor(storage);
+final hasura = HasuraConnect(
+  "<your hasura url>",
+  interceptors: [cacheInterceptor],
+  httpClient: httpClient,
+)
 ```
 
-## Custom Database by Delegate
+``` dart
+//Hive
+import 'package:hasura_connect/hasura_connect.dart';
+import 'package:hasura_hive_cache_interceptor/hasura_hive_cache_interceptor.dart';
 
-You can add others database to work with cache using **localStorageDelegate** param in **HasuraConnect** construct.
+final cacheInterceptor = HiveCacheInterceptor("<your box name> (optional)");
+final hasura = HasuraConnect(
+  "<your hasura url>",
+  interceptors: [cacheInterceptor],
+  httpClient: httpClient,
+)
+```
 
-This library have two delegates:
-- **LocalStorageSharedPreferences** (default) 
-- **LocalStorageHive** (Using Hive Database for Desktops)
-
-Implements **LocalStorage** interface and use any Database:
 
 ```dart
-HasuraConnect hasuraConnect = HasuraConnect(url,
-            localStorageDelegate: () => LocalStorageHive(),);
+//Shared Preference
+import 'package:hasura_connect/hasura_connect.dart';
+import 'package:shared_preferences_cache_interceptor/shared_preferences_cache_interceptor.dart';
+
+final cacheInterceptor = SharedPreferencesCacheInterceptor();
+final hasura = HasuraConnect(
+  "<your hasura url>",
+  interceptors: [cacheInterceptor],
+  httpClient: httpClient,
+)
+
 ```
 
 ## Dispose
