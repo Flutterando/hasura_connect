@@ -188,7 +188,7 @@ Now you can intercept all requests, erros, subscritions.... all states of your h
 
 ## CACHE OFFLINE
 
-Now you will need to create a Interceptor ou use a Cache Interceptor Package made to help you like: [InMemory](https://pub.dev/packages/hasura_cache_interceptor) , [Hive](https://pub.dev/packages/hive_cache_interceptor) or [SharedPreference](https://pub.dev/packages/shared_preferences_cache_interceptor) 
+Now you will need to create a Interceptor or use a Cache Interceptor Package made to help you like: [InMemory](https://pub.dev/packages/hasura_cache_interceptor) , [Hive](https://pub.dev/packages/hive_cache_interceptor) or [SharedPreference](https://pub.dev/packages/shared_preferences_cache_interceptor) 
 
 ``` dart
 //In Memory
