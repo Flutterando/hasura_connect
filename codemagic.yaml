@@ -4,5 +4,5 @@ workflows:
         environment:
             flutter: dev
         scripts:
-            - flutter packages pub get
-            - flutter test
+            - pub get
+            - pub run test
