@@ -5,7 +5,7 @@ import '../entities/snapshot.dart';
 import '../errors/errors.dart';
 
 abstract class GetSnapshotSubscription {
-  Future<Either<HasuraError, Snapshot>> call({
+  Either<HasuraError, Snapshot> call({
     Request request,
     void Function(Snapshot) closeConnection,
     void Function(Snapshot) changeVariables,
@@ -14,10 +14,10 @@ abstract class GetSnapshotSubscription {
 
 class GetSnapshotSubscriptionImpl implements GetSnapshotSubscription {
   @override
-  Future<Either<HasuraError, Snapshot>> call(
+  Either<HasuraError, Snapshot> call(
       {Request request,
       void Function(Snapshot) closeConnection,
-      void Function(Snapshot) changeVariables}) async {
+      void Function(Snapshot) changeVariables}) {
     if (!request.query.isValid) {
       return Left(const InvalidRequestError('Invalid Query document'));
     } else if (!request.query.document.startsWith('subscription')) {

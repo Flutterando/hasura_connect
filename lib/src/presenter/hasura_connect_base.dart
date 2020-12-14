@@ -84,6 +84,7 @@ class HasuraConnect {
           ),
         );
       } else {
+        print(data['payload']);
         snapshot.addError(
           HasuraRequestError.fromJson(
             data['payload'],
@@ -205,7 +206,7 @@ class HasuraConnect {
           variables: variables,
         ),
       );
-      final result = await usecase(
+      final result = usecase(
         closeConnection: _removeSnapshot,
         changeVariables: _changeVariables,
         request: request,
@@ -215,9 +216,9 @@ class HasuraConnect {
       await _interceptorExecutor.onSubscription(request, snapshot);
 
       return snapshot;
-    }, (a) async => a);
+    }, (a) => a);
 
-    if (snapmap.keys.isNotEmpty) {
+    if (snapmap.keys.isNotEmpty && !_isConnected) {
       // ignore: unawaited_futures
       _connect();
     } else if (_isConnected) {
