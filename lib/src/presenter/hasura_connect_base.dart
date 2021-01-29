@@ -53,9 +53,9 @@ class HasuraConnect {
     this.reconnectionAttemp,
     List<Interceptor> interceptors,
     this.headers,
-    http.Client httpClient,
+    Function() httpClientFactory
   }) {
-    startModule(httpClient == null ? null : () => httpClient);
+    startModule(httpClientFactory);
     _interceptorExecutor = InterceptorExecutor(interceptors);
 
     _subscription = controller.stream
