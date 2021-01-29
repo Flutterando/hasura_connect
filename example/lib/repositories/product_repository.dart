@@ -19,7 +19,7 @@ class AddProdutoRepository {
 
     var snapshot = await _hasuraConnect.query(query);
 
-    return ProdutoDto.fromMap(snapshot["data"]);
+    return ProdutoDto.fromMap(snapshot['data']);
   }
 
   Future<bool> addproduto(String descricao) async {
@@ -32,10 +32,10 @@ class AddProdutoRepository {
               ''';
 
     var snapshot = await _hasuraConnect.mutation(mutation, variables: {
-      "descricao": descricao,
+      'descricao': descricao,
     });
 
-    return snapshot["data"]["insert_produto"]["affected_rows"] > 0;
+    return snapshot['data']['insert_produto']['affected_rows'] > 0;
   }
 
   Future<Snapshot<List<ProdutoDto>>> getProdutoStream() async {
@@ -53,7 +53,7 @@ class AddProdutoRepository {
       if (data == null) {
         return null;
       }
-      return ProdutoDto.fromJsonList(data["data"]["produto"]);
+      return ProdutoDto.fromJsonList(data['data']['produto']);
     });
   }
 }
