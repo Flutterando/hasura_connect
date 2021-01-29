@@ -10,40 +10,43 @@ import 'package:test/test.dart';
 
 class RequestRepositoryMock extends Mock implements RequestRepository {}
 
+class ResponseMock extends Mock implements Response {}
+
 void main() {
-  QueryToServer usecase;
-  RequestRepository repository;
+  late QueryToServer usecase;
+  late RequestRepository repository;
+  late Response response;
+
   final url = 'https://hasura-fake.com';
 
   setUpAll(() {
     repository = RequestRepositoryMock();
     usecase = QueryToServerImpl(repository);
-    when(repository.sendRequest(request: anyNamed('request'))).thenAnswer((_) async => Right(const Response()));
+    response = ResponseMock();
+
+    when(repository).calls(#sendRequest).thenAnswer((_) async => Right<HasuraError, Response>(response));
   });
 
   test('should return Response', () async {
     final result = await usecase(request: Request(url: url, type: RequestType.query, query: Query(document: 'query', key: 'dadas')));
-    expect(result | null, equals(const Response()));
+    expect(result.right, equals(response));
   });
   test('should throw InvalidRequestError if Query.document is invalid', () async {
     final result = await usecase(request: Request(url: url, type: RequestType.query, query: Query(document: '', key: 'dadas')));
-    expect(result.fold(id, id), equals(const InvalidRequestError('Invalid document')));
+    expect(result.left, isA<InvalidRequestError>());
   });
 
   test('should throw InvalidRequestError if Document is not a query', () async {
     final result = await usecase(request: Request(url: url, type: RequestType.query, query: Query(document: 'mutation', key: 'dadas')));
-    expect(result.fold(id, id), equals(const InvalidRequestError('Document is not a query')));
+    expect(result.left, isA<InvalidRequestError>());
   });
 
   test('should throw InvalidRequestError if type request is not query', () async {
     final result = await usecase(request: Request(url: url, type: RequestType.mutation, query: Query(document: 'query', key: 'dadas')));
-    expect(result.fold(id, id), equals(const InvalidRequestError('Request type is not RequestType.query')));
+    expect(result.left, isA<InvalidRequestError>());
   });
   test('should throw InvalidRequestError if Url is invalid', () async {
     final result = await usecase(request: Request(url: '', type: RequestType.query, query: Query(document: 'query', key: 'fdsfsffs')));
-    expect(
-      result.fold(id, id),
-      equals(const InvalidRequestError('Invalid url')),
-    );
+    expect(result.left, isA<InvalidRequestError>());
   });
 }

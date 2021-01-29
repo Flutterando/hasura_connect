@@ -6,14 +6,15 @@ import 'package:hasura_connect/src/infra/datasources/connector_datasource.dart';
 import 'package:dart_websocket/websocket.dart';
 
 class WebsocketConnector implements ConnectorDatasource {
-  final WebSocketWrapper wrapper;
+  final WebSocketWrapper? wrapper;
 
   WebsocketConnector(this.wrapper);
 
   @override
   Future<Connector> websocketConnector(String url) async {
     try {
-      final _channelPromisse = await wrapper.connect(url.replaceFirst('http', 'ws'));
+      final _wrapper = wrapper ?? _WebSocketWrapper();
+      final _channelPromisse = await _wrapper.connect(url.replaceFirst('http', 'ws'));
       return Connector(
         _channelPromisse.stream,
         add: _channelPromisse.addUtf8Text,
@@ -33,7 +34,12 @@ class WebsocketConnector implements ConnectorDatasource {
   }
 }
 
-class WebSocketWrapper {
+abstract class WebSocketWrapper {
+  Future<WebSocket> connect(String url);
+}
+
+class _WebSocketWrapper implements WebSocketWrapper {
+  @override
   Future<WebSocket> connect(String url) {
     return WebSocket.connect(url, protocols: ['graphql-ws']);
   }

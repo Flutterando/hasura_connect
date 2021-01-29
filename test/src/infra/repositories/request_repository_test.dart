@@ -11,30 +11,35 @@ import 'package:test/test.dart';
 
 class RequestDatasourceMock extends Mock implements RequestDatasource {}
 
+class ResponseMock extends Mock implements Response {}
+
 void main() {
-  RequestDatasource datasource;
-  RequestRepository repository;
+  late RequestDatasource datasource;
+  late RequestRepository repository;
+  late Response response;
+
   final tRequest = Request(url: '', query: Query(document: 'query', key: 'dadas'));
   setUpAll(() {
+    response = ResponseMock();
     datasource = RequestDatasourceMock();
     repository = RequestRepositoryImpl(datasource: datasource);
   });
 
   test('should return Response', () async {
-    when(datasource.post(request: anyNamed('request'))).thenAnswer((_) async => const Response());
+    when(datasource).calls(#post).thenAnswer((_) async => response);
     final result = await repository.sendRequest(request: tRequest);
-    expect(result | null, equals(const Response()));
+    expect(result.right, equals(response));
   });
 
   test('should return DatasourceError when datasource failed', () async {
-    when(datasource.post(request: anyNamed('request'))).thenThrow(Exception());
+    when(datasource).calls(#post).thenThrow(Exception());
     final result = await repository.sendRequest(request: tRequest);
-    expect(result.fold(id, id), isA<DatasourceError>());
+    expect(result.left, isA<DatasourceError>());
   });
 
   test('should return error from datasource', () async {
-    when(datasource.post(request: anyNamed('request'))).thenThrow(InvalidRequestError('Error'));
+    when(datasource).calls(#post).thenThrow(InvalidRequestError('Error'));
     final result = await repository.sendRequest(request: tRequest);
-    expect(result.fold(id, id), isA<InvalidRequestError>());
+    expect(result.left, isA<InvalidRequestError>());
   });
 }

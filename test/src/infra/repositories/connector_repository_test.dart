@@ -10,28 +10,28 @@ import 'package:test/test.dart';
 class ConnectorDataourceMock extends Mock implements ConnectorDatasource {}
 
 void main() {
-  ConnectorDatasource datasource;
-  ConnectorRepository repository;
+  late ConnectorDatasource datasource;
+  late ConnectorRepository repository;
   setUpAll(() {
     datasource = ConnectorDataourceMock();
     repository = ConnectorRepositoryImpl(datasource: datasource);
   });
 
   test('should return Response', () async {
-    when(datasource.websocketConnector('')).thenAnswer((_) async => Connector(null));
+    when(datasource).calls(#websocketConnector).thenAnswer((_) async => Connector(Stream.empty()));
     final result = await repository.getConnector('');
-    expect(result | null, isA<Connector>());
+    expect(result.right, isA<Connector>());
   });
 
   test('should return DatasourceError when datasource failed', () async {
-    when(datasource.websocketConnector('')).thenThrow(Exception());
+    when(datasource).calls(#websocketConnector).thenThrow(Exception());
     final result = await repository.getConnector('');
-    expect(result.fold(id, id), isA<DatasourceError>());
+    expect(result.left, isA<DatasourceError>());
   });
 
   test('should return error from datasource', () async {
-    when(datasource.websocketConnector('')).thenThrow(InvalidRequestError('error'));
+    when(datasource).calls(#websocketConnector).thenThrow(InvalidRequestError('error'));
     final result = await repository.getConnector('');
-    expect(result.fold(id, id), isA<InvalidRequestError>());
+    expect(result.left, isA<InvalidRequestError>());
   });
 }

@@ -26,7 +26,7 @@ class HasuraRequestError extends HasuraError {
       HasuraRequestError(message, null, exception: _exception, request: request);
 
   factory HasuraRequestError.fromJson(Map json, {required Request request}) => HasuraRequestError(
-        json['message'],
+        json['message'] ?? '',
         json['extensions'] == null ? null : Extensions.fromJson(json['extensions']),
         request: request,
       );

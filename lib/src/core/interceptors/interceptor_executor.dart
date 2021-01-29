@@ -41,7 +41,7 @@ class InterceptorExecutor {
     }
   }
 
-  Future<void> onConnected(HasuraConnect connect) async {
+  Future<void>? onConnected(HasuraConnect connect) async {
     if (interceptors == null || interceptors!.isEmpty) {
       return;
     }
@@ -54,7 +54,7 @@ class InterceptorExecutor {
     }
   }
 
-  Future<void> onTryAgain(HasuraConnect connect) async {
+  Future<void>? onTryAgain(HasuraConnect connect) async {
     if (interceptors == null || interceptors!.isEmpty) {
       return;
     }
@@ -67,7 +67,7 @@ class InterceptorExecutor {
     }
   }
 
-  Future<void> onDisconnect() async {
+  Future<void>? onDisconnect() async {
     if (interceptors == null || interceptors!.isEmpty) {
       return;
     }

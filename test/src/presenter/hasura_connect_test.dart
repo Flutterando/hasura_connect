@@ -9,30 +9,34 @@ import 'package:hasura_connect/src/presenter/hasura_connect_base.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
-import 'package:websocket/websocket.dart';
+import 'package:dart_websocket/websocket.dart';
 
 import '../utils/client_response.dart';
 
-class ClientMock extends Mock implements http.Client {}
+class ClientMock extends Mock implements http.Client {
+  @override
+  void close() {}
+}
 
 class WrapperMock extends Mock implements WebSocketWrapper {}
 
 class WebSocketMock extends Mock implements WebSocket {}
 
 void main() {
-  HasuraConnect connect;
+  late HasuraConnect connect;
   final client = ClientMock();
   final wrapper = WrapperMock();
+  final websocket = WebSocketMock();
+  when(websocket).calls(#stream).thenReturn(Stream.empty());
+  when(websocket).calls(#addUtf8Text).thenReturn((List<int> list) {});
+  when(websocket).calls(#close).thenReturn(Future.value(0));
+  when(websocket).calls(#closeCode).thenReturn(0);
+  when(websocket).calls(#done).thenAnswer((_) async => 0);
 
   setUp(() {
     connect = HasuraConnect('https://fake-hasura.com', interceptors: [LogInterceptor()]);
-    when(client.post(
-      any,
-      body: anyNamed('body'),
-      headers: anyNamed('headers'),
-    )).thenAnswer((_) async => http.Response(stringJsonReponse, 200));
-
-    when(wrapper.connect(any)).thenAnswer((_) async => WebSocketMock());
+    when(client).calls(#post).thenAnswer((_) async => http.Response(stringJsonReponse, 200));
+    when(wrapper).calls(#connect).thenAnswer((_) async => websocket);
     cleanModule();
     startModule(() => client, wrapper);
   });
@@ -67,8 +71,8 @@ void main() {
       expect(snapshot, isA<Snapshot>());
       final snapshot2 = await connect.subscription('subscription');
       expect(snapshot2 == snapshot, true);
-      await snapshot.close();
-      await snapshot2.close();
+      snapshot.close();
+      snapshot2.close();
     });
 
     test('should execute with error', () {
@@ -81,9 +85,9 @@ void main() {
       expect(snapshot, emits('test'));
       connect.snapmap['fdfhsf'] = snapshot;
       connect.rootStreamListener({'id': 'fdfhsf', 'payload': 'test', 'type': 'data'});
-      await snapshot.close();
+      snapshot.close();
     });
-    test('should execute with HasuraRequestError', () async {
+    test('should execute with HasuraRequestError 1', () async {
       final snapshot = Snapshot(query: Query(document: 'null'));
       expect(snapshot, emitsError(isA<HasuraRequestError>()));
       connect.snapmap['fdfhsf'] = snapshot;
@@ -92,10 +96,10 @@ void main() {
         'payload': {'error': 'test'},
         'type': 'error'
       });
-      await snapshot.close();
+      snapshot.close();
     });
 
-    test('should execute with HasuraRequestError', () async {
+    test('should execute with HasuraRequestError 2', () async {
       final snapshot = Snapshot(query: Query(document: 'null'));
       expect(snapshot, emitsError(isA<HasuraRequestError>()));
       connect.snapmap['fdfhsf'] = snapshot;
@@ -108,7 +112,7 @@ void main() {
         },
         'type': 'error'
       });
-      await snapshot.close();
+      snapshot.close();
     });
   });
 
@@ -119,14 +123,14 @@ void main() {
       final data = {'id': 'fdfhsf', 'payload': 'test', 'type': 'data'};
       expect(connect.controller.stream, emits(data));
       await connect.normalizeStreamValue(data);
-      await snapshot.close();
+      snapshot.close();
     });
     test('should execute connection_ack', () async {
       final snapshot = Snapshot(query: Query(document: 'null'));
       connect.snapmap['fdfhsf'] = snapshot;
       final data = {'id': 'fdfhsf', 'payload': 'test', 'type': 'connection_ack'};
       await connect.normalizeStreamValue(data);
-      await snapshot.close();
+      snapshot.close();
     });
     test('should execute connection_error', () async {
       final data = {'id': 'fdfhsf', 'payload': 'test', 'type': 'connection_error'};

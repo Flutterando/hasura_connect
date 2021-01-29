@@ -1,4 +1,3 @@
-import 'package:either_dart/either.dart';
 import 'package:hasura_connect/src/domain/errors/errors.dart';
 import 'package:hasura_connect/src/domain/models/query.dart';
 import 'package:hasura_connect/src/domain/models/request.dart';
@@ -6,7 +5,7 @@ import 'package:hasura_connect/src/domain/usecases/get_snapshot_subscription.dar
 import 'package:test/test.dart';
 
 void main() {
-  GetSnapshotSubscription usecase;
+  late GetSnapshotSubscription usecase;
   final url = 'https://hasura-fake.com';
   setUp(() {
     usecase = GetSnapshotSubscriptionImpl();
@@ -14,7 +13,7 @@ void main() {
 
   test('should return Snapshot', () async {
     final result = await usecase(request: Request(url: url, type: RequestType.subscription, query: Query(document: 'subscription', key: 'fdsfsffs')));
-    final snapshot = result | null;
+    final snapshot = result.right;
     expect(
         snapshot,
         emitsInOrder([
@@ -29,11 +28,11 @@ void main() {
 
   test('should throw InvalidRequestError if Query.document is invalid', () async {
     final result = await usecase(request: Request(url: url, type: RequestType.subscription, query: Query(document: '', key: 'fdsfsffs')));
-    expect(result.fold(id, id), equals(const InvalidRequestError('Invalid Query document')));
+    expect(result.left, isA<InvalidRequestError>());
   });
   test('should throw InvalidRequestError if Document is not a subscription', () async {
     final result = await usecase(request: Request(url: url, type: RequestType.subscription, query: Query(document: 'mutation', key: 'fdsfsffs')));
-    expect(result.fold(id, id), equals(const InvalidRequestError('Document is not a subscription')));
+    expect(result.left, isA<InvalidRequestError>());
   });
 
   test('should throw InvalidRequestError if invalid key', () async {
@@ -44,7 +43,7 @@ void main() {
         query: Query(document: 'subscription', key: ''),
       ),
     );
-    expect(result.fold(id, id), equals(const InvalidRequestError('Invalid key')));
+    expect(result.left, isA<InvalidRequestError>());
   });
 
   test('should throw InvalidRequestError if type request is not subscription', () async {
@@ -55,14 +54,14 @@ void main() {
         query: Query(document: 'subscription', key: 'dadas'),
       ),
     );
-    expect(result.fold(id, id), equals(const InvalidRequestError('Request type is not RequestType.subscription')));
+    expect(result.left, isA<InvalidRequestError>());
   });
 
   test('should throw InvalidRequestError if Url is invalid', () async {
     final result = await usecase(request: Request(url: '', type: RequestType.subscription, query: Query(document: 'subscription', key: 'fdsfsffs')));
     expect(
-      result.fold(id, id),
-      equals(const InvalidRequestError('Invalid url')),
+      result.left,
+      isA<InvalidRequestError>(),
     );
   });
 }

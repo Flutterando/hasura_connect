@@ -1,3 +1,6 @@
+import 'package:collection/collection.dart';
+
+import '../../../hasura_connect.dart';
 import '../models/request.dart';
 
 class Response {
@@ -6,4 +9,15 @@ class Response {
   final Request request;
 
   const Response({required this.data, required this.statusCode, required this.request});
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+    final mapEquals = const DeepCollectionEquality().equals;
+
+    return o is Response && mapEquals(o.data, data) && o.statusCode == statusCode && o.request == request;
+  }
+
+  @override
+  int get hashCode => data.hashCode ^ statusCode.hashCode ^ request.hashCode;
 }

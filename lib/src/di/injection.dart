@@ -9,8 +9,9 @@ void cleanModule() {
 }
 
 T get<T>() {
-  return _dependencies.firstWhere(
-    (element) => element is T,
-    orElse: () => null,
-  );
+  try {
+    return _dependencies.firstWhere((element) => element is T);
+  } catch (e) {
+    throw Exception('injection error');
+  }
 }

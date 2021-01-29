@@ -13,7 +13,7 @@ import 'injection.dart' as sl;
 void startModule([Client Function()? client, WebSocketWrapper? wrapper]) {
   //external
   sl.register(client ?? () => Client());
-  sl.register(wrapper ?? WebSocketWrapper());
+  sl.register(wrapper);
   sl.register(WebsocketConnector(sl.get()));
   sl.register(PostHttpRequest(sl.get()));
 

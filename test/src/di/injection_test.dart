@@ -9,6 +9,6 @@ void main() {
     expect(sl.get<int>(), 0);
   });
   test('should return null', () {
-    expect(sl.get<bool>(), null);
+    expect(() => sl.get<bool>(), throwsA(isA<Exception>()));
   });
 }

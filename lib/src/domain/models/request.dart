@@ -26,6 +26,16 @@ class Request {
       type: type ?? this.type,
     );
   }
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+
+    return o is Request && o.url == url && o.query == query && o.type == type;
+  }
+
+  @override
+  int get hashCode => url.hashCode ^ query.hashCode ^ type.hashCode;
 }
 
 enum RequestType { query, mutation, subscription, none }
