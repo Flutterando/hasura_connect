@@ -10,7 +10,7 @@ import 'package:http/http.dart';
 
 import 'injection.dart' as sl;
 
-void startModule([Client Function() client, WebSocketWrapper wrapper]) {
+void startModule([Client Function()? client, WebSocketWrapper? wrapper]) {
   //external
   sl.register(client ?? () => Client());
   sl.register(wrapper ?? WebSocketWrapper());

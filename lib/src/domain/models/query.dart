@@ -1,18 +1,14 @@
 import 'dart:convert';
 
-import 'package:meta/meta.dart';
-
 class Query {
   final String document;
-  final Map<String, dynamic> variables;
-  final String key;
+  final Map<String, dynamic>? variables;
+  final String? key;
 
-  const Query({@required this.document, this.variables, this.key});
+  const Query({required this.document, this.variables, this.key});
 
   bool get isValid {
-    return document.startsWith('query') ||
-        document.startsWith('subscription') ||
-        document.startsWith('mutation');
+    return document.startsWith('query') || document.startsWith('subscription') || document.startsWith('mutation');
   }
 
   Map toJson() {
@@ -23,9 +19,9 @@ class Query {
   String toString() => jsonEncode(toJson());
 
   Query copyWith({
-    String document,
-    Map<String, dynamic> variables,
-    String key,
+    String? document,
+    Map<String, dynamic>? variables,
+    String? key,
   }) {
     return Query(
       document: document ?? this.document,

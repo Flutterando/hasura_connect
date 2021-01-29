@@ -1,5 +1,3 @@
-import 'package:meta/meta.dart';
-
 import 'query.dart';
 
 class Request {
@@ -11,22 +9,16 @@ class Request {
   final Query query;
   final RequestType type;
 
-  Request(
-      {@required this.url,
-      @required this.query,
-      this.type,
-      Map<String, String> headers}) {
-    assert(url != null);
-    assert(query != null);
+  Request({required this.url, required this.query, this.type = RequestType.none, Map<String, String>? headers}) {
     if (headers != null) {
       this.headers.addAll(headers);
     }
   }
 
   Request copyWith({
-    String url,
-    Query query,
-    RequestType type,
+    String? url,
+    Query? query,
+    RequestType? type,
   }) {
     return Request(
       url: url ?? this.url,
@@ -36,4 +28,4 @@ class Request {
   }
 }
 
-enum RequestType { query, mutation, subscription }
+enum RequestType { query, mutation, subscription, none }

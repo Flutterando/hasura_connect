@@ -4,7 +4,7 @@ import 'package:hasura_connect/src/domain/errors/errors.dart';
 import 'package:hasura_connect/src/domain/models/query.dart';
 import 'package:hasura_connect/src/domain/models/request.dart';
 import 'package:hasura_connect/src/external/post_http_request.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
 
@@ -15,8 +15,7 @@ class ClientMock extends Mock implements http.Client {}
 void main() {
   final client = ClientMock();
   final datasource = PostHttpRequest(() => client);
-  final tRequest =
-      Request(url: '', query: Query(document: 'query', key: 'dadas'));
+  final tRequest = Request(url: '', query: Query(document: 'query', key: 'dadas'));
 
   test('should execute post request and return Response object', () async {
     when(client.post(
@@ -54,8 +53,7 @@ void main() {
       expect(datasource.post(request: tRequest), throwsA(isA<Exception>()));
     });
 
-    test('should throw HasuraRequestError when server reject connection',
-        () async {
+    test('should throw HasuraRequestError when server reject connection', () async {
       when(client.post(
         any,
         body: anyNamed('body'),

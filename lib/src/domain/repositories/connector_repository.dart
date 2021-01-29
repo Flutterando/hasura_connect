@@ -1,4 +1,4 @@
-import 'package:dartz/dartz.dart';
+import 'package:either_dart/either.dart';
 import '../errors/errors.dart';
 import '../entities/connector.dart';
 

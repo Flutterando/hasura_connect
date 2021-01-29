@@ -1,6 +1,6 @@
 import 'package:hasura_connect/hasura_connect.dart';
 import 'package:hasura_connect/src/external/websocket_connector.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:websocket/websocket.dart';
 
@@ -19,8 +19,7 @@ void main() {
 
   test('should return ConnectionError when WebSocketWrapper is fail', () async {
     when(wrapper.connect(any)).thenThrow(Exception());
-    expect(datasource.websocketConnector('request: tRequest'),
-        throwsA(isA<ConnectionError>()));
+    expect(datasource.websocketConnector('request: tRequest'), throwsA(isA<ConnectionError>()));
   });
 
   test('only coverage', () async {

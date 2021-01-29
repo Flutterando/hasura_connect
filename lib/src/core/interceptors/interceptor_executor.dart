@@ -6,51 +6,48 @@ import 'package:hasura_connect/src/domain/models/request.dart';
 import 'package:hasura_connect/src/presenter/hasura_connect_base.dart';
 
 class InterceptorExecutor {
-  final List<Interceptor> interceptors;
+  final List<Interceptor>? interceptors;
 
   const InterceptorExecutor(this.interceptors);
 
   Future<dynamic> call(ClientResolver resolver) async {
-    if (interceptors == null || interceptors.isEmpty) {
+    if (interceptors == null || interceptors!.isEmpty) {
       return resolver.value;
     }
 
     switch (resolver.type) {
       case Request:
         return await _executeRequestInterceptors(resolver.value);
-        break;
       case Response:
         return await _executeResponseInterceptors(resolver.value);
-        break;
       case HasuraError:
         return await _executeHasuraErrorInterceptors(resolver.value);
-        break;
       default:
         return null;
     }
   }
 
   Future<void> onSubscription(Request request, Snapshot snashot) async {
-    if (interceptors == null || interceptors.isEmpty) {
+    if (interceptors == null || interceptors!.isEmpty) {
       return;
     }
     try {
-      for (var interceptor in interceptors) {
-        await interceptor.onSubscription?.call(request, snashot);
+      for (var interceptor in interceptors!) {
+        await interceptor.onSubscription(request, snashot);
       }
-      return request;
+      return;
     } catch (e) {
       throw InterceptorError(e.toString());
     }
   }
 
   Future<void> onConnected(HasuraConnect connect) async {
-    if (interceptors == null || interceptors.isEmpty) {
+    if (interceptors == null || interceptors!.isEmpty) {
       return;
     }
     try {
-      for (var interceptor in interceptors) {
-        await interceptor.onConnected?.call(connect);
+      for (var interceptor in interceptors!) {
+        await interceptor.onConnected(connect);
       }
     } catch (e) {
       throw InterceptorError(e.toString());
@@ -58,12 +55,12 @@ class InterceptorExecutor {
   }
 
   Future<void> onTryAgain(HasuraConnect connect) async {
-    if (interceptors == null || interceptors.isEmpty) {
+    if (interceptors == null || interceptors!.isEmpty) {
       return;
     }
     try {
-      for (var interceptor in interceptors) {
-        await interceptor.onTryAgain?.call(connect);
+      for (var interceptor in interceptors!) {
+        await interceptor.onTryAgain(connect);
       }
     } catch (e) {
       throw InterceptorError(e.toString());
@@ -71,12 +68,12 @@ class InterceptorExecutor {
   }
 
   Future<void> onDisconnect() async {
-    if (interceptors == null || interceptors.isEmpty) {
+    if (interceptors == null || interceptors!.isEmpty) {
       return;
     }
     try {
-      for (var interceptor in interceptors) {
-        await interceptor.onDisconnected?.call();
+      for (var interceptor in interceptors!) {
+        await interceptor.onDisconnected();
       }
     } catch (e) {
       throw InterceptorError(e.toString());
@@ -85,7 +82,7 @@ class InterceptorExecutor {
 
   Future<dynamic> _executeRequestInterceptors(Request request) async {
     try {
-      for (var interceptor in interceptors) {
+      for (var interceptor in interceptors ?? []) {
         final result = await interceptor.onRequest?.call(request);
         if (result is Request) {
           request = result;
@@ -101,7 +98,7 @@ class InterceptorExecutor {
 
   Future<dynamic> _executeResponseInterceptors(Response response) async {
     try {
-      for (var interceptor in interceptors) {
+      for (var interceptor in interceptors ?? []) {
         final result = await interceptor.onResponse?.call(response);
         if (result is Response) {
           response = result;
@@ -114,13 +111,13 @@ class InterceptorExecutor {
       }
       return response;
     } catch (e) {
-      throw InterceptorError(e?.toString());
+      throw InterceptorError(e.toString());
     }
   }
 
   Future<dynamic> _executeHasuraErrorInterceptors(HasuraError error) async {
     try {
-      for (var interceptor in interceptors) {
+      for (var interceptor in interceptors ?? []) {
         final result = await interceptor.onError?.call(error);
         if (result is HasuraError) {
           error = result;
@@ -133,7 +130,7 @@ class InterceptorExecutor {
       }
       return error;
     } catch (e) {
-      throw InterceptorError(e?.toString());
+      throw InterceptorError(e.toString());
     }
   }
 }

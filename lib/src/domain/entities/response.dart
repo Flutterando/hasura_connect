@@ -5,5 +5,5 @@ class Response {
   final int statusCode;
   final Request request;
 
-  const Response({this.data, this.statusCode, this.request});
+  const Response({required this.data, required this.statusCode, required this.request});
 }

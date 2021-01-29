@@ -74,7 +74,7 @@ void main() {
     query = query.copyWith(variables: {'test': 'test'});
     expect(query.variables, isA<Map>());
     query = query.copyWith(variables: {});
-    expect(query.variables.length, 0);
+    expect(query.variables?.length, 0);
   });
 
   test('copywith', () {

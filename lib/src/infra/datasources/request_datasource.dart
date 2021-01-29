@@ -4,5 +4,5 @@ import '../../domain/models/request.dart';
 import '../../domain/entities/response.dart';
 
 abstract class RequestDatasource {
-  Future<Response> post({Request request});
+  Future<Response> post({required Request request});
 }

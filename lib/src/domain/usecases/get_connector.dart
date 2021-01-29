@@ -1,4 +1,4 @@
-import 'package:dartz/dartz.dart';
+import 'package:either_dart/either.dart';
 import '../repositories/connector_repository.dart';
 import '../errors/errors.dart';
 import '../entities/connector.dart';
@@ -16,7 +16,7 @@ class GetConnectorImpl implements GetConnector {
   @override
   Future<Either<HasuraError, Connector>> call(String url) async {
     if (!validator.isURL(url)) {
-      return left(const InvalidRequestError('Invalid URL'));
+      return Left(InvalidRequestError('Invalid URL'));
     }
 
     return await repository.getConnector(url);

@@ -9,7 +9,7 @@ import 'package:hasura_connect/src/domain/usecases/query_to_server.dart';
 import 'package:hasura_connect/src/domain/usecases/get_connector.dart';
 import 'package:hasura_connect/src/external/websocket_connector.dart';
 import 'package:http/http.dart' as http;
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:websocket/websocket.dart';
 
@@ -25,14 +25,8 @@ void main() {
   final client = ClientMock();
   final wrapper = WrapperMock();
   final url = 'https://hasura-fake.com';
-  final tRequestQuery = Request(
-      type: RequestType.query,
-      url: url,
-      query: Query(document: 'query', key: 'jfslfj'));
-  final tRequestMutation = Request(
-      type: RequestType.mutation,
-      url: url,
-      query: Query(document: 'mutation', key: 'jfslfj'));
+  final tRequestQuery = Request(type: RequestType.query, url: url, query: Query(document: 'query', key: 'jfslfj'));
+  final tRequestMutation = Request(type: RequestType.mutation, url: url, query: Query(document: 'mutation', key: 'jfslfj'));
 
   setUpAll(() {
     startModule(() => client, wrapper);

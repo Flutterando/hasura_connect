@@ -6,7 +6,7 @@ import 'package:hasura_connect/src/domain/errors/errors.dart';
 import 'package:hasura_connect/src/domain/models/query.dart';
 import 'package:hasura_connect/src/external/websocket_connector.dart';
 import 'package:hasura_connect/src/presenter/hasura_connect_base.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
 import 'package:websocket/websocket.dart';
@@ -66,11 +66,8 @@ void main() {
   // });
 
   group('Subscription | ', () {
-    test(
-        'should get HasuraRequestError: an operation already exists with this id',
-        () async {
-      final snapshot =
-          await connect.subscription('''subscription MySubscription {  
+    test('should get HasuraRequestError: an operation already exists with this id', () async {
+      final snapshot = await connect.subscription('''subscription MySubscription {  
                                         produto {
                                           id
                                           nome
@@ -81,8 +78,7 @@ void main() {
 
       //  await Future.delayed(Duration(seconds: 1));
 
-      final snapshot3 =
-          await connect.subscription('''subscription MySubscription {  
+      final snapshot3 = await connect.subscription('''subscription MySubscription {  
                                         produto {
                                           id
                                           nome
@@ -109,8 +105,7 @@ void main() {
       final snapshot = Snapshot(query: Query(document: 'null'));
       expect(snapshot, emits('test'));
       connect.snapmap['fdfhsf'] = snapshot;
-      connect.rootStreamListener(
-          {'id': 'fdfhsf', 'payload': 'test', 'type': 'data'});
+      connect.rootStreamListener({'id': 'fdfhsf', 'payload': 'test', 'type': 'data'});
       await snapshot.close();
     });
     test('should execute with HasuraRequestError', () async {
@@ -154,20 +149,12 @@ void main() {
     test('should execute connection_ack', () async {
       final snapshot = Snapshot(query: Query(document: 'null'));
       connect.snapmap['fdfhsf'] = snapshot;
-      final data = {
-        'id': 'fdfhsf',
-        'payload': 'test',
-        'type': 'connection_ack'
-      };
+      final data = {'id': 'fdfhsf', 'payload': 'test', 'type': 'connection_ack'};
       await connect.normalizeStreamValue(data);
       await snapshot.close();
     });
     test('should execute connection_error', () async {
-      final data = {
-        'id': 'fdfhsf',
-        'payload': 'test',
-        'type': 'connection_error'
-      };
+      final data = {'id': 'fdfhsf', 'payload': 'test', 'type': 'connection_error'};
       await connect.normalizeStreamValue(data);
     });
   });
