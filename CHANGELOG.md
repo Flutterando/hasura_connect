@@ -1,3 +1,6 @@
+## 3.0.0-nullsafety.0
+- Migration to nullsafety
+
 ## 2.0.0
 - New Release
 

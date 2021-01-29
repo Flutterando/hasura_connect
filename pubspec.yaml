@@ -14,6 +14,7 @@ dependencies:
   string_validator: ^0.2.0-nullsafety.0
   uuid: ^3.0.0-nullsafety.0
   dart_websocket: ^1.0.0-nullsafety.0
+  collection: ^1.15.0-nullsafety.5
 
 dev_dependencies:
   test_coverage: ^0.4.3
