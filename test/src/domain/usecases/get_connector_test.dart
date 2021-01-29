@@ -14,7 +14,7 @@ void main() {
   setUpAll(() {
     repository = ConnectorRepositoryMock();
     usecase = GetConnectorImpl(repository);
-    when(repository).calls(#getConnector).thenAnswer((_) async => Right(Connector(Stream.empty())));
+    when(repository).calls(#getConnector).thenAnswer((_) async => Right<HasuraError, Connector>(Connector(Stream.empty())));
   });
 
   test('should return Connector', () async {

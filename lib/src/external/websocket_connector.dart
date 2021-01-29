@@ -3,7 +3,7 @@ import 'package:hasura_connect/src/domain/errors/errors.dart';
 import 'package:hasura_connect/src/domain/entities/connector.dart';
 import 'package:hasura_connect/src/domain/models/query.dart';
 import 'package:hasura_connect/src/infra/datasources/connector_datasource.dart';
-import 'package:websocket/websocket.dart';
+import 'package:dart_websocket/websocket.dart';
 
 class WebsocketConnector implements ConnectorDatasource {
   final WebSocketWrapper wrapper;
@@ -13,13 +13,12 @@ class WebsocketConnector implements ConnectorDatasource {
   @override
   Future<Connector> websocketConnector(String url) async {
     try {
-      final _channelPromisse =
-          await wrapper.connect(url.replaceFirst('http', 'ws'));
+      final _channelPromisse = await wrapper.connect(url.replaceFirst('http', 'ws'));
       return Connector(
         _channelPromisse.stream,
         add: _channelPromisse.addUtf8Text,
         close: _channelPromisse.close,
-        closeCodeFunction: () => _channelPromisse.closeCode,
+        closeCodeFunction: () => _channelPromisse.closeCode ?? -1,
         done: _channelPromisse.done,
       );
     } catch (e) {
