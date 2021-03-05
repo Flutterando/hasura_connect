@@ -102,11 +102,12 @@ class InterceptorExecutor {
         final result = await interceptor.onResponse?.call(response);
         if (result is Response) {
           response = result;
-        }
-        if (result is Request) {
-          throw InterceptorError('Don\'t return Request');
         } else {
-          return result;
+          if (result is Request) {
+            throw InterceptorError('Don\'t return Request');
+          } else {
+            return result;
+          }
         }
       }
       return response;
@@ -121,11 +122,12 @@ class InterceptorExecutor {
         final result = await interceptor.onError?.call(error);
         if (result is HasuraError) {
           error = result;
-        }
-        if (result is Request) {
-          throw InterceptorError('Don\'t return Request');
         } else {
-          return result;
+          if (result is Request) {
+            throw InterceptorError('Don\'t return Request');
+          } else {
+            return result;
+          }
         }
       }
       return error;
