@@ -160,6 +160,31 @@ class TokenInterceptor extends Interceptor {
 }
 ```
 
+Or:
+
+```dart
+class TokenInterceptor extends InterceptorBase {
+  final FirebaseAuth auth;
+  TokenInterceptor(this.auth);
+
+  @override
+  Future<Request> onRequest(Request request) async {
+    var user = await auth.currentUser();
+    var token = await user.getIdToken(refresh: true);
+    if (token != null) {
+      try {
+        request.headers["Authorization"] = "Bearer ${token.token}";
+        return request;
+      } catch (e) {
+        return null;
+      }
+    } else {
+      Modular.to.pushReplacementNamed("/login");
+    }
+  }
+}
+```
+
 ## INTERCEPTOR
 Now you can intercept all requests, erros, subscritions.... all states of your hasura_connect connection.
 

@@ -13,7 +13,7 @@ dependencies:
   flutter_modular: ^3.0.0-nullsafety.36
   flutter_triple: ^0.0.34
   hasura_connect:
-    path: /Users/jacobmoura/Projects/hasura_connect
+    path: ../
   
 
 dev_dependencies:

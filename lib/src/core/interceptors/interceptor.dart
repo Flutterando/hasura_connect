@@ -14,3 +14,26 @@ abstract class Interceptor {
   Future<void>? onTryAgain(HasuraConnect connect);
   Future<void>? onDisconnected();
 }
+
+abstract class InterceptorBase extends Interceptor {
+  @override
+  Future<void>? onConnected(HasuraConnect connect) {}
+
+  @override
+  Future<void>? onDisconnected() {}
+
+  @override
+  Future? onError(HasuraError error) async => error;
+
+  @override
+  Future? onRequest(Request request) async => request;
+
+  @override
+  Future? onResponse(Response data) async => data;
+
+  @override
+  Future<void>? onSubscription(Request request, Snapshot snapshot) {}
+
+  @override
+  Future<void>? onTryAgain(HasuraConnect connect) {}
+}
