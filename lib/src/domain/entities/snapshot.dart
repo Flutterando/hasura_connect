@@ -12,6 +12,8 @@ class Snapshot<T> extends Stream<T> implements EventSink<T> {
   final void Function(Snapshot)? closeConnection;
   final void Function(Snapshot)? changeVariablesF;
 
+  T? get value => _wrapper.value;
+
   Snapshot({
     required Query query,
     Stream<T>? rootStream,
