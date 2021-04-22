@@ -25,4 +25,9 @@ void main() {
     final result = await usecase('');
     expect(result.left, isA<InvalidRequestError>());
   });
+
+  test('should return Connector with -', () async {
+    final result = await usecase('http://hasura-master.server:8080/v1/graphql');
+    expect(result.right, isA<Connector>());
+  });
 }
