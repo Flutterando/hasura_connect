@@ -44,10 +44,10 @@ class HasuraConnect {
   Connector? _connector;
 
   late StreamSubscription _subscription;
-  final int? reconnectionAttemp;
+  final int? reconnectionAttempt;
   final Map<String, String>? headers;
 
-  HasuraConnect(this.url, {this.reconnectionAttemp, List<Interceptor>? interceptors, this.headers, http.Client Function()? httpClientFactory}) {
+  HasuraConnect(this.url, {this.reconnectionAttempt, List<Interceptor>? interceptors, this.headers, http.Client Function()? httpClientFactory}) {
     startModule(httpClientFactory);
     _interceptorExecutor = InterceptorExecutor(interceptors);
 
@@ -246,8 +246,8 @@ class HasuraConnect {
     final connector = _connector!;
     _disconnectionFlag = false;
 
-    if (reconnectionAttemp != null && reconnectionAttemp! > 0) {
-      if (_numbersOfConnectionAttempts >= reconnectionAttemp!) {
+    if (reconnectionAttempt != null && reconnectionAttempt! > 0) {
+      if (_numbersOfConnectionAttempts >= reconnectionAttempt!) {
         print('maximum connection attempt numbers reached');
         _isConnected = false;
         // ignore: unawaited_futures
