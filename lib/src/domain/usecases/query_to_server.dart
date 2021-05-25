@@ -22,10 +22,7 @@ class QueryToServerImpl implements QueryToServer {
       return Left(InvalidRequestError('Document is not a query'));
     } else if (request.type != RequestType.query) {
       return Left(InvalidRequestError('Request type is not RequestType.query'));
-    } else if (!isURL(request.url)) {
-      return Left(InvalidRequestError('Invalid url'));
     }
-
     return await repository.sendRequest(request: request);
   }
 }

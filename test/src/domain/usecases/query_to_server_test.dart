@@ -45,8 +45,4 @@ void main() {
     final result = await usecase(request: Request(url: url, type: RequestType.mutation, query: Query(document: 'query', key: 'dadas')));
     expect(result.left, isA<InvalidRequestError>());
   });
-  test('should throw InvalidRequestError if Url is invalid', () async {
-    final result = await usecase(request: Request(url: '', type: RequestType.query, query: Query(document: 'query', key: 'fdsfsffs')));
-    expect(result.left, isA<InvalidRequestError>());
-  });
 }
