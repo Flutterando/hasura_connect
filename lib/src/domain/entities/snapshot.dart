@@ -36,7 +36,10 @@ class Snapshot<T> extends Stream<T> implements EventSink<T> {
 
   @override
   StreamSubscription<T> listen(void Function(T event)? onData, {Function? onError, void Function()? onDone, bool? cancelOnError}) {
-    return _rootStream.listen(onData, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+    return _rootStream.listen((T event) {
+      _wrapper.value = event;
+      onData?.call(event);
+    }, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
   }
 
   @override
