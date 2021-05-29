@@ -1,6 +1,6 @@
 name: hasura_connect
 description: Connect your Flutter/Dart apps to Hasura simply. All the power of GraphQL and Postgres in Flutter.
-version: 3.0.3
+version: 3.0.4
 homepage: https://github.com/Flutterando/hasura_connect
 
 environment:

@@ -24,8 +24,6 @@ class MutationToServerImpl implements MutationToServer {
       return Left(InvalidRequestError('Invalid key'));
     } else if (request.type != RequestType.mutation) {
       return Left(InvalidRequestError('Request type is not RequestType.mutation'));
-    } else if (!isURL(request.url)) {
-      return Left(InvalidRequestError('Invalid url'));
     }
 
     return await repository.sendRequest(request: request);

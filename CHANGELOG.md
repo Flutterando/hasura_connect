@@ -1,3 +1,6 @@
+## 3.0.4
+- Remove  invalid url launch
+
 ## 3.0.0-nullsafety.0
 - Migration to nullsafety
 
