@@ -201,7 +201,7 @@ class HasuraConnect {
 
     if (snapmap.keys.isNotEmpty && !_isConnected) {
       // ignore: unawaited_futures
-      await _connect();
+      _connect();
     } else if (_isConnected) {
       final input = querySubscription(snapshot.query);
       sendToWebSocketServer(input);
