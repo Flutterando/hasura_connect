@@ -94,14 +94,14 @@ class HasuraConnect {
 
   Future query(String document, {String? key, Map<String, dynamic>? variables}) async {
     key = key ?? _keyGenerator.generateBase(document);
-    return execQuery(Query(
+    return executeQuery(Query(
       key: key,
       document: document.trimLeft(),
       variables: variables,
     ));
   }
 
-  Future execQuery(Query query) async {
+  Future executeQuery(Query query) async {
     final usecase = sl.get<QueryToServer>();
     var request = Request(
       headers: headers,
@@ -152,14 +152,14 @@ class HasuraConnect {
   Future mutation(String document, {Map<String, dynamic>? variables, bool tryAgain = true, String? key}) async {
     key = key ?? _keyGenerator.randomString(15);
 
-    return execMutation(Query(
+    return executeMutation(Query(
       key: key,
       document: document.trimLeft(),
       variables: variables,
     ));
   }
 
-  Future execMutation(Query query) async {
+  Future executeMutation(Query query) async {
     final usecase = sl.get<MutationToServer>();
 
     var request = Request(
@@ -189,14 +189,14 @@ class HasuraConnect {
     document = document.trim();
     key = key ?? _keyGenerator.generateBase(document);
 
-    return execSubscription(Query(
+    return executeSubscription(Query(
       key: key,
       document: document,
       variables: variables,
     ));
   }
 
-  Future<Snapshot> execSubscription(Query query) async {
+  Future<Snapshot> executeSubscription(Query query) async {
     Snapshot snapshot;
     if (snapmap.containsKey(query.key)) {
       snapshot = snapmap[query.key]!;
