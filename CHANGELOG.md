@@ -1,3 +1,8 @@
+## 3.0.4-dev.1
+- Export Query Model
+- Add function to Execute Mutation, Query and Subscription execQuery(Query query), execMutation(Query query) and execSubscription(Query query)
+
+
 ## 3.0.4
 - Remove  invalid url launch
 

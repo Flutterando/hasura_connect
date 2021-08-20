@@ -14,7 +14,8 @@ abstract class GetSnapshotSubscription {
 
 class GetSnapshotSubscriptionImpl implements GetSnapshotSubscription {
   @override
-  Either<HasuraError, Snapshot> call({required Request request, void Function(Snapshot)? closeConnection, void Function(Snapshot)? changeVariables}) {
+  Either<HasuraError, Snapshot> call(
+      {required Request request, void Function(Snapshot)? closeConnection, void Function(Snapshot)? changeVariables}) {
     if (!request.query.isValid) {
       return Left(InvalidRequestError('Invalid Query document'));
     } else if (!request.query.document.startsWith('subscription')) {
@@ -23,7 +24,7 @@ class GetSnapshotSubscriptionImpl implements GetSnapshotSubscription {
       return Left(InvalidRequestError('Invalid key'));
     } else if (request.type != RequestType.subscription) {
       return Left(InvalidRequestError('Request type is not RequestType.subscription'));
-    } 
+    }
     return Right(
       Snapshot(
         query: request.query,

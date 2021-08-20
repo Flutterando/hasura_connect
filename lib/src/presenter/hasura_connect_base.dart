@@ -47,12 +47,17 @@ class HasuraConnect {
   final int? reconnectionAttemp;
   final Map<String, String>? headers;
 
-  HasuraConnect(this.url, {this.reconnectionAttemp, List<Interceptor>? interceptors, this.headers, http.Client Function()? httpClientFactory}) {
+  HasuraConnect(this.url,
+      {this.reconnectionAttemp, List<Interceptor>? interceptors, this.headers, http.Client Function()? httpClientFactory}) {
     startModule(httpClientFactory);
     _interceptorExecutor = InterceptorExecutor(interceptors);
 
-    _subscription =
-        controller.stream.where((data) => data is Map).map((data) => data as Map).where((data) => data.containsKey('id')).where((data) => snapmap.containsKey(data['id'])).listen(rootStreamListener);
+    _subscription = controller.stream
+        .where((data) => data is Map)
+        .map((data) => data as Map)
+        .where((data) => data.containsKey('id'))
+        .where((data) => snapmap.containsKey(data['id']))
+        .listen(rootStreamListener);
   }
 
   @visibleForTesting
@@ -74,7 +79,6 @@ class HasuraConnect {
           ),
         );
       } else {
-        print(data['payload']);
         snapshot.addError(
           HasuraRequestError.fromJson(
             data['payload'],
@@ -89,17 +93,21 @@ class HasuraConnect {
   }
 
   Future query(String document, {String? key, Map<String, dynamic>? variables}) async {
-    final usecase = sl.get<QueryToServer>();
     key = key ?? _keyGenerator.generateBase(document);
+    return execQuery(Query(
+      key: key,
+      document: document.trimLeft(),
+      variables: variables,
+    ));
+  }
+
+  Future execQuery(Query query) async {
+    final usecase = sl.get<QueryToServer>();
     var request = Request(
       headers: headers,
       type: RequestType.query,
       url: url,
-      query: Query(
-        key: key,
-        document: document.trimLeft(),
-        variables: variables,
-      ),
+      query: query,
     );
     final interceptedValue = await _interceptorExecutor(
       ClientResolver.request(request),
@@ -142,18 +150,23 @@ class HasuraConnect {
   }
 
   Future mutation(String document, {Map<String, dynamic>? variables, bool tryAgain = true, String? key}) async {
+    key = key ?? _keyGenerator.randomString(15);
+
+    return execMutation(Query(
+      key: key,
+      document: document.trimLeft(),
+      variables: variables,
+    ));
+  }
+
+  Future execMutation(Query query) async {
     final usecase = sl.get<MutationToServer>();
 
-    key = key ?? _keyGenerator.randomString(15);
     var request = Request(
       headers: headers,
       type: RequestType.mutation,
       url: url,
-      query: Query(
-        key: key,
-        document: document.trimLeft(),
-        variables: variables,
-      ),
+      query: query,
     );
 
     final interceptedValue = await _interceptorExecutor(
@@ -175,19 +188,24 @@ class HasuraConnect {
   Future<Snapshot> subscription(String document, {String? key, Map<String, dynamic>? variables}) async {
     document = document.trim();
     key = key ?? _keyGenerator.generateBase(document);
+
+    return execSubscription(Query(
+      key: key,
+      document: document,
+      variables: variables,
+    ));
+  }
+
+  Future<Snapshot> execSubscription(Query query) async {
     Snapshot snapshot;
-    if (snapmap.containsKey(key)) {
-      snapshot = snapmap[key]!;
+    if (snapmap.containsKey(query.key)) {
+      snapshot = snapmap[query.key]!;
     } else {
       final usecase = sl.get<GetSnapshotSubscription>();
       final request = Request(
         url: url,
         type: RequestType.subscription,
-        query: Query(
-          key: key,
-          document: document,
-          variables: variables,
-        ),
+        query: query,
       );
       final result = usecase(
         closeConnection: _removeSnapshot,
@@ -195,7 +213,7 @@ class HasuraConnect {
         request: request,
       );
       snapshot = result.fold((l) => throw l, (s) => s);
-      snapmap[key] = snapshot;
+      snapmap[query.key!] = snapshot;
       await _interceptorExecutor.onSubscription(request, snapshot);
     }
 
@@ -352,7 +370,6 @@ class HasuraConnect {
 
   @mustCallSuper
   Future dispose() async {
-    // ignore: unawaited_futures
     await disconnect();
     await controller.close();
     await _subscription.cancel();

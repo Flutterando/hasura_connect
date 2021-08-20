@@ -158,7 +158,8 @@ class InterceptorMock extends Interceptor {
   final Future<void> Function()? onDisconnectedF;
   final Future<void> Function(Request connect, Snapshot snapshot)? onSubscriptionF;
 
-  InterceptorMock({this.onConnectedF, this.onTryAgainF, this.onDisconnectedF, this.onSubscriptionF, this.onErrorF, this.onRequestF, this.onResponseF});
+  InterceptorMock(
+      {this.onConnectedF, this.onTryAgainF, this.onDisconnectedF, this.onSubscriptionF, this.onErrorF, this.onRequestF, this.onResponseF});
   @override
   Future<dynamic>? onError(HasuraError error) => onErrorF?.call(error);
 

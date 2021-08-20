@@ -10,8 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  flutter_modular: ^3.0.0-nullsafety.36
-  flutter_triple: ^0.0.34
+  flutter_modular: ^3.4.0
+  flutter_triple: ^1.2.4+3
   hasura_connect:
     path: ../
   
@@ -19,6 +19,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
 flutter:
   uses-material-design: true
 

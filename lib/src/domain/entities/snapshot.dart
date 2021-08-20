@@ -93,7 +93,8 @@ class StartWithStreamTransformer<T> extends StreamTransformerBase<T, T> {
               controller.add(wrapper.value);
             }
 
-            subscription = input.listen(controller.add, onError: controller.addError, onDone: controller.close, cancelOnError: cancelOnError);
+            subscription =
+                input.listen(controller.add, onError: controller.addError, onDone: controller.close, cancelOnError: cancelOnError);
           },
           onPause: ([Future<dynamic>? resumeSignal]) => subscription.pause(resumeSignal),
           onResume: () => subscription.resume(),

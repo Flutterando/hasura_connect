@@ -22,8 +22,7 @@ void main() {
     final function = (Snapshot snap) {
       isCalled = true;
     };
-    final snapshot =
-        Snapshot(query: Query(document: 'null'), changeVariablesF: function);
+    final snapshot = Snapshot(query: Query(document: 'null'), changeVariablesF: function);
     snapshot.changeVariables({'header': 'test'});
     expect(isCalled, true);
     expect(snapshot.query.variables, isNotNull);

@@ -12,7 +12,8 @@ void main() {
   });
 
   test('should return Snapshot', () async {
-    final result = await usecase(request: Request(url: url, type: RequestType.subscription, query: Query(document: 'subscription', key: 'fdsfsffs')));
+    final result =
+        await usecase(request: Request(url: url, type: RequestType.subscription, query: Query(document: 'subscription', key: 'fdsfsffs')));
     final snapshot = result.right;
     expect(
         snapshot,
@@ -31,7 +32,8 @@ void main() {
     expect(result.left, isA<InvalidRequestError>());
   });
   test('should throw InvalidRequestError if Document is not a subscription', () async {
-    final result = await usecase(request: Request(url: url, type: RequestType.subscription, query: Query(document: 'mutation', key: 'fdsfsffs')));
+    final result =
+        await usecase(request: Request(url: url, type: RequestType.subscription, query: Query(document: 'mutation', key: 'fdsfsffs')));
     expect(result.left, isA<InvalidRequestError>());
   });
 
@@ -58,7 +60,8 @@ void main() {
   });
 
   test('should throw InvalidRequestError if Url is invalid', () async {
-    final result = await usecase(request: Request(url: '', type: RequestType.subscription, query: Query(document: 'subscription', key: 'fdsfsffs')));
+    final result =
+        await usecase(request: Request(url: '', type: RequestType.subscription, query: Query(document: 'subscription', key: 'fdsfsffs')));
     expect(
       result.left,
       isA<InvalidRequestError>(),

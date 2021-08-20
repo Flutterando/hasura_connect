@@ -49,7 +49,8 @@ void main() {
   });
 
   test('should throw InvalidRequestError if Url is invalid', () async {
-    final result = await usecase(request: Request(url: '', type: RequestType.mutation, query: Query(document: 'mutation', key: 'fdsfsffs')));
+    final result =
+        await usecase(request: Request(url: '', type: RequestType.mutation, query: Query(document: 'mutation', key: 'fdsfsffs')));
     expect(result.left, isA<InvalidRequestError>());
   });
 }
