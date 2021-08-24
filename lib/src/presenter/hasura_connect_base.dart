@@ -370,8 +370,9 @@ class HasuraConnect {
 
   @mustCallSuper
   Future dispose() async {
-    await disconnect();
     await controller.close();
     await _subscription.cancel();
+    // ignore: unawaited_futures
+    disconnect();
   }
 }
