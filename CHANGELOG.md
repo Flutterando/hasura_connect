@@ -1,3 +1,7 @@
+## 3.0.4-dev.2
+- Fix Bug: an operation already exists with this id
+- Migrate Mockito to Mocktail
+
 ## 3.0.4-dev.1
 - Export Query Model
 - Add function to Execute Mutation, Query and Subscription execQuery(Query query), execMutation(Query query) and execSubscription(Query query)
