@@ -19,10 +19,12 @@ void main() {
   late Response response;
   final url = 'https://hasura-fake.com';
   setUpAll(() {
+    registerFallbackValue<Request>(Request(url: '', query: Query(document: 'query', key: 'dadas')));
+
     repository = RequestRepositoryMock();
     usecase = MutationToServerImpl(repository);
     response = ResponseMock();
-    when(repository).calls(#sendRequest).thenAnswer((_) async => Right<HasuraError, Response>(response));
+    when(() => repository.sendRequest(request: any(named: 'request'))).thenAnswer((_) async => Right<HasuraError, Response>(response));
   });
 
   test('should return Response', () async {

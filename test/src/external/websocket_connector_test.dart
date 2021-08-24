@@ -14,19 +14,19 @@ void main() {
   final datasource = WebsocketConnector(wrapper);
   final url = 'http://test.com';
 
-  when(websocket).calls(#stream).thenReturn(Stream.empty());
-  when(websocket).calls(#addUtf8Text).thenReturn((List<int> list) {});
-  when(websocket).calls(#close).thenReturn(([int? code, String? reason]) async => 0);
-  when(websocket).calls(#closeCode).thenReturn(0);
-  when(websocket).calls(#done).thenAnswer((_) async => 0);
+  when(() => websocket.stream).thenAnswer((_) => Stream.empty());
+  when(() => websocket.addUtf8Text([])).thenReturn((List<int> list) {});
+  when(() => websocket.close()).thenAnswer((invocation) => Future.value(0));
+  when(() => websocket.closeCode).thenReturn(0);
+  when(() => websocket.done).thenAnswer((_) async => 0);
 
   test('should execute post request and return Connector object', () async {
-    when(wrapper).calls(#connect).thenAnswer((_) async => websocket);
+    when(() => wrapper.connect(any())).thenAnswer((_) async => websocket);
     expect(datasource.websocketConnector(url), completes);
   });
 
   test('should return ConnectionError when WebSocketWrapper is fail', () async {
-    when(wrapper).calls(#connect).thenThrow(Exception());
+    when(() => wrapper.connect(any())).thenThrow(Exception());
     expect(datasource.websocketConnector('request: tRequest'), throwsA(isA<ConnectionError>()));
   });
 }

@@ -27,16 +27,21 @@ void main() {
   final client = ClientMock();
   final wrapper = WrapperMock();
   final websocket = WebSocketMock();
-  when(websocket).calls(#stream).thenReturn(Stream.empty());
-  when(websocket).calls(#addUtf8Text).thenReturn((List<int> list) {});
-  when(websocket).calls(#close).thenReturn(Future.value(0));
-  when(websocket).calls(#closeCode).thenReturn(0);
-  when(websocket).calls(#done).thenAnswer((_) async => 0);
+  when(() => websocket.stream).thenAnswer((invocation) => Stream.empty());
+  when(() => websocket.addUtf8Text([])).thenReturn((List<int> list) {});
+  when(() => websocket.close()).thenAnswer((_) => Future.value(0));
+  when(() => websocket.closeCode).thenReturn(0);
+  when(() => websocket.done).thenAnswer((_) async => 0);
+
+  setUpAll(() {
+    registerFallbackValue(Uri.parse('https://fake-hasura.com'));
+  });
 
   setUp(() {
     connect = HasuraConnect('https://fake-hasura.com', interceptors: [LogInterceptor()]);
-    when(client).calls(#post).thenAnswer((_) async => http.Response(stringJsonReponse, 200));
-    when(wrapper).calls(#connect).thenAnswer((_) async => websocket);
+    when(() => client.post(any(), body: any(named: 'body'), headers: any(named: 'headers')))
+        .thenAnswer((_) async => http.Response(stringJsonReponse, 200));
+    when(() => wrapper.connect(any())).thenAnswer((_) async => websocket);
     cleanModule();
     startModule(() => client, wrapper);
   });

@@ -28,21 +28,24 @@ void main() {
   final client = ClientMock();
   final wrapper = WrapperMock();
   final websocket = WebSocketMock();
-
   final url = 'https://hasura-fake.com';
+
   final tRequestQuery = Request(type: RequestType.query, url: url, query: Query(document: 'query', key: 'jfslfj'));
   final tRequestMutation = Request(type: RequestType.mutation, url: url, query: Query(document: 'mutation', key: 'jfslfj'));
 
   setUpAll(() {
-    startModule(() => client, wrapper);
-    when(client).calls(#post).thenAnswer((_) async => http.Response(stringJsonReponse, 200));
+    registerFallbackValue(Uri.parse(url));
 
-    when(wrapper).calls(#connect).thenAnswer((_) async => websocket);
-    when(websocket).calls(#stream).thenReturn(Stream.empty());
-    when(websocket).calls(#addUtf8Text).thenReturn((List<int> list) {});
-    when(websocket).calls(#close).thenReturn(([int? code, String? reason]) async => 0);
-    when(websocket).calls(#closeCode).thenReturn(0);
-    when(websocket).calls(#done).thenAnswer((_) async => 0);
+    startModule(() => client, wrapper);
+    //Mocks
+    when(() => client.post(any(), body: any(named: 'body'), headers: any(named: 'headers')))
+        .thenAnswer((_) async => http.Response(stringJsonReponse, 200));
+    when(() => wrapper.connect(any())).thenAnswer((_) async => websocket);
+    when(() => websocket.stream).thenAnswer((_) => Stream.empty());
+    when(() => websocket.addUtf8Text([])).thenReturn((List<int> list) {});
+    when(() => websocket.close()).thenAnswer((_) => Future.value(0));
+    when(() => websocket.closeCode).thenReturn(0);
+    when(() => websocket.done).thenAnswer((_) async => 0);
   });
 
   test('should execute usecase QueryToServer by DI', () async {
@@ -55,7 +58,7 @@ void main() {
     final result = await usecase(request: tRequestMutation);
     expect(result.right, isA<Response>());
   });
-  test('should execute usecase QueryToServer by DI', () async {
+  test('should execute usecase GetConnector by DI', () async {
     final usecase = sl.get<GetConnector>();
     final result = await usecase('https://flutterando.com.br');
     expect(result.right, isA<Connector>());

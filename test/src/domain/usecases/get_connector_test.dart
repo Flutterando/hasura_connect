@@ -14,7 +14,7 @@ void main() {
   setUpAll(() {
     repository = ConnectorRepositoryMock();
     usecase = GetConnectorImpl(repository);
-    when(repository).calls(#getConnector).thenAnswer((_) async => Right<HasuraError, Connector>(Connector(Stream.empty())));
+    when(() => repository.getConnector(any())).thenAnswer((_) async => Right<HasuraError, Connector>(Connector(Stream.empty())));
   });
 
   test('should return Connector', () async {
@@ -23,6 +23,7 @@ void main() {
   });
   test('should throw InvalidRequestError if Url is invalid', () async {
     final result = await usecase('');
+    expect(result.isLeft, true);
     expect(result.left, isA<InvalidRequestError>());
   });
 

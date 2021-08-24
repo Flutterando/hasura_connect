@@ -1,9 +1,10 @@
 import 'package:either_dart/either.dart';
 import 'package:string_validator/string_validator.dart';
-import '../repositories/request_repository.dart';
+
+import '../entities/response.dart';
 import '../errors/errors.dart';
 import '../models/request.dart';
-import '../entities/response.dart';
+import '../repositories/request_repository.dart';
 
 abstract class MutationToServer {
   Future<Either<HasuraError, Response>> call({required Request request});
@@ -24,6 +25,8 @@ class MutationToServerImpl implements MutationToServer {
       return Left(InvalidRequestError('Invalid key'));
     } else if (request.type != RequestType.mutation) {
       return Left(InvalidRequestError('Request type is not RequestType.mutation'));
+    } else if (!isURL(request.url)) {
+      return Left(InvalidRequestError('Invalid url'));
     }
 
     return await repository.sendRequest(request: request);

@@ -18,10 +18,15 @@ class ClientMock extends Mock implements http.Client {
 void main() {
   final client = ClientMock();
   final datasource = PostHttpRequest(() => client);
-  final tRequest = Request(url: '', query: Query(document: 'query', key: 'dadas'));
+  final tRequest = Request(url: 'myUrl', query: Query(document: 'query', key: 'dadas'));
+
+  setUpAll(() {
+    registerFallbackValue(Uri.parse('myUrl'));
+  });
 
   test('should execute post request and return Response object', () async {
-    when(client).calls(#post).thenAnswer((_) async => http.Response(stringJsonReponse, 200));
+    when(() => client.post(any(), body: any(named: 'body'), headers: any(named: 'headers')))
+        .thenAnswer((_) async => http.Response(stringJsonReponse, 200));
     expect(datasource.post(request: tRequest), completes);
     final result = await datasource.post(request: tRequest);
     expect(result.statusCode, 200);
@@ -30,7 +35,8 @@ void main() {
 
   group('Connection Errors | ', () {
     test('should ConnectionError if connection gonna be rejected', () async {
-      when(client).calls(#post).thenAnswer((_) async => http.Response(stringJsonReponse, 401));
+      when(() => client.post(any(), body: any(named: 'body'), headers: any(named: 'headers')))
+          .thenAnswer((_) async => http.Response(stringJsonReponse, 401));
       expect(
         datasource.post(request: tRequest),
         throwsA(
@@ -40,12 +46,12 @@ void main() {
     });
 
     test('should throw ConnectionError when socket fail connection', () async {
-      when(client).calls(#post).thenThrow(Exception('error'));
+      when(() => client.post(any(), body: any(named: 'body'), headers: any(named: 'headers'))).thenThrow(Exception('error'));
       expect(datasource.post(request: tRequest), throwsA(isA<Exception>()));
     });
 
     test('should throw HasuraRequestError when server reject connection', () async {
-      when(client).calls(#post).thenAnswer((_) async => http.Response(
+      when(() => client.post(any(), body: any(named: 'body'), headers: any(named: 'headers'))).thenAnswer((_) async => http.Response(
           jsonEncode({
             'errors': [
               {

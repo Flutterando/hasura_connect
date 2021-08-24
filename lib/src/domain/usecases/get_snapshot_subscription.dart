@@ -1,6 +1,7 @@
 import 'package:either_dart/either.dart';
 import 'package:hasura_connect/src/domain/models/request.dart';
 import 'package:string_validator/string_validator.dart';
+
 import '../entities/snapshot.dart';
 import '../errors/errors.dart';
 
@@ -24,6 +25,8 @@ class GetSnapshotSubscriptionImpl implements GetSnapshotSubscription {
       return Left(InvalidRequestError('Invalid key'));
     } else if (request.type != RequestType.subscription) {
       return Left(InvalidRequestError('Request type is not RequestType.subscription'));
+    } else if (!isURL(request.url)) {
+      return Left(InvalidRequestError('Invalid url'));
     }
     return Right(
       Snapshot(

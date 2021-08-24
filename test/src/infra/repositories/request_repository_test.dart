@@ -18,6 +18,9 @@ void main() {
   late Response response;
 
   final tRequest = Request(url: '', query: Query(document: 'query', key: 'dadas'));
+
+  registerFallbackValue<Request>(tRequest);
+
   setUpAll(() {
     response = ResponseMock();
     datasource = RequestDatasourceMock();
@@ -25,19 +28,19 @@ void main() {
   });
 
   test('should return Response', () async {
-    when(datasource).calls(#post).thenAnswer((_) async => response);
+    when(() => datasource.post(request: any(named: 'request'))).thenAnswer((_) async => response);
     final result = await repository.sendRequest(request: tRequest);
     expect(result.right, equals(response));
   });
 
   test('should return DatasourceError when datasource failed', () async {
-    when(datasource).calls(#post).thenThrow(Exception());
+    when(() => datasource.post(request: any(named: 'request'))).thenThrow(Exception());
     final result = await repository.sendRequest(request: tRequest);
     expect(result.left, isA<DatasourceError>());
   });
 
   test('should return error from datasource', () async {
-    when(datasource).calls(#post).thenThrow(InvalidRequestError('Error'));
+    when(() => datasource.post(request: any(named: 'request'))).thenThrow(InvalidRequestError('Error'));
     final result = await repository.sendRequest(request: tRequest);
     expect(result.left, isA<InvalidRequestError>());
   });

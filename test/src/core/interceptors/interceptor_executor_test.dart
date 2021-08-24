@@ -62,7 +62,7 @@ void main() async {
   });
   group('onResponse || ', () {
     test('should exec interceptor ', () async {
-      when(response).calls(#statusCode).thenReturn(1);
+      when(() => response.statusCode).thenReturn(1);
       final exec = InterceptorExecutor([InterceptorMock(onResponseF: (r) async => response)]);
       final resolver = ClientResolver.response(response);
       final result = await exec(resolver);

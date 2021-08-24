@@ -1,9 +1,9 @@
 import 'package:either_dart/either.dart';
-import 'package:string_validator/string_validator.dart';
-import '../repositories/request_repository.dart';
+
+import '../entities/response.dart';
 import '../errors/errors.dart';
 import '../models/request.dart';
-import '../entities/response.dart';
+import '../repositories/request_repository.dart';
 
 abstract class QueryToServer {
   Future<Either<HasuraError, Response>> call({required Request request});

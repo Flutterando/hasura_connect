@@ -17,19 +17,19 @@ void main() {
   });
 
   test('should return Response', () async {
-    when(datasource).calls(#websocketConnector).thenAnswer((_) async => Connector(Stream.empty()));
+    when(() => datasource.websocketConnector('')).thenAnswer((_) async => Connector(Stream.empty()));
     final result = await repository.getConnector('');
     expect(result.right, isA<Connector>());
   });
 
   test('should return DatasourceError when datasource failed', () async {
-    when(datasource).calls(#websocketConnector).thenThrow(Exception());
+    when(() => datasource.websocketConnector('')).thenThrow(Exception());
     final result = await repository.getConnector('');
     expect(result.left, isA<DatasourceError>());
   });
 
   test('should return error from datasource', () async {
-    when(datasource).calls(#websocketConnector).thenThrow(InvalidRequestError('error'));
+    when(() => datasource.websocketConnector('')).thenThrow(InvalidRequestError('error'));
     final result = await repository.getConnector('');
     expect(result.left, isA<InvalidRequestError>());
   });
