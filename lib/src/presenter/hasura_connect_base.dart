@@ -92,6 +92,7 @@ class HasuraConnect {
     }
   }
 
+  ///Execute a Query from a Document
   Future query(String document, {String? key, Map<String, dynamic>? variables}) async {
     key = key ?? _keyGenerator.generateBase(document);
     return executeQuery(Query(
@@ -101,6 +102,7 @@ class HasuraConnect {
     ));
   }
 
+  ///Execute a Query from a Query
   Future executeQuery(Query query) async {
     final usecase = sl.get<QueryToServer>();
     var request = Request(
@@ -149,6 +151,7 @@ class HasuraConnect {
     }
   }
 
+  ///Execute a Mutation from a Document
   Future mutation(String document, {Map<String, dynamic>? variables, bool tryAgain = true, String? key}) async {
     key = key ?? _keyGenerator.randomString(15);
 
@@ -159,6 +162,7 @@ class HasuraConnect {
     ));
   }
 
+  ///Execute a Mutation from a Query
   Future executeMutation(Query query) async {
     final usecase = sl.get<MutationToServer>();
 
@@ -185,6 +189,7 @@ class HasuraConnect {
     return (await result.fold(_interceptError, _interceptResponse)).data;
   }
 
+  ///Execute a Subscription from a Document
   Future<Snapshot> subscription(String document, {String? key, Map<String, dynamic>? variables}) async {
     document = document.trim();
     key = key ?? _keyGenerator.generateBase(document);
@@ -196,6 +201,7 @@ class HasuraConnect {
     ));
   }
 
+  ///Execute a Subscription from a Query
   Future<Snapshot> executeSubscription(Query query) async {
     Snapshot snapshot;
     if (snapmap.containsKey(query.key)) {
@@ -220,6 +226,7 @@ class HasuraConnect {
     if (snapmap.keys.isNotEmpty && !_isConnected) {
       // ignore: unawaited_futures
       _connect();
+      await Future.delayed(Duration(milliseconds: 500));
     } else if (_isConnected) {
       final input = querySubscription(snapshot.query);
       sendToWebSocketServer(input);
@@ -346,6 +353,7 @@ class HasuraConnect {
     }
   }
 
+  ///Disconect from Hasura
   Future<void> disconnect() async {
     if (_disconnectionFlag) {
       return;
@@ -372,7 +380,6 @@ class HasuraConnect {
   Future dispose() async {
     await controller.close();
     await _subscription.cancel();
-    // ignore: unawaited_futures
-    disconnect();
+    await disconnect();
   }
 }
