@@ -206,6 +206,7 @@ class HasuraConnect {
     Snapshot snapshot;
     if (snapmap.containsKey(query.key)) {
       snapshot = snapmap[query.key]!;
+      return snapshot;
     } else {
       final usecase = sl.get<GetSnapshotSubscription>();
       final request = Request(
