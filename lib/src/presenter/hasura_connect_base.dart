@@ -174,7 +174,7 @@ class HasuraConnect {
     }
 
     var request = Request(
-      headers: headers,
+      headers: _headers,
       type: RequestType.mutation,
       url: url,
       query: query,

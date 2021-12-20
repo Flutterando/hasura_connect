@@ -1,4 +1,4 @@
-## 4.0.0+1
+## 4.0.0+2
 - BREAK CHANGE: Added HasuraConnect instance in Request, Response and Error in Interceptors;
 - Added headers property in `HasuraConnect.query` and `HasuraConnect.mutation`;
 
