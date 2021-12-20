@@ -47,17 +47,12 @@ class HasuraConnect {
   final int? reconnectionAttemp;
   final Map<String, String>? headers;
 
-  HasuraConnect(this.url,
-      {this.reconnectionAttemp, List<Interceptor>? interceptors, this.headers, http.Client Function()? httpClientFactory}) {
+  HasuraConnect(this.url, {this.reconnectionAttemp, List<Interceptor>? interceptors, this.headers, http.Client Function()? httpClientFactory}) {
     startModule(httpClientFactory);
     _interceptorExecutor = InterceptorExecutor(interceptors);
 
-    _subscription = controller.stream
-        .where((data) => data is Map)
-        .map((data) => data as Map)
-        .where((data) => data.containsKey('id'))
-        .where((data) => snapmap.containsKey(data['id']))
-        .listen(rootStreamListener);
+    _subscription =
+        controller.stream.where((data) => data is Map).map((data) => data as Map).where((data) => data.containsKey('id')).where((data) => snapmap.containsKey(data['id'])).listen(rootStreamListener);
   }
 
   @visibleForTesting
@@ -93,10 +88,11 @@ class HasuraConnect {
   }
 
   ///Execute a Query from a Document
-  Future query(String document, {String? key, Map<String, dynamic>? variables}) async {
+  Future query(String document, {String? key, Map<String, dynamic>? variables, Map<String, String>? headers}) async {
     key = key ?? _keyGenerator.generateBase(document);
     return executeQuery(Query(
       key: key,
+      headers: headers,
       document: document.trimLeft(),
       variables: variables,
     ));
@@ -105,14 +101,19 @@ class HasuraConnect {
   ///Execute a Query from a Query
   Future executeQuery(Query query) async {
     final usecase = sl.get<QueryToServer>();
+    var _headers = Map<String, String>.from(headers ?? {});
+    if (query.headers != null) {
+      _headers.addAll(query.headers!);
+    }
+
     var request = Request(
-      headers: headers,
+      headers: _headers,
       type: RequestType.query,
       url: url,
       query: query,
     );
     final interceptedValue = await _interceptorExecutor(
-      ClientResolver.request(request),
+      ClientResolver.request(request, this),
     );
 
     if (interceptedValue is Response) {
@@ -129,7 +130,7 @@ class HasuraConnect {
 
   Future<Response> _interceptError(HasuraError error) async {
     final interceptedValue = await _interceptorExecutor(
-      ClientResolver.error(error),
+      ClientResolver.error(error, this),
     );
 
     if (interceptedValue is Response) {
@@ -141,7 +142,7 @@ class HasuraConnect {
 
   Future<Response> _interceptResponse(Response response) async {
     final interceptedValue = await _interceptorExecutor(
-      ClientResolver.response(response),
+      ClientResolver.response(response, this),
     );
 
     if (interceptedValue is Response) {
@@ -174,7 +175,7 @@ class HasuraConnect {
     );
 
     final interceptedValue = await _interceptorExecutor(
-      ClientResolver.request(request),
+      ClientResolver.request(request, this),
     );
 
     if (interceptedValue is Response) {
@@ -190,12 +191,13 @@ class HasuraConnect {
   }
 
   ///Execute a Subscription from a Document
-  Future<Snapshot> subscription(String document, {String? key, Map<String, dynamic>? variables}) async {
+  Future<Snapshot> subscription(String document, {String? key, Map<String, dynamic>? variables, Map<String, String>? headers}) async {
     document = document.trim();
     key = key ?? _keyGenerator.generateBase(document);
 
     return executeSubscription(Query(
       key: key,
+      headers: headers,
       document: document,
       variables: variables,
     ));
@@ -292,7 +294,7 @@ class HasuraConnect {
     );
 
     final interceptedValue = await _interceptorExecutor(
-      ClientResolver.request(request),
+      ClientResolver.request(request, this),
     );
 
     try {

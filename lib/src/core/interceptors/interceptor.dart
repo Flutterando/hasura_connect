@@ -6,9 +6,9 @@ import 'package:hasura_connect/src/presenter/hasura_connect_base.dart';
 import '../../domain/models/request.dart';
 
 abstract class Interceptor {
-  Future<dynamic>? onRequest(Request request);
-  Future<dynamic>? onResponse(Response data);
-  Future<dynamic>? onError(HasuraError request);
+  Future<dynamic>? onRequest(Request request, HasuraConnect connect);
+  Future<dynamic>? onResponse(Response data, HasuraConnect connect);
+  Future<dynamic>? onError(HasuraError request, HasuraConnect connect);
   Future<void>? onSubscription(Request request, Snapshot snapshot);
   Future<void>? onConnected(HasuraConnect connect);
   Future<void>? onTryAgain(HasuraConnect connect);
@@ -23,13 +23,13 @@ abstract class InterceptorBase extends Interceptor {
   Future<void>? onDisconnected() {}
 
   @override
-  Future? onError(HasuraError error) async => error;
+  Future? onError(HasuraError error, HasuraConnect connect) async => error;
 
   @override
-  Future? onRequest(Request request) async => request;
+  Future? onRequest(Request request, HasuraConnect connect) async => request;
 
   @override
-  Future? onResponse(Response data) async => data;
+  Future? onResponse(Response data, HasuraConnect connect) async => data;
 
   @override
   Future<void>? onSubscription(Request request, Snapshot snapshot) {}

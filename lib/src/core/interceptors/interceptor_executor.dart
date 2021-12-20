@@ -17,11 +17,11 @@ class InterceptorExecutor {
 
     switch (resolver.type) {
       case Request:
-        return await _executeRequestInterceptors(resolver.value);
+        return await _executeRequestInterceptors(resolver.value, resolver.connect);
       case Response:
-        return await _executeResponseInterceptors(resolver.value);
+        return await _executeResponseInterceptors(resolver.value, resolver.connect);
       case HasuraError:
-        return await _executeHasuraErrorInterceptors(resolver.value);
+        return await _executeHasuraErrorInterceptors(resolver.value, resolver.connect);
       default:
         return null;
     }
@@ -80,10 +80,10 @@ class InterceptorExecutor {
     }
   }
 
-  Future<dynamic> _executeRequestInterceptors(Request request) async {
+  Future<dynamic> _executeRequestInterceptors(Request request, HasuraConnect connect) async {
     try {
       for (var interceptor in interceptors ?? []) {
-        final result = await interceptor.onRequest?.call(request);
+        final result = await interceptor.onRequest?.call(request, connect);
         if (result is Request) {
           request = result;
         } else {
@@ -96,10 +96,10 @@ class InterceptorExecutor {
     }
   }
 
-  Future<dynamic> _executeResponseInterceptors(Response response) async {
+  Future<dynamic> _executeResponseInterceptors(Response response, HasuraConnect connect) async {
     try {
       for (var interceptor in interceptors ?? []) {
-        final result = await interceptor.onResponse?.call(response);
+        final result = await interceptor.onResponse?.call(response, connect);
         if (result is Response) {
           response = result;
         } else {
@@ -116,10 +116,10 @@ class InterceptorExecutor {
     }
   }
 
-  Future<dynamic> _executeHasuraErrorInterceptors(HasuraError error) async {
+  Future<dynamic> _executeHasuraErrorInterceptors(HasuraError error, HasuraConnect connect) async {
     try {
       for (var interceptor in interceptors ?? []) {
-        final result = await interceptor.onError?.call(error);
+        final result = await interceptor.onError?.call(error, connect);
         if (result is HasuraError) {
           error = result;
         } else {
@@ -140,16 +140,17 @@ class InterceptorExecutor {
 class ClientResolver {
   final dynamic value;
   final Type type;
+  final HasuraConnect connect;
 
-  const ClientResolver._(this.value, this.type);
+  const ClientResolver._(this.value, this.type, this.connect);
 
-  factory ClientResolver.request(Request value) {
-    return ClientResolver._(value, Request);
+  factory ClientResolver.request(Request value, HasuraConnect connect) {
+    return ClientResolver._(value, Request, connect);
   }
-  factory ClientResolver.response(Response value) {
-    return ClientResolver._(value, Response);
+  factory ClientResolver.response(Response value, HasuraConnect connect) {
+    return ClientResolver._(value, Response, connect);
   }
-  factory ClientResolver.error(HasuraError value) {
-    return ClientResolver._(value, HasuraError);
+  factory ClientResolver.error(HasuraError value, HasuraConnect connect) {
+    return ClientResolver._(value, HasuraError, connect);
   }
 }
