@@ -153,11 +153,12 @@ class HasuraConnect {
   }
 
   ///Execute a Mutation from a Document
-  Future mutation(String document, {Map<String, dynamic>? variables, bool tryAgain = true, String? key}) async {
+  Future mutation(String document, {Map<String, dynamic>? variables, bool tryAgain = true, String? key, Map<String, String>? headers}) async {
     key = key ?? _keyGenerator.randomString(15);
 
     return executeMutation(Query(
       key: key,
+      headers: headers,
       document: document.trimLeft(),
       variables: variables,
     ));
@@ -166,6 +167,11 @@ class HasuraConnect {
   ///Execute a Mutation from a Query
   Future executeMutation(Query query) async {
     final usecase = sl.get<MutationToServer>();
+
+    var _headers = Map<String, String>.from(headers ?? {});
+    if (query.headers != null) {
+      _headers.addAll(query.headers!);
+    }
 
     var request = Request(
       headers: headers,
