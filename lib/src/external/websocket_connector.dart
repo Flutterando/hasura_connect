@@ -14,7 +14,7 @@ class WebsocketConnector implements ConnectorDatasource {
   Future<Connector> websocketConnector(String url) async {
     try {
       final _wrapper = wrapper ?? _WebSocketWrapper();
-      final _channelPromisse = await _wrapper.connect(url.replaceFirst('http', 'ws'));
+      final _channelPromisse = await _wrapper.connect(url.replaceFirst('https', 'wss').replaceFirst('http', 'ws'));
       return Connector(
         _channelPromisse.stream,
         add: _channelPromisse.addUtf8Text,
