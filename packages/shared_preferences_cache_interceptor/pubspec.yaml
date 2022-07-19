@@ -8,12 +8,13 @@ environment:
   sdk: ">=2.16.0 <3.0.0"
 
 dependencies:
-  shared_preferences: ">=2.0.0 <3.0.0"
+  platform: ^3.1.0
+  shared_preferences: ">=2.0.15 <3.0.0"
   hasura_cache_interceptor: ">=1.0.0-dev.5 <2.0.0"
   flutter:
     sdk: flutter
 
-dependency_overrides: 
+dependency_overrides:   
   hasura_cache_interceptor: 
     path: ../hasura_cache_interceptor
 
