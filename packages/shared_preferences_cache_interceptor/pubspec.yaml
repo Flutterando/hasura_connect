@@ -1,6 +1,6 @@
 name: shared_preferences_cache_interceptor
 description: Package to implements cache using shared preferences to hasura_connect package
-version: 1.0.0-dev.4
+version: 1.0.0-dev.5
 homepage: https://flutterando.com.br
 repository: https://github.com/Flutterando/shared_preferences_cache_interceptor
 

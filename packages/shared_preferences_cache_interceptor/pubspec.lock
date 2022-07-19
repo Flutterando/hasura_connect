@@ -155,14 +155,14 @@ packages:
       path: "../hasura_cache_interceptor"
       relative: true
     source: path
-    version: "1.0.0-dev.6"
+    version: "1.0.0-dev.7"
   hasura_connect:
     dependency: "direct overridden"
     description:
       path: "../hasura_connect"
       relative: true
     source: path
-    version: "4.0.0+2"
+    version: "4.0.0+3"
   http:
     dependency: transitive
     description:

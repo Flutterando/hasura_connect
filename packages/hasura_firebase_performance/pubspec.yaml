@@ -1,6 +1,6 @@
 name: hasura_firebase_performance
 description: Hasura connect Interceptor implementation that sends querys metric data to Firebase.
-version: 0.0.7
+version: 0.0.8
 homepage: https://github.com/Flutterando/hasura_firebase_performance
 
 environment:
