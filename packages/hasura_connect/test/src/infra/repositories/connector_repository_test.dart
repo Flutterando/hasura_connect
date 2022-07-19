@@ -17,8 +17,7 @@ void main() {
   });
 
   test('should return Response', () async {
-    when(() => datasource.websocketConnector(''))
-        .thenAnswer((_) async => Connector(Stream.empty()));
+    when(() => datasource.websocketConnector('')).thenAnswer((_) async => Connector(Stream.empty()));
     final result = await repository.getConnector('');
     expect(result.right, isA<Connector>());
   });
@@ -30,8 +29,7 @@ void main() {
   });
 
   test('should return error from datasource', () async {
-    when(() => datasource.websocketConnector(''))
-        .thenThrow(InvalidRequestError('error'));
+    when(() => datasource.websocketConnector('')).thenThrow(InvalidRequestError('error'));
     final result = await repository.getConnector('');
     expect(result.left, isA<InvalidRequestError>());
   });

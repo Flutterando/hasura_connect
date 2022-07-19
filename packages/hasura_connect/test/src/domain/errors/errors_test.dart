@@ -1,4 +1,6 @@
 import 'package:hasura_connect/hasura_connect.dart';
+import 'package:hasura_connect/src/domain/errors/errors.dart';
+import 'package:hasura_connect/src/domain/models/query.dart';
 import 'package:test/test.dart';
 
 void main() {

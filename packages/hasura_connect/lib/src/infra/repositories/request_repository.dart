@@ -11,8 +11,7 @@ class RequestRepositoryImpl implements RequestRepository {
   RequestRepositoryImpl({required this.datasource});
 
   @override
-  Future<Either<HasuraError, Response>> sendRequest(
-      {required Request request}) async {
+  Future<Either<HasuraError, Response>> sendRequest({required Request request}) async {
     try {
       final result = await datasource.post(request: request);
       return Right(result);

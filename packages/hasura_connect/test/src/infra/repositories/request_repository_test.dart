@@ -17,8 +17,7 @@ void main() {
   late RequestRepository repository;
   late Response response;
 
-  final tRequest =
-      Request(url: '', query: Query(document: 'query', key: 'dadas'));
+  final tRequest = Request(url: '', query: Query(document: 'query', key: 'dadas'));
 
   registerFallbackValue(tRequest);
 
@@ -29,22 +28,19 @@ void main() {
   });
 
   test('should return Response', () async {
-    when(() => datasource.post(request: any(named: 'request')))
-        .thenAnswer((_) async => response);
+    when(() => datasource.post(request: any(named: 'request'))).thenAnswer((_) async => response);
     final result = await repository.sendRequest(request: tRequest);
     expect(result.right, equals(response));
   });
 
   test('should return DatasourceError when datasource failed', () async {
-    when(() => datasource.post(request: any(named: 'request')))
-        .thenThrow(Exception());
+    when(() => datasource.post(request: any(named: 'request'))).thenThrow(Exception());
     final result = await repository.sendRequest(request: tRequest);
     expect(result.left, isA<DatasourceError>());
   });
 
   test('should return error from datasource', () async {
-    when(() => datasource.post(request: any(named: 'request')))
-        .thenThrow(InvalidRequestError('Error'));
+    when(() => datasource.post(request: any(named: 'request'))).thenThrow(InvalidRequestError('Error'));
     final result = await repository.sendRequest(request: tRequest);
     expect(result.left, isA<InvalidRequestError>());
   });

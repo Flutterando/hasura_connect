@@ -38,10 +38,8 @@ void main() {
   });
 
   setUp(() {
-    connect = HasuraConnect('https://fake-hasura.com',
-        interceptors: [LogInterceptor()]);
-    when(() => client.post(any(),
-            body: any(named: 'body'), headers: any(named: 'headers')))
+    connect = HasuraConnect('https://fake-hasura.com', interceptors: [LogInterceptor()]);
+    when(() => client.post(any(), body: any(named: 'body'), headers: any(named: 'headers')))
         .thenAnswer((_) async => http.Response(stringJsonReponse, 200));
     when(() => wrapper.connect(any())).thenAnswer((_) async => websocket);
     cleanModule();
@@ -91,8 +89,7 @@ void main() {
       final snapshot = Snapshot(query: Query(document: 'null'));
       expect(snapshot, emits('test'));
       connect.snapmap['fdfhsf'] = snapshot;
-      connect.rootStreamListener(
-          {'id': 'fdfhsf', 'payload': 'test', 'type': 'data'});
+      connect.rootStreamListener({'id': 'fdfhsf', 'payload': 'test', 'type': 'data'});
       snapshot.close();
     });
     test('should execute with HasuraRequestError 1', () async {
@@ -136,20 +133,12 @@ void main() {
     test('should execute connection_ack', () async {
       final snapshot = Snapshot(query: Query(document: 'null'));
       connect.snapmap['fdfhsf'] = snapshot;
-      final data = {
-        'id': 'fdfhsf',
-        'payload': 'test',
-        'type': 'connection_ack'
-      };
+      final data = {'id': 'fdfhsf', 'payload': 'test', 'type': 'connection_ack'};
       await connect.normalizeStreamValue(data);
       snapshot.close();
     });
     test('should execute connection_error', () async {
-      final data = {
-        'id': 'fdfhsf',
-        'payload': 'test',
-        'type': 'connection_error'
-      };
+      final data = {'id': 'fdfhsf', 'payload': 'test', 'type': 'connection_error'};
       await connect.normalizeStreamValue(data);
     });
   });

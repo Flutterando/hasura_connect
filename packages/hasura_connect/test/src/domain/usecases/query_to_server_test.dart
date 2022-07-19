@@ -20,52 +20,32 @@ void main() {
   final url = 'https://hasura-fake.com';
 
   setUpAll(() {
-    final tRequest =
-        Request(url: '', query: Query(document: 'query', key: 'dadas'));
+    final tRequest = Request(url: '', query: Query(document: 'query', key: 'dadas'));
 
     registerFallbackValue(tRequest);
     repository = RequestRepositoryMock();
     usecase = QueryToServerImpl(repository);
     response = ResponseMock();
 
-    when(() => repository.sendRequest(request: any(named: 'request')))
-        .thenAnswer((_) async => Right<HasuraError, Response>(response));
+    when(() => repository.sendRequest(request: any(named: 'request'))).thenAnswer((_) async => Right<HasuraError, Response>(response));
   });
 
   test('should return Response', () async {
-    final result = await usecase(
-        request: Request(
-            url: url,
-            type: RequestType.query,
-            query: Query(document: 'query', key: 'dadas')));
+    final result = await usecase(request: Request(url: url, type: RequestType.query, query: Query(document: 'query', key: 'dadas')));
     expect(result.right, equals(response));
   });
-  test('should throw InvalidRequestError if Query.document is invalid',
-      () async {
-    final result = await usecase(
-        request: Request(
-            url: url,
-            type: RequestType.query,
-            query: Query(document: '', key: 'dadas')));
+  test('should throw InvalidRequestError if Query.document is invalid', () async {
+    final result = await usecase(request: Request(url: url, type: RequestType.query, query: Query(document: '', key: 'dadas')));
     expect(result.left, isA<InvalidRequestError>());
   });
 
   test('should throw InvalidRequestError if Document is not a query', () async {
-    final result = await usecase(
-        request: Request(
-            url: url,
-            type: RequestType.query,
-            query: Query(document: 'mutation', key: 'dadas')));
+    final result = await usecase(request: Request(url: url, type: RequestType.query, query: Query(document: 'mutation', key: 'dadas')));
     expect(result.left, isA<InvalidRequestError>());
   });
 
-  test('should throw InvalidRequestError if type request is not query',
-      () async {
-    final result = await usecase(
-        request: Request(
-            url: url,
-            type: RequestType.mutation,
-            query: Query(document: 'query', key: 'dadas')));
+  test('should throw InvalidRequestError if type request is not query', () async {
+    final result = await usecase(request: Request(url: url, type: RequestType.mutation, query: Query(document: 'query', key: 'dadas')));
     expect(result.left, isA<InvalidRequestError>());
   });
 }

@@ -30,22 +30,15 @@ void main() {
   final websocket = WebSocketMock();
   final url = 'https://hasura-fake.com';
 
-  final tRequestQuery = Request(
-      type: RequestType.query,
-      url: url,
-      query: Query(document: 'query', key: 'jfslfj'));
-  final tRequestMutation = Request(
-      type: RequestType.mutation,
-      url: url,
-      query: Query(document: 'mutation', key: 'jfslfj'));
+  final tRequestQuery = Request(type: RequestType.query, url: url, query: Query(document: 'query', key: 'jfslfj'));
+  final tRequestMutation = Request(type: RequestType.mutation, url: url, query: Query(document: 'mutation', key: 'jfslfj'));
 
   setUpAll(() {
     registerFallbackValue(Uri.parse(url));
 
     startModule(() => client, wrapper);
     //Mocks
-    when(() => client.post(any(),
-            body: any(named: 'body'), headers: any(named: 'headers')))
+    when(() => client.post(any(), body: any(named: 'body'), headers: any(named: 'headers')))
         .thenAnswer((_) async => http.Response(stringJsonReponse, 200));
     when(() => wrapper.connect(any())).thenAnswer((_) async => websocket);
     when(() => websocket.stream).thenAnswer((_) => Stream.empty());

@@ -47,20 +47,12 @@ class HasuraConnect {
   final int? reconnectionAttempt;
   final Map<String, String>? headers;
 
-  HasuraConnect(this.url,
-      {this.reconnectionAttempt,
-      List<Interceptor>? interceptors,
-      this.headers,
-      http.Client Function()? httpClientFactory}) {
+  HasuraConnect(this.url, {this.reconnectionAttempt, List<Interceptor>? interceptors, this.headers, http.Client Function()? httpClientFactory}) {
     startModule(httpClientFactory);
     _interceptorExecutor = InterceptorExecutor(interceptors);
 
-    _subscription = controller.stream
-        .where((data) => data is Map)
-        .map((data) => data as Map)
-        .where((data) => data.containsKey('id'))
-        .where((data) => snapmap.containsKey(data['id']))
-        .listen(rootStreamListener);
+    _subscription =
+        controller.stream.where((data) => data is Map).map((data) => data as Map).where((data) => data.containsKey('id')).where((data) => snapmap.containsKey(data['id'])).listen(rootStreamListener);
   }
 
   @visibleForTesting
@@ -96,10 +88,7 @@ class HasuraConnect {
   }
 
   ///Execute a Query from a Document
-  Future query(String document,
-      {String? key,
-      Map<String, dynamic>? variables,
-      Map<String, String>? headers}) async {
+  Future query(String document, {String? key, Map<String, dynamic>? variables, Map<String, String>? headers}) async {
     key = key ?? _keyGenerator.generateBase(document);
     return executeQuery(Query(
       key: key,
@@ -164,11 +153,7 @@ class HasuraConnect {
   }
 
   ///Execute a Mutation from a Document
-  Future mutation(String document,
-      {Map<String, dynamic>? variables,
-      bool tryAgain = true,
-      String? key,
-      Map<String, String>? headers}) async {
+  Future mutation(String document, {Map<String, dynamic>? variables, bool tryAgain = true, String? key, Map<String, String>? headers}) async {
     key = key ?? _keyGenerator.randomString(15);
 
     return executeMutation(Query(
@@ -212,10 +197,7 @@ class HasuraConnect {
   }
 
   ///Execute a Subscription from a Document
-  Future<Snapshot> subscription(String document,
-      {String? key,
-      Map<String, dynamic>? variables,
-      Map<String, String>? headers}) async {
+  Future<Snapshot> subscription(String document, {String? key, Map<String, dynamic>? variables, Map<String, String>? headers}) async {
     document = document.trim();
     key = key ?? _keyGenerator.generateBase(document);
 
@@ -327,9 +309,7 @@ class HasuraConnect {
       } else if (interceptedValue is HasuraError) {
         throw interceptedValue;
       }
-      final subscriptionStream = connector
-          .map<Map>((event) => jsonDecode(event))
-          .listen(normalizeStreamValue);
+      final subscriptionStream = connector.map<Map>((event) => jsonDecode(event)).listen(normalizeStreamValue);
       (_init['payload'] as Map)['headers'] = request.headers;
       sendToWebSocketServer(jsonEncode(_init));
       subscriptionStream.onError(print);

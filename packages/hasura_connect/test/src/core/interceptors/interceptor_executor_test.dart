@@ -41,8 +41,7 @@ void main() async {
 
   group('onRequest || ', () {
     test('should exec interceptor request', () async {
-      final exec = InterceptorExecutor(
-          [InterceptorMock(onRequestF: (r) async => r.copyWith(url: 'test'))]);
+      final exec = InterceptorExecutor([InterceptorMock(onRequestF: (r) async => r.copyWith(url: 'test'))]);
       final resolver = ClientResolver.request(request, HasuraConnectMock());
       final result = await exec(resolver);
       expect(result, isA<Request>());
@@ -50,15 +49,13 @@ void main() async {
     });
 
     test('should exec interceptor returning other type', () async {
-      final exec = InterceptorExecutor(
-          [InterceptorMock(onRequestF: (r) async => response)]);
+      final exec = InterceptorExecutor([InterceptorMock(onRequestF: (r) async => response)]);
       final resolver = ClientResolver.request(request, HasuraConnectMock());
       final result = await exec(resolver);
       expect(result, isA<Response>());
     });
     test('should exec interceptor throw InterceptorError', () async {
-      final exec = InterceptorExecutor(
-          [InterceptorMock(onRequestF: (r) async => throw Exception('error'))]);
+      final exec = InterceptorExecutor([InterceptorMock(onRequestF: (r) async => throw Exception('error'))]);
       final resolver = ClientResolver.request(request, HasuraConnectMock());
       expect(exec(resolver), throwsA(isA<InterceptorError>()));
     });
@@ -66,8 +63,7 @@ void main() async {
   group('onResponse || ', () {
     test('should exec interceptor ', () async {
       when(() => response.statusCode).thenReturn(1);
-      final exec = InterceptorExecutor(
-          [InterceptorMock(onResponseF: (r) async => response)]);
+      final exec = InterceptorExecutor([InterceptorMock(onResponseF: (r) async => response)]);
       final resolver = ClientResolver.response(response, HasuraConnectMock());
       final result = await exec(resolver);
       expect(result, isA<Response>());
@@ -92,18 +88,14 @@ void main() async {
       expect(result, isA<HasuraRequestError>());
     });
 
-    test('should exec interceptor throw error if return type Request',
-        () async {
-      final exec = InterceptorExecutor(
-          [InterceptorMock(onResponseF: (r) async => request)]);
+    test('should exec interceptor throw error if return type Request', () async {
+      final exec = InterceptorExecutor([InterceptorMock(onResponseF: (r) async => request)]);
       final resolver = ClientResolver.response(response, HasuraConnectMock());
       expect(exec(resolver), throwsA(isA<InterceptorError>()));
     });
 
     test('should exec interceptor throw InterceptorError', () async {
-      final exec = InterceptorExecutor([
-        InterceptorMock(onResponseF: (r) async => throw Exception('error'))
-      ]);
+      final exec = InterceptorExecutor([InterceptorMock(onResponseF: (r) async => throw Exception('error'))]);
       final resolver = ClientResolver.response(response, HasuraConnectMock());
       expect(exec(resolver), throwsA(isA<InterceptorError>()));
     });
@@ -111,32 +103,27 @@ void main() async {
 
   group('onError || ', () {
     test('should exec interceptor ', () async {
-      final exec =
-          InterceptorExecutor([InterceptorMock(onErrorF: (r) async => error)]);
+      final exec = InterceptorExecutor([InterceptorMock(onErrorF: (r) async => error)]);
       final resolver = ClientResolver.error(error, HasuraConnectMock());
       final result = await exec(resolver);
       expect(result, isA<HasuraError>());
     });
 
     test('should exec interceptor returning other type', () async {
-      final exec = InterceptorExecutor(
-          [InterceptorMock(onErrorF: (r) async => response)]);
+      final exec = InterceptorExecutor([InterceptorMock(onErrorF: (r) async => response)]);
       final resolver = ClientResolver.error(error, HasuraConnectMock());
       final result = await exec(resolver);
       expect(result, isA<Response>());
     });
 
-    test('should exec interceptor throw error if return type Request',
-        () async {
-      final exec = InterceptorExecutor(
-          [InterceptorMock(onErrorF: (r) async => request)]);
+    test('should exec interceptor throw error if return type Request', () async {
+      final exec = InterceptorExecutor([InterceptorMock(onErrorF: (r) async => request)]);
       final resolver = ClientResolver.error(error, HasuraConnectMock());
       expect(exec(resolver), throwsA(isA<InterceptorError>()));
     });
 
     test('should exec interceptor throw InterceptorError', () async {
-      final exec = InterceptorExecutor(
-          [InterceptorMock(onErrorF: (r) async => throw Exception('error'))]);
+      final exec = InterceptorExecutor([InterceptorMock(onErrorF: (r) async => throw Exception('error'))]);
       final resolver = ClientResolver.error(error, HasuraConnectMock());
       expect(exec(resolver), throwsA(isA<InterceptorError>()));
     });
@@ -144,28 +131,19 @@ void main() async {
 
   group('interceptors | ', () {
     test('onSubscription || should return error after fail', () {
-      var exec = InterceptorExecutor([
-        InterceptorMock(
-            onSubscriptionF: (connect, snapshot) => Future.error('error'))
-      ]);
-      expect(exec.onSubscription(request, SnapshotMock()),
-          throwsA(isA<InterceptorError>()));
+      var exec = InterceptorExecutor([InterceptorMock(onSubscriptionF: (connect, snapshot) => Future.error('error'))]);
+      expect(exec.onSubscription(request, SnapshotMock()), throwsA(isA<InterceptorError>()));
     });
     test('onConnected || should return error after fail', () {
-      var exec = InterceptorExecutor(
-          [InterceptorMock(onConnectedF: (connect) => Future.error('error'))]);
-      expect(exec.onConnected(HasuraConnectMock()),
-          throwsA(isA<InterceptorError>()));
+      var exec = InterceptorExecutor([InterceptorMock(onConnectedF: (connect) => Future.error('error'))]);
+      expect(exec.onConnected(HasuraConnectMock()), throwsA(isA<InterceptorError>()));
     });
     test('onTryAgain || should return error after fail', () {
-      var exec = InterceptorExecutor(
-          [InterceptorMock(onTryAgainF: (connect) => Future.error('error'))]);
-      expect(exec.onTryAgain(HasuraConnectMock()),
-          throwsA(isA<InterceptorError>()));
+      var exec = InterceptorExecutor([InterceptorMock(onTryAgainF: (connect) => Future.error('error'))]);
+      expect(exec.onTryAgain(HasuraConnectMock()), throwsA(isA<InterceptorError>()));
     });
     test('onDisconnect || should return error after fail', () {
-      var exec = InterceptorExecutor(
-          [InterceptorMock(onDisconnectedF: () => Future.error('error'))]);
+      var exec = InterceptorExecutor([InterceptorMock(onDisconnectedF: () => Future.error('error'))]);
       expect(exec.onDisconnect(), throwsA(isA<InterceptorError>()));
     });
   });
@@ -178,39 +156,26 @@ class InterceptorMock extends Interceptor {
   final Future<void> Function(HasuraConnect connect)? onConnectedF;
   final Future<void> Function(HasuraConnect connect)? onTryAgainF;
   final Future<void> Function()? onDisconnectedF;
-  final Future<void> Function(Request connect, Snapshot snapshot)?
-      onSubscriptionF;
+  final Future<void> Function(Request connect, Snapshot snapshot)? onSubscriptionF;
 
-  InterceptorMock(
-      {this.onConnectedF,
-      this.onTryAgainF,
-      this.onDisconnectedF,
-      this.onSubscriptionF,
-      this.onErrorF,
-      this.onRequestF,
-      this.onResponseF});
+  InterceptorMock({this.onConnectedF, this.onTryAgainF, this.onDisconnectedF, this.onSubscriptionF, this.onErrorF, this.onRequestF, this.onResponseF});
   @override
-  Future<dynamic>? onError(HasuraError error, HasuraConnect connect) =>
-      onErrorF?.call(error);
+  Future<dynamic>? onError(HasuraError error, HasuraConnect connect) => onErrorF?.call(error);
 
   @override
-  Future? onRequest(Request request, HasuraConnect connect) =>
-      onRequestF?.call(request);
+  Future? onRequest(Request request, HasuraConnect connect) => onRequestF?.call(request);
 
   @override
-  Future? onResponse(Response response, HasuraConnect connect) =>
-      onResponseF?.call(response);
+  Future? onResponse(Response response, HasuraConnect connect) => onResponseF?.call(response);
 
   @override
-  Future<void>? onConnected(HasuraConnect connect) =>
-      onConnectedF?.call(connect);
+  Future<void>? onConnected(HasuraConnect connect) => onConnectedF?.call(connect);
 
   @override
   Future<void>? onDisconnected() => onDisconnectedF?.call();
 
   @override
-  Future<void>? onSubscription(Request connect, Snapshot snapshot) =>
-      onSubscriptionF?.call(connect, snapshot);
+  Future<void>? onSubscription(Request connect, Snapshot snapshot) => onSubscriptionF?.call(connect, snapshot);
 
   @override
   Future<void>? onTryAgain(HasuraConnect connect) => onTryAgainF?.call(connect);

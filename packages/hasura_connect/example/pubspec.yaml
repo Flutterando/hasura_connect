@@ -1,4 +1,4 @@
-name: hasura_connect_example
+name: example
 description: A new Flutter project.
 publish_to: 'none' 
 version: 1.0.0+1
@@ -10,8 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  flutter_modular: ^5.0.3
-  flutter_triple: ^1.2.7+4
+  flutter_modular: ^3.4.1+1
+  flutter_triple: ^1.2.4+3
   hasura_connect:
     path: ../
   

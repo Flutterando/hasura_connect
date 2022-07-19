@@ -9,11 +9,7 @@ class Request {
   final Query query;
   final RequestType type;
 
-  Request(
-      {required this.url,
-      required this.query,
-      this.type = RequestType.none,
-      Map<String, String>? headers}) {
+  Request({required this.url, required this.query, this.type = RequestType.none, Map<String, String>? headers}) {
     if (headers != null) {
       this.headers.addAll(headers);
     }

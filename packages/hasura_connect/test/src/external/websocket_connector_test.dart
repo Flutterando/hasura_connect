@@ -27,7 +27,6 @@ void main() {
 
   test('should return ConnectionError when WebSocketWrapper is fail', () async {
     when(() => wrapper.connect(any())).thenThrow(Exception());
-    expect(datasource.websocketConnector('request: tRequest'),
-        throwsA(isA<ConnectionError>()));
+    expect(datasource.websocketConnector('request: tRequest'), throwsA(isA<ConnectionError>()));
   });
 }
