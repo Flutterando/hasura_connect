@@ -1,13 +1,12 @@
 import 'package:either_dart/either.dart';
-import 'package:mocktail/mocktail.dart';
-import 'package:test/test.dart';
-
 import 'package:hasura_connect/src/domain/entities/response.dart';
 import 'package:hasura_connect/src/domain/errors/errors.dart';
 import 'package:hasura_connect/src/domain/models/query.dart';
 import 'package:hasura_connect/src/domain/models/request.dart';
 import 'package:hasura_connect/src/domain/repositories/request_repository.dart';
 import 'package:hasura_connect/src/domain/usecases/mutation_to_server.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:test/test.dart';
 
 class RequestRepositoryMock extends Mock implements RequestRepository {}
 
@@ -19,7 +18,7 @@ void main() {
   late Response response;
   final url = 'https://hasura-fake.com';
   setUpAll(() {
-    registerFallbackValue<Request>(
+    registerFallbackValue(
         Request(url: '', query: Query(document: 'query', key: 'dadas')));
 
     repository = RequestRepositoryMock();

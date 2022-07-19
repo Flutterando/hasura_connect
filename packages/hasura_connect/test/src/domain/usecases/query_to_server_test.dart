@@ -23,7 +23,7 @@ void main() {
     final tRequest =
         Request(url: '', query: Query(document: 'query', key: 'dadas'));
 
-    registerFallbackValue<Request>(tRequest);
+    registerFallbackValue(tRequest);
     repository = RequestRepositoryMock();
     usecase = QueryToServerImpl(repository);
     response = ResponseMock();

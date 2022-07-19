@@ -20,7 +20,7 @@ void main() {
   final tRequest =
       Request(url: '', query: Query(document: 'query', key: 'dadas'));
 
-  registerFallbackValue<Request>(tRequest);
+  registerFallbackValue(tRequest);
 
   setUpAll(() {
     response = ResponseMock();

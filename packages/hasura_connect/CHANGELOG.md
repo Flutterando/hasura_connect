@@ -1,3 +1,7 @@
+## 4.0.0+2
+- BREAK CHANGE: Added HasuraConnect instance in Request, Response and Error in Interceptors;
+- Added headers property in `HasuraConnect.query` and `HasuraConnect.mutation`;
+
 ## 3.0.4-dev.2
 - Fix Bug: an operation already exists with this id
 - Migrate Mockito to Mocktail

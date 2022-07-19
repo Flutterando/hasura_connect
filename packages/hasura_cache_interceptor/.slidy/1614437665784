@@ -1,0 +1,10 @@
+example/lib/main.dart
+example/lib/src/app_module.dart
+example/lib/src/app_widget.dart
+example/lib/src/example/modules/home/home_module.dart
+example/lib/src/example/app_controller.dart
+example/lib/src/example/modules/home/home_page.dart
+example/test/src/example/app_controller_test.dart
+example/test/src/example/modules/home/home_page_test.dart
+example/lib/src/example/modules/home/home_controller.dart
+example/test/src/example/modules/home/home_controller_test.dart
