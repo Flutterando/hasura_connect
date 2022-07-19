@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_implementing_value_types
+
 import 'package:hasura_connect/src/domain/entities/response.dart';
 import 'package:hasura_connect/src/domain/errors/errors.dart';
 import 'package:hasura_connect/src/domain/models/query.dart';
@@ -17,7 +19,7 @@ void main() {
   late RequestRepository repository;
   late Response response;
 
-  final tRequest = Request(url: '', query: Query(document: 'query', key: 'dadas'));
+  final tRequest = Request(url: '', query: const Query(document: 'query', key: 'dadas'));
 
   registerFallbackValue(tRequest);
 

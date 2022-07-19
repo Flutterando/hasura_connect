@@ -3,7 +3,10 @@ import 'package:hasura_connect/src/domain/models/query.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final snapshot = Snapshot(query: Query(document: '''query {
+  final snapshot = Snapshot(
+    query: const Query(
+      document: '''
+query {
         author(
           where: {name: {_eq: "Sidney"}}
         ) {
@@ -11,7 +14,10 @@ void main() {
           name
         }
       }
-    ''', key: 'fdsfd'));
+    ''',
+      key: 'fdsfd',
+    ),
+  );
 
   test('should be valid Query if start with "query"', () {
     snapshot.add('test');

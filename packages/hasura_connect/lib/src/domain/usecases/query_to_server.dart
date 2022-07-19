@@ -1,9 +1,8 @@
 import 'package:either_dart/either.dart';
-
-import '../entities/response.dart';
-import '../errors/errors.dart';
-import '../models/request.dart';
-import '../repositories/request_repository.dart';
+import 'package:hasura_connect/src/domain/entities/response.dart';
+import 'package:hasura_connect/src/domain/errors/errors.dart';
+import 'package:hasura_connect/src/domain/models/request.dart';
+import 'package:hasura_connect/src/domain/repositories/request_repository.dart';
 
 abstract class QueryToServer {
   Future<Either<HasuraError, Response>> call({required Request request});
@@ -23,6 +22,6 @@ class QueryToServerImpl implements QueryToServer {
     } else if (request.type != RequestType.query) {
       return Left(InvalidRequestError('Request type is not RequestType.query'));
     }
-    return await repository.sendRequest(request: request);
+    return repository.sendRequest(request: request);
   }
 }

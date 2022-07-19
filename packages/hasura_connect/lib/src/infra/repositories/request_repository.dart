@@ -1,7 +1,7 @@
-import 'package:hasura_connect/src/domain/models/request.dart';
-import 'package:hasura_connect/src/domain/errors/errors.dart';
-import 'package:hasura_connect/src/domain/entities/response.dart';
 import 'package:either_dart/either.dart';
+import 'package:hasura_connect/src/domain/entities/response.dart';
+import 'package:hasura_connect/src/domain/errors/errors.dart';
+import 'package:hasura_connect/src/domain/models/request.dart';
 import 'package:hasura_connect/src/domain/repositories/request_repository.dart';
 import 'package:hasura_connect/src/infra/datasources/request_datasource.dart';
 
@@ -18,10 +18,12 @@ class RequestRepositoryImpl implements RequestRepository {
     } on HasuraError catch (e) {
       return Left(e);
     } catch (e) {
-      return Left(DatasourceError(
-        'DatasourceError: ${e.toString()}',
-        request: request,
-      ));
+      return Left(
+        DatasourceError(
+          'DatasourceError: ${e.toString()}',
+          request: request,
+        ),
+      );
     }
   }
 }

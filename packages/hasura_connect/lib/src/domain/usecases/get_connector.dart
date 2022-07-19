@@ -1,8 +1,8 @@
 import 'package:either_dart/either.dart';
+import 'package:hasura_connect/src/domain/entities/connector.dart';
+import 'package:hasura_connect/src/domain/errors/errors.dart';
+import 'package:hasura_connect/src/domain/repositories/connector_repository.dart';
 import 'package:string_validator/string_validator.dart' as validator;
-import '../repositories/connector_repository.dart';
-import '../errors/errors.dart';
-import '../entities/connector.dart';
 
 abstract class GetConnector {
   Future<Either<HasuraError, Connector>> call(String url);
@@ -19,6 +19,6 @@ class GetConnectorImpl implements GetConnector {
       return Left(InvalidRequestError('Invalid URL'));
     }
 
-    return await repository.getConnector(url);
+    return repository.getConnector(url);
   }
 }

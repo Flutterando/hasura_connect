@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:hasura_connect/src/core/interceptors/interceptor.dart';
 import 'package:hasura_connect/src/domain/entities/response.dart';
 import 'package:hasura_connect/src/domain/entities/snapshot.dart';

@@ -17,11 +17,11 @@ class InterceptorExecutor {
 
     switch (resolver.type) {
       case Request:
-        return await _executeRequestInterceptors(resolver.value, resolver.connect);
+        return _executeRequestInterceptors(resolver.value, resolver.connect);
       case Response:
-        return await _executeResponseInterceptors(resolver.value, resolver.connect);
+        return _executeResponseInterceptors(resolver.value, resolver.connect);
       case HasuraError:
-        return await _executeHasuraErrorInterceptors(resolver.value, resolver.connect);
+        return _executeHasuraErrorInterceptors(resolver.value, resolver.connect);
       default:
         return null;
     }
@@ -32,7 +32,7 @@ class InterceptorExecutor {
       return;
     }
     try {
-      for (var interceptor in interceptors!) {
+      for (final interceptor in interceptors!) {
         await interceptor.onSubscription(request, snashot);
       }
       return;
@@ -46,7 +46,7 @@ class InterceptorExecutor {
       return;
     }
     try {
-      for (var interceptor in interceptors!) {
+      for (final interceptor in interceptors!) {
         await interceptor.onConnected(connect);
       }
     } catch (e) {
@@ -59,7 +59,7 @@ class InterceptorExecutor {
       return;
     }
     try {
-      for (var interceptor in interceptors!) {
+      for (final interceptor in interceptors!) {
         await interceptor.onTryAgain(connect);
       }
     } catch (e) {
@@ -72,7 +72,7 @@ class InterceptorExecutor {
       return;
     }
     try {
-      for (var interceptor in interceptors!) {
+      for (final interceptor in interceptors!) {
         await interceptor.onDisconnected();
       }
     } catch (e) {
@@ -82,15 +82,16 @@ class InterceptorExecutor {
 
   Future<dynamic> _executeRequestInterceptors(Request request, HasuraConnect connect) async {
     try {
-      for (var interceptor in interceptors ?? []) {
-        final result = await interceptor.onRequest?.call(request, connect);
+      Request _request = request;
+      for (final Interceptor interceptor in interceptors ?? []) {
+        final result = await interceptor.onRequest.call(_request, connect);
         if (result is Request) {
-          request = result;
+          _request = result;
         } else {
           return result;
         }
       }
-      return request;
+      return _request;
     } catch (e) {
       throw InterceptorError(e.toString());
     }
@@ -98,19 +99,20 @@ class InterceptorExecutor {
 
   Future<dynamic> _executeResponseInterceptors(Response response, HasuraConnect connect) async {
     try {
-      for (var interceptor in interceptors ?? []) {
-        final result = await interceptor.onResponse?.call(response, connect);
+      Response _response = response;
+      for (final Interceptor interceptor in interceptors ?? []) {
+        final result = await interceptor.onResponse.call(_response, connect);
         if (result is Response) {
-          response = result;
+          _response = result;
         } else {
           if (result is Request) {
-            throw InterceptorError('Don\'t return Request');
+            throw InterceptorError("Don't return Request");
           } else {
             return result;
           }
         }
       }
-      return response;
+      return _response;
     } catch (e) {
       throw InterceptorError(e.toString());
     }
@@ -118,19 +120,20 @@ class InterceptorExecutor {
 
   Future<dynamic> _executeHasuraErrorInterceptors(HasuraError error, HasuraConnect connect) async {
     try {
-      for (var interceptor in interceptors ?? []) {
-        final result = await interceptor.onError?.call(error, connect);
+      HasuraError _error = error;
+      for (final Interceptor interceptor in interceptors ?? []) {
+        final result = await interceptor.onError.call(_error, connect);
         if (result is HasuraError) {
-          error = result;
+          _error = result;
         } else {
           if (result is Request) {
-            throw InterceptorError('Don\'t return Request');
+            throw InterceptorError("Don't return Request");
           } else {
             return result;
           }
         }
       }
-      return error;
+      return _error;
     } catch (e) {
       throw InterceptorError(e.toString());
     }
@@ -142,15 +145,9 @@ class ClientResolver {
   final Type type;
   final HasuraConnect connect;
 
-  const ClientResolver._(this.value, this.type, this.connect);
+  const ClientResolver.request(this.value, this.connect) : type = Request;
 
-  factory ClientResolver.request(Request value, HasuraConnect connect) {
-    return ClientResolver._(value, Request, connect);
-  }
-  factory ClientResolver.response(Response value, HasuraConnect connect) {
-    return ClientResolver._(value, Response, connect);
-  }
-  factory ClientResolver.error(HasuraError value, HasuraConnect connect) {
-    return ClientResolver._(value, HasuraError, connect);
-  }
+  const ClientResolver.response(this.value, this.connect) : type = Response;
+
+  const ClientResolver.error(this.value, this.connect) : type = HasuraError;
 }

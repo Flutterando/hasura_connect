@@ -1,4 +1,4 @@
-import 'query.dart';
+import 'package:hasura_connect/src/domain/models/query.dart';
 
 class Request {
   final Map<String, String> headers = {

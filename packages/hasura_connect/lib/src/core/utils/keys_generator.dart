@@ -3,8 +3,8 @@ import 'dart:math';
 
 class KeyGenerator {
   String randomString(int length) {
-    var rand = Random();
-    var codeUnits = List.generate(length, (index) {
+    final rand = Random();
+    final codeUnits = List.generate(length, (index) {
       return rand.nextInt(33) + 89;
     });
 
@@ -12,9 +12,9 @@ class KeyGenerator {
   }
 
   String generateBase(String query) {
-    query = query.replaceAll(RegExp('[^a-zA-Z0-9 -]'), '').replaceAll(' ', '');
-    var bytes = utf8.encode(query);
-    var base64Str = base64.encode(bytes);
+    final _query = query.replaceAll(RegExp('[^a-zA-Z0-9 -]'), '').replaceAll(' ', '');
+    final bytes = utf8.encode(_query);
+    final base64Str = base64.encode(bytes);
     return base64Str;
   }
 }

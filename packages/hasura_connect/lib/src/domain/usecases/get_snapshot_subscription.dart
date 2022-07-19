@@ -1,9 +1,8 @@
 import 'package:either_dart/either.dart';
+import 'package:hasura_connect/src/domain/entities/snapshot.dart';
+import 'package:hasura_connect/src/domain/errors/errors.dart';
 import 'package:hasura_connect/src/domain/models/request.dart';
 import 'package:string_validator/string_validator.dart';
-
-import '../entities/snapshot.dart';
-import '../errors/errors.dart';
 
 abstract class GetSnapshotSubscription {
   Either<HasuraError, Snapshot> call({
@@ -15,8 +14,11 @@ abstract class GetSnapshotSubscription {
 
 class GetSnapshotSubscriptionImpl implements GetSnapshotSubscription {
   @override
-  Either<HasuraError, Snapshot> call(
-      {required Request request, void Function(Snapshot)? closeConnection, void Function(Snapshot)? changeVariables}) {
+  Either<HasuraError, Snapshot> call({
+    required Request request,
+    void Function(Snapshot)? closeConnection,
+    void Function(Snapshot)? changeVariables,
+  }) {
     if (!request.query.isValid) {
       return Left(InvalidRequestError('Invalid Query document'));
     } else if (!request.query.document.startsWith('subscription')) {

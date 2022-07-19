@@ -10,7 +10,7 @@ void cleanModule() {
 
 T get<T>() {
   try {
-    return _dependencies.firstWhere((element) => element is T);
+    return _dependencies.firstWhere((element) => element is T) as T;
   } catch (e) {
     throw Exception('injection error');
   }

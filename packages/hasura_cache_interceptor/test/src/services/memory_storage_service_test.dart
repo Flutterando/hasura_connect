@@ -1,6 +1,5 @@
+import 'package:hasura_cache_interceptor/hasura_cache_interceptor.dart';
 import 'package:test/test.dart';
-
-import '../../../lib/src/services/memory_storage_service.dart';
 
 void main() {
   MemoryStorageService storage = MemoryStorageService();
@@ -28,7 +27,9 @@ void main() {
 
   group("containsKey", () {
     test("true", () async {
-      storage.db["mock_key"] = {'value': 'mock_value'};
+      storage.db["mock_key"] = {
+        'value': 'mock_value'
+      };
       final response = await storage.containsKey("mock_key");
       expect(response, true);
     });
@@ -39,7 +40,9 @@ void main() {
   });
 
   test("clear", () async {
-    storage.db["mock_key"] = {'value': 'mock_value'};
+    storage.db["mock_key"] = {
+      'value': 'mock_value'
+    };
     await storage.clear();
     expect(storage.db, {});
   });

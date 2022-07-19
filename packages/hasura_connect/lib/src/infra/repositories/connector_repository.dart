@@ -1,6 +1,6 @@
+import 'package:either_dart/either.dart';
 import 'package:hasura_connect/src/domain/entities/connector.dart';
 import 'package:hasura_connect/src/domain/errors/errors.dart';
-import 'package:either_dart/either.dart';
 import 'package:hasura_connect/src/domain/models/query.dart';
 import 'package:hasura_connect/src/domain/models/request.dart';
 import 'package:hasura_connect/src/domain/repositories/connector_repository.dart';
@@ -24,7 +24,7 @@ class ConnectorRepositoryImpl implements ConnectorRepository {
           'Datasource Error',
           request: Request(
             url: url,
-            query: Query(document: ''),
+            query: const Query(document: ''),
           ),
         ),
       );

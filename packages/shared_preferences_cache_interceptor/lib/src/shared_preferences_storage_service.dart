@@ -1,17 +1,15 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:hasura_cache_interceptor/hasura_cache_interceptor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 
 class SharedPreferencesStorageService implements IStorageService {
   final _instance = Completer<SharedPreferences>();
 
-  factory SharedPreferencesStorageService() =>
-      SharedPreferencesStorageService._();
+  factory SharedPreferencesStorageService() => SharedPreferencesStorageService._();
 
-  factory SharedPreferencesStorageService.test(SharedPreferences instance) =>
-      SharedPreferencesStorageService._(instance);
+  factory SharedPreferencesStorageService.test(SharedPreferences instance) => SharedPreferencesStorageService._(instance);
 
   SharedPreferencesStorageService._([SharedPreferences? instance]) {
     if (instance == null) {

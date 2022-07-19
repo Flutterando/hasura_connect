@@ -7,7 +7,7 @@ class MockBox<T> extends Mock implements Box<T> {
   Map data = {};
 
   @override
-  Future<void> put(key, T value) async => data[key] = value;
+  Future<void> put(dynamic key, T value) async => data[key] = value;
 
   @override
   Future<int> clear() async {
@@ -16,17 +16,17 @@ class MockBox<T> extends Mock implements Box<T> {
   }
 
   @override
-  Future<void> delete(key) async {
+  Future<void> delete(dynamic key) async {
     if (data.containsKey(key)) {
       data.remove(key);
     }
   }
 
   @override
-  T get(key, {T? defaultValue}) => data[key] ?? defaultValue;
+  T get(dynamic key, {T? defaultValue}) => data[key] ?? defaultValue;
 
   @override
-  bool containsKey(key) => data.containsKey(key);
+  bool containsKey(dynamic key) => data.containsKey(key);
 }
 
 void main() {
@@ -39,25 +39,33 @@ void main() {
   });
 
   test("get", () async {
-    box.data["mock_key"] = {'value': 'mock_value'};
+    box.data["mock_key"] = {
+      'value': 'mock_value'
+    };
     final response = await storage.get("mock_key");
     expect(response, 'mock_value');
   });
 
   test("put", () async {
     await storage.put("mock_key", "mock_value");
-    expect(box.data["mock_key"], {'value': 'mock_value'});
+    expect(box.data["mock_key"], {
+      'value': 'mock_value'
+    });
   });
 
   test("remove", () async {
-    box.data["mock_key"] = {'value': 'mock_value'};
+    box.data["mock_key"] = {
+      'value': 'mock_value'
+    };
     await storage.remove("mock_key");
     expect(box.data, {});
   });
 
   group("containsKey", () {
     test("true", () async {
-      box.data["mock_key"] = {'value': 'mock_value'};
+      box.data["mock_key"] = {
+        'value': 'mock_value'
+      };
       final response = await storage.containsKey("mock_key");
       expect(response, true);
     });
@@ -68,7 +76,9 @@ void main() {
   });
 
   test("clear", () async {
-    box.data["mock_key"] = {'value': 'mock_value'};
+    box.data["mock_key"] = {
+      'value': 'mock_value'
+    };
     await storage.clear();
     expect(box.data, {});
   });

@@ -1,6 +1,8 @@
+// ignore_for_file: leading_newlines_in_multiline_strings, unnecessary_raw_strings
+
 import 'dart:convert';
 
-const stringJsonReponse = ''' 
+const stringJsonReponse = r''' 
 {
   "data": {
     "author": [
@@ -10,7 +12,6 @@ const stringJsonReponse = '''
       }
     ]
   }
-}
-''';
+}''';
 
 String get jsonReponse => jsonDecode(stringJsonReponse);

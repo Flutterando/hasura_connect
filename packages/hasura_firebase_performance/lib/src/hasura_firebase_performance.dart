@@ -10,12 +10,16 @@ class HasuraFirebasePerformanceInterceptor extends InterceptorBase {
   @override
   Future onRequest(Request request, HasuraConnect hasuraConnect) async {
     try {
-      var metric = FirebasePerformance.instance.newHttpMetric(
-          '${request.url}'.replaceAll('_', '-'), HttpMethod.Post);
+      final metric = FirebasePerformance.instance.newHttpMetric(
+        request.url.replaceAll('_', '-'),
+        HttpMethod.Post,
+      );
       metric.requestPayloadSize = request.query.document.length;
-      var size = request.query.document.indexOf('{');
+      final size = request.query.document.indexOf('{');
       metric.putAttribute(
-          'query', request.query.document.substring(0, size > 39 ? 39 : size));
+        'query',
+        request.query.document.substring(0, size > 39 ? 39 : size),
+      );
       _mapMetric[request.query.hashCode] = metric;
       await metric.start();
       // ignore: avoid_catches_without_on_clauses

@@ -1,10 +1,9 @@
 import 'package:either_dart/either.dart';
+import 'package:hasura_connect/src/domain/entities/response.dart';
+import 'package:hasura_connect/src/domain/errors/errors.dart';
+import 'package:hasura_connect/src/domain/models/request.dart';
+import 'package:hasura_connect/src/domain/repositories/request_repository.dart';
 import 'package:string_validator/string_validator.dart';
-
-import '../entities/response.dart';
-import '../errors/errors.dart';
-import '../models/request.dart';
-import '../repositories/request_repository.dart';
 
 abstract class MutationToServer {
   Future<Either<HasuraError, Response>> call({required Request request});
@@ -29,6 +28,6 @@ class MutationToServerImpl implements MutationToServer {
       return Left(InvalidRequestError('Invalid url'));
     }
 
-    return await repository.sendRequest(request: request);
+    return repository.sendRequest(request: request);
   }
 }

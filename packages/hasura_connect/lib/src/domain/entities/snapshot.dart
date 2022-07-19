@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'dart:async';
 
 import 'package:hasura_connect/src/domain/models/query.dart';
@@ -30,27 +32,33 @@ class Snapshot<T> extends Stream<T> implements EventSink<T> {
   Future changeVariables(Map<String, dynamic> variables) async {
     _query = _query.copyWith(variables: variables);
     if (changeVariablesF != null) {
-      changeVariablesF!(this);
+      changeVariablesF?.call(this);
     }
   }
 
   @override
   StreamSubscription<T> listen(void Function(T event)? onData, {Function? onError, void Function()? onDone, bool? cancelOnError}) {
-    return _rootStream.listen((T event) {
-      _wrapper.value = event;
-      onData?.call(event);
-    }, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+    return _rootStream.listen(
+      (T event) {
+        _wrapper.value = event;
+        onData?.call(event);
+      },
+      onError: onError,
+      onDone: onDone,
+      cancelOnError: cancelOnError,
+    );
   }
 
   @override
   Snapshot<S> map<S>(S Function(T event) convert) {
     return Snapshot<S>(
-        query: _query,
-        rootStream: _rootStream.map((e) => convert(e)),
-        controller: _controller,
-        closeConnection: closeConnection,
-        changeVariablesF: changeVariablesF,
-        defaultValue: _wrapper.value == null ? null : convert(_wrapper.value!));
+      query: _query,
+      rootStream: _rootStream.map((e) => convert(e)),
+      controller: _controller,
+      closeConnection: closeConnection,
+      changeVariablesF: changeVariablesF,
+      defaultValue: _wrapper.value == null ? null : convert(_wrapper.value as T),
+    );
   }
 
   @override
@@ -87,18 +95,18 @@ class StartWithStreamTransformer<T> extends StreamTransformerBase<T, T> {
       late StreamSubscription<T> subscription;
 
       controller = StreamController<T>(
-          sync: true,
-          onListen: () {
-            if (wrapper.value != null) {
-              controller.add(wrapper.value);
-            }
+        sync: true,
+        onListen: () {
+          if (wrapper.value != null) {
+            controller.add(wrapper.value);
+          }
 
-            subscription =
-                input.listen(controller.add, onError: controller.addError, onDone: controller.close, cancelOnError: cancelOnError);
-          },
-          onPause: ([Future<dynamic>? resumeSignal]) => subscription.pause(resumeSignal),
-          onResume: () => subscription.resume(),
-          onCancel: () => subscription.cancel());
+          subscription = input.listen(controller.add, onError: controller.addError, onDone: controller.close, cancelOnError: cancelOnError);
+        },
+        onPause: ([Future<dynamic>? resumeSignal]) => subscription.pause(resumeSignal),
+        onResume: () => subscription.resume(),
+        onCancel: () => subscription.cancel(),
+      );
 
       return controller.stream.listen(null);
     });

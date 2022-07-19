@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 
 void main() {
   late GetSnapshotSubscription usecase;
-  final url = 'https://hasura-fake.com';
+  const url = 'https://hasura-fake.com';
   setUp(() {
     usecase = GetSnapshotSubscriptionImpl();
   });
@@ -16,17 +16,18 @@ void main() {
       request: Request(
         url: url,
         type: RequestType.subscription,
-        query: Query(document: 'subscription', key: 'fdsfsffs'),
+        query: const Query(document: 'subscription', key: 'fdsfsffs'),
       ),
     );
     final snapshot = result.right;
     expect(
-        snapshot,
-        emitsInOrder([
-          'test 1',
-          'test 2',
-          'test 3',
-        ]));
+      snapshot,
+      emitsInOrder([
+        'test 1',
+        'test 2',
+        'test 3',
+      ]),
+    );
     snapshot.add('test 1');
     snapshot.add('test 2');
     snapshot.add('test 3');
@@ -37,7 +38,7 @@ void main() {
       request: Request(
         url: url,
         type: RequestType.subscription,
-        query: Query(document: '', key: 'fdsfsffs'),
+        query: const Query(document: '', key: 'fdsfsffs'),
       ),
     );
     expect(result.left, isA<InvalidRequestError>());
@@ -47,7 +48,7 @@ void main() {
       request: Request(
         url: url,
         type: RequestType.subscription,
-        query: Query(document: 'mutation', key: 'fdsfsffs'),
+        query: const Query(document: 'mutation', key: 'fdsfsffs'),
       ),
     );
     expect(result.left, isA<InvalidRequestError>());
@@ -58,7 +59,7 @@ void main() {
       request: Request(
         url: url,
         type: RequestType.subscription,
-        query: Query(document: 'subscription', key: ''),
+        query: const Query(document: 'subscription', key: ''),
       ),
     );
     expect(result.left, isA<InvalidRequestError>());
@@ -69,7 +70,7 @@ void main() {
       request: Request(
         url: url,
         type: RequestType.query,
-        query: Query(document: 'subscription', key: 'dadas'),
+        query: const Query(document: 'subscription', key: 'dadas'),
       ),
     );
     expect(result.left, isA<InvalidRequestError>());
@@ -80,7 +81,7 @@ void main() {
       request: Request(
         url: '',
         type: RequestType.subscription,
-        query: Query(document: 'subscription', key: 'fdsfsffs'),
+        query: const Query(document: 'subscription', key: 'fdsfsffs'),
       ),
     );
     expect(result.isLeft, true);

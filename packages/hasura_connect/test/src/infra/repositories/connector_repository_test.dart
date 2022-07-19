@@ -17,7 +17,7 @@ void main() {
   });
 
   test('should return Response', () async {
-    when(() => datasource.websocketConnector('')).thenAnswer((_) async => Connector(Stream.empty()));
+    when(() => datasource.websocketConnector('')).thenAnswer((_) async => Connector(const Stream.empty()));
     final result = await repository.getConnector('');
     expect(result.right, isA<Connector>());
   });

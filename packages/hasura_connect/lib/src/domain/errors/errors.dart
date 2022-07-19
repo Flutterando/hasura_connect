@@ -1,10 +1,7 @@
+import 'package:hasura_connect/hasura_connect.dart';
 import 'package:hasura_connect/src/domain/models/extensions.dart';
-import 'package:hasura_connect/src/domain/models/request.dart';
 
-import '../../../hasura_connect.dart';
-import '../models/query.dart';
-
-final _request = Request(url: '', query: Query(document: ''));
+final _request = Request(url: '', query: const Query(document: ''));
 
 abstract class HasuraError implements Exception {
   final String message;

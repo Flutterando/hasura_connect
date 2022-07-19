@@ -1,8 +1,10 @@
+// ignore_for_file: void_checks
+
+import 'package:dart_websocket/websocket.dart';
 import 'package:hasura_connect/hasura_connect.dart';
 import 'package:hasura_connect/src/external/websocket_connector.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
-import 'package:dart_websocket/websocket.dart';
 
 class WebSocketMock extends Mock implements WebSocket {}
 
@@ -12,9 +14,9 @@ void main() {
   final wrapper = WrapperMock();
   final websocket = WebSocketMock();
   final datasource = WebsocketConnector(wrapper);
-  final url = 'http://test.com';
+  const url = 'http://test.com';
 
-  when(() => websocket.stream).thenAnswer((_) => Stream.empty());
+  when(() => websocket.stream).thenAnswer((_) => const Stream.empty());
   when(() => websocket.addUtf8Text([])).thenReturn((List<int> list) {});
   when(() => websocket.close()).thenAnswer((invocation) => Future.value(0));
   when(() => websocket.closeCode).thenReturn(0);

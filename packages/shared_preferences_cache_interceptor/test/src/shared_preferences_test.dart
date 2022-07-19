@@ -7,7 +7,7 @@ class MockSharedPreferences extends Mock implements SharedPreferences {
   Map data = {};
 
   @override
-  get(String key) => data[key];
+  dynamic get(String key) => data[key];
 
   @override
   String getString(String key) => data[key];
@@ -46,11 +46,15 @@ void main() {
   test("get", () async {
     service.data["mock_key"] = '{"mock":"value"}';
     final response = await storage.get("mock_key");
-    expect(response, {"mock": "value"});
+    expect(response, {
+      "mock": "value"
+    });
   });
 
   test("put", () async {
-    await storage.put("mock_key", {"mock": "value"});
+    await storage.put("mock_key", {
+      "mock": "value"
+    });
     expect(service.data["mock_key"], '{"mock":"value"}');
   });
 
@@ -62,7 +66,9 @@ void main() {
 
   group("containsKey", () {
     test("true", () async {
-      service.data["mock_key"] = {'value': 'mock_value'};
+      service.data["mock_key"] = {
+        'value': 'mock_value'
+      };
       final response = await storage.containsKey("mock_key");
       expect(response, true);
     });
@@ -73,7 +79,9 @@ void main() {
   });
 
   test("clear", () async {
-    service.data["mock_key"] = {'value': 'mock_value'};
+    service.data["mock_key"] = {
+      'value': 'mock_value'
+    };
     await storage.clear();
     expect(service.data, {});
   });
