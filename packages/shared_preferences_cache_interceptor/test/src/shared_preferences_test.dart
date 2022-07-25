@@ -43,43 +43,43 @@ void main() {
     storage = SharedPreferencesStorageService.test(service);
   });
 
-  test("get", () async {
-    service.data["mock_key"] = '{"mock":"value"}';
-    final response = await storage.get("mock_key");
+  test('get', () async {
+    service.data['mock_key'] = '{"mock":"value"}';
+    final response = await storage.get('mock_key');
     expect(response, {
-      "mock": "value"
+      'mock': 'value'
     });
   });
 
-  test("put", () async {
-    await storage.put("mock_key", {
-      "mock": "value"
+  test('put', () async {
+    await storage.put('mock_key', {
+      'mock': 'value'
     });
-    expect(service.data["mock_key"], '{"mock":"value"}');
+    expect(service.data['mock_key'], '{"mock":"value"}');
   });
 
-  test("remove", () async {
-    service.data["mock_key"] = 'mock_value';
-    await storage.remove("mock_key");
+  test('remove', () async {
+    service.data['mock_key'] = 'mock_value';
+    await storage.remove('mock_key');
     expect(service.data, {});
   });
 
-  group("containsKey", () {
-    test("true", () async {
-      service.data["mock_key"] = {
+  group('containsKey', () {
+    test('true', () async {
+      service.data['mock_key'] = {
         'value': 'mock_value'
       };
-      final response = await storage.containsKey("mock_key");
+      final response = await storage.containsKey('mock_key');
       expect(response, true);
     });
-    test("false", () async {
-      final response = await storage.containsKey("mock_key");
+    test('false', () async {
+      final response = await storage.containsKey('mock_key');
       expect(response, false);
     });
   });
 
-  test("clear", () async {
-    service.data["mock_key"] = {
+  test('clear', () async {
+    service.data['mock_key'] = {
       'value': 'mock_value'
     };
     await storage.clear();

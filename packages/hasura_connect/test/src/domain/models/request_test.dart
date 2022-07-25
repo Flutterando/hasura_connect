@@ -3,9 +3,7 @@ import 'package:test/test.dart';
 
 void main() {
   final request = Request(
-    headers: {
-      'Authorization': 'bearer'
-    },
+    headers: {'Authorization': 'bearer'},
     url: 'https://flutterando.com',
     query: const Query(document: 'query'),
   );

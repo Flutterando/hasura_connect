@@ -16,7 +16,8 @@ class HomeStore extends StreamStore<Exception, List<Books>> {
         }
       }''');
 
-    var listBooks = (result['data']['books'] as List).map((e) => Books.fromMap(e)).toList();
+    var listBooks =
+        (result['data']['books'] as List).map((e) => Books.fromMap(e)).toList();
 
     update(listBooks);
 

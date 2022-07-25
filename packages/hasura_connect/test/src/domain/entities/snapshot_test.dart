@@ -8,10 +8,7 @@ void main() {
     snapshot.add(1);
     expect(
       snapshot2,
-      emitsInOrder([
-        '1',
-        '2'
-      ]),
+      emitsInOrder(['1', '2']),
     );
     snapshot.add(2);
   });
@@ -30,9 +27,7 @@ void main() {
         isCalled = true;
       },
     );
-    snapshot.changeVariables({
-      'header': 'test'
-    });
+    snapshot.changeVariables({'header': 'test'});
     expect(isCalled, true);
     expect(snapshot.query.variables, isNotNull);
   });

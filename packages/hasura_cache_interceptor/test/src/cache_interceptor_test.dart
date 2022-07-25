@@ -23,42 +23,42 @@ void main() {
     // await cacheInterceptor.clearAllCache();
   });
 
-  group("onError -", () {
-    test("Erro genérico", () async {
+  group('onError -', () {
+    test('Erro genérico', () async {
       when(() => storage.containsKey(any())).thenAnswer((realInvocation) async => false);
-      final requestMock = Request(url: "", query: const Query(document: "query"));
+      final requestMock = Request(url: '', query: const Query(document: 'query'));
       final error = HasuraRequestError.fromException(
-        "Generic Error",
-        Exception("Generic Error"),
+        'Generic Error',
+        Exception('Generic Error'),
         request: requestMock,
       );
       final response = await cacheInterceptor.onError(error, hasuraConnect);
       expect(response, error);
     });
-    group("Sem conexão:", () {
-      test("Sem cache salvo deve retornar a exceção", () async {
+    group('Sem conexão:', () {
+      test('Sem cache salvo deve retornar a exceção', () async {
         when(() => storage.containsKey(any())).thenAnswer((realInvocation) async => false);
-        final request = Request(url: "", query: const Query(document: "query"));
+        final request = Request(url: '', query: const Query(document: 'query'));
         final error = HasuraRequestError.fromException(
-          "Connection Rejected",
-          Exception("Connection Rejected"),
+          'Connection Rejected',
+          Exception('Connection Rejected'),
           request: request,
         );
         final response = await cacheInterceptor.onError(error, hasuraConnect);
         expect(response, error);
       });
-      test("Com cache salvo deve retornar o cache", () async {
+      test('Com cache salvo deve retornar o cache', () async {
         final cachedData = {
-          "cache_mock_key": "cache_mock_value"
+          'cache_mock_key': 'cache_mock_value'
         };
 
         when(() => storage.containsKey(any())).thenAnswer((realInvocation) async => true);
         when(() => storage.get(any())).thenAnswer((realInvocation) async => cachedData);
 
-        final request = Request(url: "", query: const Query(document: "query"));
+        final request = Request(url: '', query: const Query(document: 'query'));
         final error = HasuraRequestError.fromException(
-          "Connection Rejected",
-          Exception("Connection Rejected"),
+          'Connection Rejected',
+          Exception('Connection Rejected'),
           request: request,
         );
         final Response response = await cacheInterceptor.onError(error, hasuraConnect);
@@ -67,22 +67,22 @@ void main() {
     });
   });
 
-  group("onResponse -", () {
-    test("Sem Key na Query - Deve salvar o cache", () async {
+  group('onResponse -', () {
+    test('Sem Key na Query - Deve salvar o cache', () async {
       final requestMock = Request(
-        url: "mock_url",
-        query: const Query(document: "mock_request_document"),
+        url: 'mock_url',
+        query: const Query(document: 'mock_request_document'),
       );
       final responseMock = Response(
         request: requestMock,
         statusCode: 200,
         data: {
-          "mock_key": "mock_value"
+          'mock_key': 'mock_value'
         },
       );
       final key = const Uuid().v5(
         CacheInterceptor.namespaceKey,
-        "${requestMock.url}: ${requestMock.query}",
+        '${requestMock.url}: ${requestMock.query}',
       );
       final Map cacheMock = {};
       when(() => storage.put(any(), any())).thenAnswer(
@@ -99,21 +99,24 @@ void main() {
       });
     });
 
-    test("Com Key na Query - Deve salvar o cache", () async {
+    test('Com Key na Query - Deve salvar o cache', () async {
       final requestMock = Request(
-        url: "mock_url",
-        query: const Query(document: "mock_request_document", key: "mock_query_key"),
+        url: 'mock_url',
+        query: const Query(
+          document: 'mock_request_document',
+          key: 'mock_query_key',
+        ),
       );
       final responseMock = Response(
         request: requestMock,
         statusCode: 200,
         data: {
-          "mock_key": "mock_value"
+          'mock_key': 'mock_value'
         },
       );
       final key = const Uuid().v5(
         CacheInterceptor.namespaceKey,
-        "${requestMock.url}: ${requestMock.query.key}",
+        '${requestMock.url}: ${requestMock.query.key}',
       );
       final Map cacheMock = {};
       when(() => storage.put(any(), any())).thenAnswer(
@@ -131,19 +134,19 @@ void main() {
     });
   });
 
-  group("onSubscription -", () {
-    test("Deve mostrar o cache e depois o response original", () async {
-      final requestMock = Request(url: "mock_url", query: const Query(document: "query"));
+  group('onSubscription -', () {
+    test('Deve mostrar o cache e depois o response original', () async {
+      final requestMock = Request(url: 'mock_url', query: const Query(document: 'query'));
       final snapshotMock = Snapshot(query: requestMock.query);
       final key = const Uuid().v5(
         CacheInterceptor.namespaceKey,
-        "${requestMock.url}: ${requestMock.query}",
+        '${requestMock.url}: ${requestMock.query}',
       );
       final Map cacheMock = {
         key: '{"cache_mock_key": "cache_mock_value"}'
       };
       final Map responseMock = {
-        "mock_key": "mock_value"
+        'mock_key': 'mock_value'
       };
 
       when(() => storage.containsKey(any())).thenAnswer(
@@ -163,19 +166,19 @@ void main() {
       expect(seccondValue, responseMock);
     });
 
-    test("Deve salvar o cache", () async {
-      final requestMock = Request(url: "mock_url", query: const Query(document: "query"));
+    test('Deve salvar o cache', () async {
+      final requestMock = Request(url: 'mock_url', query: const Query(document: 'query'));
       final snapshotMock = Snapshot(query: requestMock.query);
       final key = const Uuid().v5(
         CacheInterceptor.namespaceKey,
-        "${requestMock.url}: ${requestMock.query}",
+        '${requestMock.url}: ${requestMock.query}',
       );
       final Map cacheMock = {
         key: '{"cache_mock_key": "cache_mock_value"}'
       };
 
       final Map responseMock = {
-        "mock_key": "mock_value"
+        'mock_key': 'mock_value'
       };
 
       when(() => storage.containsKey(any())).thenAnswer((realInvocation) async => true);

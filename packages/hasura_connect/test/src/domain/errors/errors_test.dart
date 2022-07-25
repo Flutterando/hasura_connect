@@ -18,9 +18,7 @@ void main() {
     error = HasuraRequestError.fromException('test', null, request: request);
     expect(error.toString(), 'HasuraRequestError: test');
     error = HasuraRequestError.fromJson(
-      {
-        'message': 'test'
-      },
+      {'message': 'test'},
       request: request,
     );
     expect(error.toString(), 'HasuraRequestError: test');

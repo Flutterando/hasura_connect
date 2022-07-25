@@ -14,7 +14,10 @@ void main() {
   setUpAll(() {
     repository = ConnectorRepositoryMock();
     usecase = GetConnectorImpl(repository);
-    when(() => repository.getConnector(any())).thenAnswer((_) async => Right<HasuraError, Connector>(Connector(const Stream.empty())));
+    when(() => repository.getConnector(any())).thenAnswer(
+      (_) async =>
+          Right<HasuraError, Connector>(Connector(const Stream.empty())),
+    );
   });
 
   test('should return Connector', () async {

@@ -3,7 +3,7 @@ import 'package:hasura_connect/hasura_connect.dart';
 import 'package:uuid/uuid.dart';
 
 class CacheInterceptor extends InterceptorBase implements Interceptor {
-  static const namespaceKey = "b34a217c-f439-50b1-b1c1-4e491a72d05f";
+  static const namespaceKey = 'b34a217c-f439-50b1-b1c1-4e491a72d05f';
   final IStorageService _storage;
   CacheInterceptor(this._storage);
 
@@ -12,8 +12,8 @@ class CacheInterceptor extends InterceptorBase implements Interceptor {
   @override
   Future onError(HasuraError error, HasuraConnect connect) async {
     bool isConnectionError = [
-      "Connection Rejected",
-      "Websocket Error",
+      'Connection Rejected',
+      'Websocket Error',
     ].contains(error.message);
 
     isConnectionError = isConnectionError || error.message.contains('No address associated with hostname, errno = 7');
@@ -63,7 +63,7 @@ class CacheInterceptor extends InterceptorBase implements Interceptor {
     final keyIsNullOrEmpty = request.query.key == null || request.query.key!.isEmpty;
     final String key = const Uuid().v5(
       namespaceKey,
-      "${request.url}: ${keyIsNullOrEmpty ? request.query : request.query.key}",
+      '${request.url}: ${keyIsNullOrEmpty ? request.query : request.query.key}',
     );
     return key;
   }

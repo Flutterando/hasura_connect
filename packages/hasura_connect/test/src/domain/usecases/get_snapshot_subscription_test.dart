@@ -43,7 +43,8 @@ void main() {
     );
     expect(result.left, isA<InvalidRequestError>());
   });
-  test('should throw InvalidRequestError if Document is not a subscription', () {
+  test('should throw InvalidRequestError if Document is not a subscription',
+      () {
     final result = usecase(
       request: Request(
         url: url,
@@ -65,7 +66,8 @@ void main() {
     expect(result.left, isA<InvalidRequestError>());
   });
 
-  test('should throw InvalidRequestError if type request is not subscription', () {
+  test('should throw InvalidRequestError if type request is not subscription',
+      () {
     final result = usecase(
       request: Request(
         url: url,

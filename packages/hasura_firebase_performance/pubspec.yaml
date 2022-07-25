@@ -16,9 +16,9 @@ dependencies:
     sdk: flutter
   hasura_connect: ^4.0.0+2
 
-dependency_overrides: 
-  hasura_connect: 
-    path: ../hasura_connect
+# dependency_overrides: 
+#   hasura_connect: 
+#     path: ../hasura_connect
 
 dev_dependencies:
   flutter_test:

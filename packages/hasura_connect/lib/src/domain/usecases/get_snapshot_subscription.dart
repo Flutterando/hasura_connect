@@ -26,7 +26,9 @@ class GetSnapshotSubscriptionImpl implements GetSnapshotSubscription {
     } else if (request.query.key == null || request.query.key!.isEmpty) {
       return Left(InvalidRequestError('Invalid key'));
     } else if (request.type != RequestType.subscription) {
-      return Left(InvalidRequestError('Request type is not RequestType.subscription'));
+      return Left(
+        InvalidRequestError('Request type is not RequestType.subscription'),
+      );
     } else if (!isURL(request.url)) {
       return Left(InvalidRequestError('Invalid url'));
     }

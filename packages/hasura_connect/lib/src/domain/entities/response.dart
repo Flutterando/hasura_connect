@@ -7,14 +7,21 @@ class Response {
   final int statusCode;
   final Request request;
 
-  const Response({required this.data, required this.statusCode, required this.request});
+  const Response({
+    required this.data,
+    required this.statusCode,
+    required this.request,
+  });
 
   @override
   bool operator ==(Object o) {
     if (identical(this, o)) return true;
     final mapEquals = const DeepCollectionEquality().equals;
 
-    return o is Response && mapEquals(o.data, data) && o.statusCode == statusCode && o.request == request;
+    return o is Response &&
+        mapEquals(o.data, data) &&
+        o.statusCode == statusCode &&
+        o.request == request;
   }
 
   @override

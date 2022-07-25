@@ -23,7 +23,9 @@ class MutationToServerImpl implements MutationToServer {
     } else if (request.query.key == null || request.query.key!.isEmpty) {
       return Left(InvalidRequestError('Invalid key'));
     } else if (request.type != RequestType.mutation) {
-      return Left(InvalidRequestError('Request type is not RequestType.mutation'));
+      return Left(
+        InvalidRequestError('Request type is not RequestType.mutation'),
+      );
     } else if (!isURL(request.url)) {
       return Left(InvalidRequestError('Invalid url'));
     }

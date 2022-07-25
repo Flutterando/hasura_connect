@@ -9,7 +9,9 @@ class Query {
   const Query({required this.document, this.variables, this.key, this.headers});
 
   bool get isValid {
-    return document.startsWith('query') || document.startsWith('subscription') || document.startsWith('mutation');
+    return document.startsWith('query') ||
+        document.startsWith('subscription') ||
+        document.startsWith('mutation');
   }
 
   Map toJson() {

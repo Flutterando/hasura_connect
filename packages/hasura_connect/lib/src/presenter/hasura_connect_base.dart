@@ -33,9 +33,7 @@ class HasuraConnect {
   bool _disconnectionFlag = false;
   final _init = {
     'payload': {
-      'headers': {
-        'content-type': 'application/json'
-      }
+      'headers': {'content-type': 'application/json'}
     },
     'type': 'connection_init'
   };
@@ -49,11 +47,22 @@ class HasuraConnect {
   final int? reconnectionAttempt;
   final Map<String, String>? headers;
 
-  HasuraConnect(this.url, {this.reconnectionAttempt, List<Interceptor>? interceptors, this.headers, http.Client Function()? httpClientFactory}) {
+  HasuraConnect(
+    this.url, {
+    this.reconnectionAttempt,
+    List<Interceptor>? interceptors,
+    this.headers,
+    http.Client Function()? httpClientFactory,
+  }) {
     startModule(httpClientFactory);
     _interceptorExecutor = InterceptorExecutor(interceptors);
 
-    _subscription = controller.stream.where((data) => data is Map).map((data) => data as Map).where((data) => data.containsKey('id')).where((data) => snapmap.containsKey(data['id'])).listen(rootStreamListener);
+    _subscription = controller.stream
+        .where((data) => data is Map)
+        .map((data) => data as Map)
+        .where((data) => data.containsKey('id'))
+        .where((data) => snapmap.containsKey(data['id']))
+        .listen(rootStreamListener);
   }
 
   @visibleForTesting
@@ -89,7 +98,12 @@ class HasuraConnect {
   }
 
   ///Execute a Query from a Document
-  Future query(String document, {String? key, Map<String, dynamic>? variables, Map<String, String>? headers}) async {
+  Future query(
+    String document, {
+    String? key,
+    Map<String, dynamic>? variables,
+    Map<String, String>? headers,
+  }) async {
     final _key = key ?? _keyGenerator.generateBase(document);
     return executeQuery(
       Query(
@@ -156,7 +170,13 @@ class HasuraConnect {
   }
 
   ///Execute a Mutation from a Document
-  Future mutation(String document, {Map<String, dynamic>? variables, bool tryAgain = true, String? key, Map<String, String>? headers}) async {
+  Future mutation(
+    String document, {
+    Map<String, dynamic>? variables,
+    bool tryAgain = true,
+    String? key,
+    Map<String, String>? headers,
+  }) async {
     final _key = key ?? _keyGenerator.randomString(15);
 
     return executeMutation(
@@ -202,7 +222,12 @@ class HasuraConnect {
   }
 
   ///Execute a Subscription from a Document
-  Future<Snapshot> subscription(String document, {String? key, Map<String, dynamic>? variables, Map<String, String>? headers}) async {
+  Future<Snapshot> subscription(
+    String document, {
+    String? key,
+    Map<String, dynamic>? variables,
+    Map<String, String>? headers,
+  }) async {
     final _document = document.trim();
     final _key = key ?? _keyGenerator.generateBase(document);
 
@@ -250,20 +275,14 @@ class HasuraConnect {
   }
 
   void _removeSnapshot(Snapshot snapshot) {
-    final stop = {
-      'id': snapshot.query.key,
-      'type': 'stop'
-    };
+    final stop = {'id': snapshot.query.key, 'type': 'stop'};
     snapmap.remove(snapshot.query.key);
     if (isConnected) sendToWebSocketServer(jsonEncode(stop));
     if (snapmap.keys.isEmpty) disconnect();
   }
 
   Future _changeVariables(Snapshot snapshot) async {
-    final stop = {
-      'id': snapshot.query.key,
-      'type': 'stop'
-    };
+    final stop = {'id': snapshot.query.key, 'type': 'stop'};
     if (isConnected) sendToWebSocketServer(jsonEncode(stop));
     if (isConnected) sendToWebSocketServer(querySubscription(snapshot.query));
   }
@@ -321,7 +340,9 @@ class HasuraConnect {
       } else if (interceptedValue is HasuraError) {
         throw interceptedValue;
       }
-      final subscriptionStream = connector.map<Map>((event) => jsonDecode(event)).listen(normalizeStreamValue);
+      final subscriptionStream = connector
+          .map<Map>((event) => jsonDecode(event))
+          .listen(normalizeStreamValue);
       (_init['payload'] as Map)['headers'] = request.headers;
       sendToWebSocketServer(jsonEncode(_init));
       subscriptionStream.onError(print);
@@ -385,9 +406,7 @@ class HasuraConnect {
       snapmap[key]?.close();
     }
     snapmap.clear();
-    final disconect = {
-      'type': 'connection_terminate'
-    };
+    final disconect = {'type': 'connection_terminate'};
     if (_isConnected) {
       sendToWebSocketServer(jsonEncode(disconect));
     }

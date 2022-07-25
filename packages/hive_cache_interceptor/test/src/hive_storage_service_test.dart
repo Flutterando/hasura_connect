@@ -38,45 +38,45 @@ void main() {
     storage = HiveStorageService.test(box);
   });
 
-  test("get", () async {
-    box.data["mock_key"] = {
+  test('get', () async {
+    box.data['mock_key'] = {
       'value': 'mock_value'
     };
-    final response = await storage.get("mock_key");
+    final response = await storage.get('mock_key');
     expect(response, 'mock_value');
   });
 
-  test("put", () async {
-    await storage.put("mock_key", "mock_value");
-    expect(box.data["mock_key"], {
+  test('put', () async {
+    await storage.put('mock_key', 'mock_value');
+    expect(box.data['mock_key'], {
       'value': 'mock_value'
     });
   });
 
-  test("remove", () async {
-    box.data["mock_key"] = {
+  test('remove', () async {
+    box.data['mock_key'] = {
       'value': 'mock_value'
     };
-    await storage.remove("mock_key");
+    await storage.remove('mock_key');
     expect(box.data, {});
   });
 
-  group("containsKey", () {
-    test("true", () async {
-      box.data["mock_key"] = {
+  group('containsKey', () {
+    test('true', () async {
+      box.data['mock_key'] = {
         'value': 'mock_value'
       };
-      final response = await storage.containsKey("mock_key");
+      final response = await storage.containsKey('mock_key');
       expect(response, true);
     });
-    test("false", () async {
-      final response = await storage.containsKey("mock_key");
+    test('false', () async {
+      final response = await storage.containsKey('mock_key');
       expect(response, false);
     });
   });
 
-  test("clear", () async {
-    box.data["mock_key"] = {
+  test('clear', () async {
+    box.data['mock_key'] = {
       'value': 'mock_value'
     };
     await storage.clear();

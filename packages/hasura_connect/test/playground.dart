@@ -20,9 +20,7 @@ Future main() async {
 
   final connect = HasuraConnect(
     url,
-    interceptors: [
-      LogInterceptor()
-    ],
+    interceptors: [LogInterceptor()],
   );
   final snapshot = await connect.subscription(document);
   final snapshot2 = await connect.subscription(document);

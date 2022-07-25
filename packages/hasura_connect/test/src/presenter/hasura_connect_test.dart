@@ -42,11 +42,15 @@ void main() {
   setUp(() {
     connect = HasuraConnect(
       'https://fake-hasura.com',
-      interceptors: [
-        LogInterceptor()
-      ],
+      interceptors: [LogInterceptor()],
     );
-    when(() => client.post(any(), body: any(named: 'body'), headers: any(named: 'headers'))).thenAnswer((_) async => http.Response(stringJsonReponse, 200));
+    when(
+      () => client.post(
+        any(),
+        body: any(named: 'body'),
+        headers: any(named: 'headers'),
+      ),
+    ).thenAnswer((_) async => http.Response(stringJsonReponse, 200));
     when(() => wrapper.connect(any())).thenAnswer((_) async => websocket);
     cleanModule();
     startModule(() => client, wrapper);
@@ -95,11 +99,9 @@ void main() {
       final snapshot = Snapshot(query: const Query(document: 'null'));
       expect(snapshot, emits('test'));
       connect.snapmap['fdfhsf'] = snapshot;
-      connect.rootStreamListener({
-        'id': 'fdfhsf',
-        'payload': 'test',
-        'type': 'data'
-      });
+      connect.rootStreamListener(
+        {'id': 'fdfhsf', 'payload': 'test', 'type': 'data'},
+      );
       snapshot.close();
     });
     test('should execute with HasuraRequestError 1', () async {
@@ -108,9 +110,7 @@ void main() {
       connect.snapmap['fdfhsf'] = snapshot;
       connect.rootStreamListener({
         'id': 'fdfhsf',
-        'payload': {
-          'error': 'test'
-        },
+        'payload': {'error': 'test'},
         'type': 'error'
       });
       snapshot.close();
@@ -124,9 +124,7 @@ void main() {
         'id': 'fdfhsf',
         'payload': {
           'errors': [
-            {
-              'error': 'test'
-            }
+            {'error': 'test'}
           ]
         },
         'type': 'error'
@@ -139,11 +137,7 @@ void main() {
     test('should send controller', () async {
       final snapshot = Snapshot(query: const Query(document: 'null'));
       connect.snapmap['fdfhsf'] = snapshot;
-      final data = {
-        'id': 'fdfhsf',
-        'payload': 'test',
-        'type': 'data'
-      };
+      final data = {'id': 'fdfhsf', 'payload': 'test', 'type': 'data'};
       expect(connect.controller.stream, emits(data));
       await connect.normalizeStreamValue(data);
       snapshot.close();
@@ -170,7 +164,10 @@ void main() {
   });
 
   test('querySubscription', () async {
-    expect(connect.querySubscription(const Query(document: 'null')), isA<String>());
+    expect(
+      connect.querySubscription(const Query(document: 'null')),
+      isA<String>(),
+    );
   });
   test('sendToWebSocketServer', () async {
     connect.sendToWebSocketServer('s');

@@ -90,9 +90,7 @@ subscription {
     );
     expect(query.variables, null);
     query = query.copyWith(
-      variables: {
-        'test': 'test'
-      },
+      variables: {'test': 'test'},
     );
     expect(query.variables, isA<Map>());
     query = query.copyWith(variables: {});

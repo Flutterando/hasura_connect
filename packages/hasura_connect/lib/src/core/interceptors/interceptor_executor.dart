@@ -21,7 +21,10 @@ class InterceptorExecutor {
       case Response:
         return _executeResponseInterceptors(resolver.value, resolver.connect);
       case HasuraError:
-        return _executeHasuraErrorInterceptors(resolver.value, resolver.connect);
+        return _executeHasuraErrorInterceptors(
+          resolver.value,
+          resolver.connect,
+        );
       default:
         return null;
     }
@@ -80,7 +83,10 @@ class InterceptorExecutor {
     }
   }
 
-  Future<dynamic> _executeRequestInterceptors(Request request, HasuraConnect connect) async {
+  Future<dynamic> _executeRequestInterceptors(
+    Request request,
+    HasuraConnect connect,
+  ) async {
     try {
       Request _request = request;
       for (final Interceptor interceptor in interceptors ?? []) {
@@ -97,7 +103,10 @@ class InterceptorExecutor {
     }
   }
 
-  Future<dynamic> _executeResponseInterceptors(Response response, HasuraConnect connect) async {
+  Future<dynamic> _executeResponseInterceptors(
+    Response response,
+    HasuraConnect connect,
+  ) async {
     try {
       Response _response = response;
       for (final Interceptor interceptor in interceptors ?? []) {
@@ -118,7 +127,10 @@ class InterceptorExecutor {
     }
   }
 
-  Future<dynamic> _executeHasuraErrorInterceptors(HasuraError error, HasuraConnect connect) async {
+  Future<dynamic> _executeHasuraErrorInterceptors(
+    HasuraError error,
+    HasuraConnect connect,
+  ) async {
     try {
       HasuraError _error = error;
       for (final Interceptor interceptor in interceptors ?? []) {

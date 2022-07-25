@@ -25,7 +25,7 @@ void main() {
   setUp(() {
     when(() => httpClient.close()).thenReturn(() {});
     service = HasuraConnect(
-      "https://www.youtube.com/c/flutterando",
+      'https://www.youtube.com/c/flutterando',
       httpClientFactory: () => httpClient,
       interceptors: [
         cacheInterceptor
@@ -37,9 +37,9 @@ void main() {
     //await cacheInterceptor.clearAllCache();
   });
 
-  group("no connection and", () {
-    test(" no cache, throws exception", () async {
-      final mockResponse = http.Response("", 404);
+  group('no connection and', () {
+    test(' no cache, throws exception', () async {
+      final mockResponse = http.Response('', 404);
       when(
         () => httpClient.post(
           any(),
@@ -48,14 +48,14 @@ void main() {
         ),
       ).thenAnswer((realInvocation) async => mockResponse);
       when(() => storage.containsKey(any())).thenAnswer((realInvocation) async => false);
-      expect(service.query("query"), throwsException);
+      expect(service.query('query'), throwsException);
     });
 
-    test(" have cache, return cache", () async {
+    test(' have cache, return cache', () async {
       final cache = {
-        "cache_mock_key": "cache_mock_value"
+        'cache_mock_key': 'cache_mock_value'
       };
-      final mockResponse = http.Response("", 404);
+      final mockResponse = http.Response('', 404);
       when(
         () => httpClient.post(
           any(),
@@ -65,14 +65,14 @@ void main() {
       ).thenAnswer((realInvocation) async => mockResponse);
       when(() => storage.containsKey(any())).thenAnswer((realInvocation) async => true);
       when(() => storage.get(any())).thenAnswer((realInvocation) async => cache);
-      expect(await service.query("query"), cache);
+      expect(await service.query('query'), cache);
     });
   });
 
-  group("have connection and", () {
-    test("no cache, return real response", () async {
+  group('have connection and', () {
+    test('no cache, return real response', () async {
       final realResponse = {
-        "mock_key": "mock_value"
+        'mock_key': 'mock_value'
       };
 
       when(
@@ -86,15 +86,15 @@ void main() {
       );
       when(() => storage.containsKey(any())).thenAnswer((realInvocation) async => false);
       when(() => storage.put(any(), any())).thenAnswer((realInvocation) async {});
-      expect(await service.query("query"), realResponse);
+      expect(await service.query('query'), realResponse);
     });
 
-    test("have cache, return real response", () async {
+    test('have cache, return real response', () async {
       final realResponse = {
-        "mock_key": "mock_value"
+        'mock_key': 'mock_value'
       };
       final cache = {
-        "cache_mock_key": "cache_mock_value"
+        'cache_mock_key': 'cache_mock_value'
       };
       //final mockResponse = http.Response("", 200);
 
@@ -110,7 +110,7 @@ void main() {
       when(() => storage.containsKey(any())).thenAnswer((realInvocation) async => true);
       when(() => storage.get(any())).thenAnswer((realInvocation) async => cache);
       when(() => storage.put(any(), any())).thenAnswer((realInvocation) async {});
-      expect(await service.query("query"), realResponse);
+      expect(await service.query('query'), realResponse);
     });
   });
 }
