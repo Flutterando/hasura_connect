@@ -1,7 +1,11 @@
 name: hasura_firebase_performance
 description: Hasura connect Interceptor implementation that sends querys metric data to Firebase.
 version: 0.0.8
-homepage: https://github.com/Flutterando/hasura_firebase_performance
+
+issue_tracker: https://github.com/Flutterando/hasura_connect/issues
+repository: https://github.com/Flutterando/hasura_connect/tree/master/packages/hasura_firebase_performance
+homepage: https://github.com/Flutterando/hasura_connect/tree/master/packages/hasura_firebase_performance
+documentation: https://github.com/Flutterando/hasura_connect/blob/master/packages/hasura_firebase_performance/README.md
 
 environment:
   sdk: ">=2.16.0 <3.0.0"  

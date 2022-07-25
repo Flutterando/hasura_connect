@@ -2,8 +2,10 @@ name: hive_cache_interceptor
 description: Package to implements cache using hive in hasura_connect package
 version: 1.0.0-dev.4
 
-homepage: https://flutterando.com.br
-repository: https://github.com/Flutterando/hive_cache_interceptor
+issue_tracker: https://github.com/Flutterando/hasura_connect/issues
+repository: https://github.com/Flutterando/hasura_connect/tree/master/packages/hive_cache_interceptor
+homepage: https://github.com/Flutterando/hasura_connect/tree/master/packages/hive_cache_interceptor
+documentation: https://github.com/Flutterando/hasura_connect/blob/master/packages/hive_cache_interceptor/README.md
 
 environment:
   sdk: ">=2.16.0 <3.0.0"  
