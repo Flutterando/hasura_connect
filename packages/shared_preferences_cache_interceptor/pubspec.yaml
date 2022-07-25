@@ -1,0 +1,27 @@
+name: shared_preferences_cache_interceptor
+description: Package to implements cache using shared preferences to hasura_connect package
+version: 1.0.0-dev.5
+homepage: https://flutterando.com.br
+repository: https://github.com/Flutterando/shared_preferences_cache_interceptor
+
+environment:
+  sdk: ">=2.16.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  hasura_cache_interceptor: ">=1.0.0-dev.5 <2.0.0"
+  platform: ^3.1.0
+  shared_preferences: ">=2.0.15 <3.0.0"
+
+dependency_overrides:   
+  hasura_cache_interceptor: 
+    path: ../hasura_cache_interceptor
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  lint: ^1.0.0
+  mocktail: ^0.3.0
+
+flutter:

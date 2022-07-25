@@ -1,0 +1,57 @@
+name: hasura_connect
+repository: https://github.com/Flutterando/hasura_connect
+
+versioning:
+  # Versioning mode, currently only independent supported.
+  mode: independent
+  
+packages:
+  - packages/**
+
+command:
+  bootstrap:
+    usePubspecOverrides: true
+    
+  version:
+    # Generate commit links in package changelogs.
+    linkToCommits: true
+    # Only allow versioning to happen on main branch.
+    branch: master
+    # Additionally build a changelog at the root of the workspace.
+    workspaceChangelog: true
+
+scripts:
+  lint:all:
+    run: melos run analyze && melos run format
+    description: Run all static analysis checks.
+
+  analyze:
+    run: |
+      melos exec -c 5 -- \
+        dart analyze . --fatal-infos
+    description: |
+      Run `dart analyze` in all packages.
+       - Note: you can also rely on your IDEs Dart Analysis / Issues window.
+  
+  format:
+    run: |
+      melos exec -c 5 -- \
+        dart format .
+
+    description: |
+      Build a specific example app for Android.
+       - Requires `flutter_plugin_tools` (`pub global activate flutter_plugin_tools`).
+       - Requires `clang-format` (can be installed via Brew on macOS).
+       - Requires `swiftformat` (can be installed via Brew on macOS).
+
+  gen_coverage: melos run test && melos exec -- "$MELOS_ROOT_PATH/combine_coverage.sh"
+
+  test:
+    run: melos exec --dir-exists="test" --fail-fast -- flutter test --no-pub --coverage
+    description:  Execute all Tests
+
+  test:selectable-package:
+    run: melos exec --dir-exists="test" --fail-fast -- flutter test --no-pub --coverage
+    description:  Execute a selected Tests
+    select-package:      
+      dir-exists: test   

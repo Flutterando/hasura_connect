@@ -1,0 +1,4 @@
+# melos_managed_dependency_overrides: hasura_connect
+dependency_overrides:
+  hasura_connect:
+    path: ../hasura_connect

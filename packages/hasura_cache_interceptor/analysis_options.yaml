@@ -1,0 +1,20 @@
+# This file configures the analyzer to use the lint rule set from `package:lint`
+
+# For apps, use the default set
+include: package:lint/analysis_options.yaml
+
+# For lint rules and documentation, see http://dart-lang.github.io/linter/lints.
+# Uncomment to specify additional rules.
+linter:
+  rules:
+    
+
+analyzer:
+#   exclude:
+#     - path/to/excluded/files/**
+  errors:
+    argument_type_not_assignable: ignore
+    invalid_assignment: ignore
+    throw_of_invalid_type: ignore
+    return_of_invalid_type_from_closure: ignore
+    return_of_invalid_type: ignore
