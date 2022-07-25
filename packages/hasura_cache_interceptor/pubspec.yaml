@@ -2,8 +2,10 @@ name: hasura_cache_interceptor
 description: Package to implements cache in Hasura package
 version: 1.0.0-dev.7
 
-homepage: https://flutterando.com.br
-repository: https://github.com/Flutterando/hasura_cache_interceptor
+issue_tracker: https://github.com/Flutterando/hasura_connect/issues
+repository: https://github.com/Flutterando/hasura_connect/tree/master/packages/hasura_cache_interceptor
+homepage: https://github.com/Flutterando/hasura_connect/tree/master/packages/hasura_cache_interceptor
+documentation: https://github.com/Flutterando/hasura_connect/blob/master/packages/hasura_cache_interceptor/README.md
 
 environment:
   sdk: ">=2.16.0 <3.0.0"
