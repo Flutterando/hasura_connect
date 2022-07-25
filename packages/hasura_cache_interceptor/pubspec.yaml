@@ -11,8 +11,8 @@ environment:
   sdk: ">=2.16.0 <3.0.0"
 
 dependencies:
-  hasura_connect: ^4.0.0+2
-  http: ^0.13.0
+  hasura_connect: ^4.0.0+3
+  http: ^0.13.4
   uuid: ^3.0.6
 
 # dependency_overrides: 

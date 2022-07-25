@@ -1,6 +1,0 @@
-# melos_managed_dependency_overrides: hasura_cache_interceptor,hasura_connect
-dependency_overrides:
-  hasura_cache_interceptor:
-    path: ../hasura_cache_interceptor
-  hasura_connect:
-    path: ../hasura_connect

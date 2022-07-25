@@ -14,7 +14,7 @@ dependencies:
   firebase_performance: ^0.8.2
   flutter:
     sdk: flutter
-  hasura_connect: ^4.0.0+2
+  hasura_connect: ^4.0.0+3
 
 # dependency_overrides: 
 #   hasura_connect: 

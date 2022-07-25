@@ -109,9 +109,9 @@ packages:
   hasura_connect:
     dependency: "direct main"
     description:
-      path: "../hasura_connect"
-      relative: true
-    source: path
+      name: hasura_connect
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "4.0.0+3"
   http:
     dependency: "direct main"
