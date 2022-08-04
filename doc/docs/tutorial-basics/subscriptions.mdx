@@ -1,0 +1,17 @@
+---
+sidebar_position: 4
+---
+
+# Subscriptions
+
+Subscriptions will notify you each time you have a change to the searched items. Use the "hasuraConnect.subscription" method to receive a stream.
+
+```dart
+Snapshot snapshot = await hasuraConnect.subscription(docSubscription);
+  snapshot.listen((data) {
+    print(data);
+  }).onError((err) {
+    print(err);
+  });
+
+```
