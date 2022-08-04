@@ -6,7 +6,7 @@ sidebar_position: 8
 
 Now you will need to create a Interceptor or use a Cache Interceptor Package made to help you like: [InMemory](https://pub.dev/packages/hasura_cache_interceptor) , [Hive](https://pub.dev/packages/hive_cache_interceptor) or [SharedPreference](https://pub.dev/packages/shared_preferences_cache_interceptor)
 
-```dart
+```dart title="lib/main.dart" {24,33-36,42-55}
 //In Memory
 import 'package:hasura_cache_interceptor/hasura_hive_cache_interceptor.dart';
 
