@@ -19,6 +19,12 @@ slorber:
 
 bwolf:
   name: Bwolf
-  title: Bwolf Evangelist
+  title: Flutter Evangelist
   url: https://github.com/Bwolfs2
   image_url: https://avatars.githubusercontent.com/u/4654514?v=4
+
+ian:
+  name: Ian Oliveira
+  title: Flutter Evangelist
+  url: https://github.com/iang12
+  image_url: https://avatars.githubusercontent.com/u/16240672?v=4
