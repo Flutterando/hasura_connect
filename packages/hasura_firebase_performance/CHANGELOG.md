@@ -1,3 +1,7 @@
+## 0.0.8+1
+
+- Update Hasura_connect version
+
 ## 0.0.8
 
 - Update Github Packages

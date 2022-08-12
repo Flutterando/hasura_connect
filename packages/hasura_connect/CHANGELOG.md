@@ -1,3 +1,7 @@
+## 4.0.0+4
+
+- Rollback meta version to 1.7.0
+
 ## 4.0.0+3
 
 - Update Github Packages

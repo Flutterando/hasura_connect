@@ -1,6 +1,6 @@
 name: hasura_firebase_performance
 description: Hasura connect Interceptor implementation that sends querys metric data to Firebase.
-version: 0.0.8
+version: 0.0.8+1
 
 issue_tracker: https://github.com/Flutterando/hasura_connect/issues
 repository: https://github.com/Flutterando/hasura_connect/tree/master/packages/hasura_firebase_performance
@@ -14,7 +14,7 @@ dependencies:
   firebase_performance: ^0.8.2
   flutter:
     sdk: flutter
-  hasura_connect: ^4.0.0+3
+  hasura_connect: ^4.0.0+4
 
 # dependency_overrides: 
 #   hasura_connect: 

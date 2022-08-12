@@ -147,17 +147,17 @@ packages:
   hasura_cache_interceptor:
     dependency: "direct main"
     description:
-      path: "../hasura_cache_interceptor"
-      relative: true
-    source: path
-    version: "1.0.0-dev.7"
+      name: hasura_cache_interceptor
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0-dev.5"
   hasura_connect:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "../hasura_connect"
-      relative: true
-    source: path
-    version: "4.0.0+3"
+      name: hasura_connect
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.6"
   hive:
     dependency: "direct main"
     description:
