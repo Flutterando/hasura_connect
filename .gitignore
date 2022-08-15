@@ -11,3 +11,4 @@ doc/api/
 test/.test_coverage.dart
 
 coverage/
+.idea

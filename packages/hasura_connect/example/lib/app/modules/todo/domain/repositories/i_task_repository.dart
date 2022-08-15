@@ -1,6 +1,8 @@
-import 'package:dartz/dartz.dart';
+import 'package:dartz/dartz.dart' hide Task;
 import 'package:example/app/core/exceptions/failure.dart';
 
+import '../entities/task.dart';
+
 abstract class ITaskRepository {
-  Stream<Either<List<Task>, Failure>> watch();
+  Future<Either<Failure, Stream<List<Task>>>> watch();
 }

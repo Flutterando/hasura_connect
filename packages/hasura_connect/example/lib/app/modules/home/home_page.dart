@@ -1,5 +1,8 @@
+import 'package:example/app/core/exceptions/failure.dart';
+import 'package:example/app/modules/home/states/task_state.dart';
+import 'package:example/app/modules/home/stores/task_store.dart';
+import 'package:example/app/modules/todo/domain/entities/task.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:example/app/modules/home/home_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_triple/flutter_triple.dart';
 
@@ -11,12 +14,12 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  final HomeStore store = Modular.get();
+  final TaskStore store = Modular.get();
 
   @override
   void initState() {
     super.initState();
-    store.loadData();
+    store.watchTasks();
   }
 
   @override
@@ -25,7 +28,7 @@ class HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: ScopedBuilder<HomeStore, Exception, List<Books>>.transition(
+      body: ScopedBuilder<TaskStore, Failure, TaskState>.transition(
         store: store,
         onLoading: (_) => Center(
           child: CircularProgressIndicator(),
@@ -34,11 +37,13 @@ class HomePageState extends State<HomePage> {
           child: Text('Deu Ruim'),
         ),
         onState: (context, state) => ListView.builder(
-          itemCount: state.length,
-          itemBuilder: (context, index) => ListTile(
-            title: Text(state[index].name),
-          ),
-        ),
+            itemCount: state.tasks.length,
+            itemBuilder: (context, index) {
+              final task = state.tasks[index];
+              return ListTile(
+                title: Text(task.title),
+              );
+            }),
       ),
     );
   }

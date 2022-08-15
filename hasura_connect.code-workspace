@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"name": "packages",
+			"path": "./packages"
+		},
+		{
+			"name": "docs",
+			"path": "./doc"
+		},
+		{
+			"name": "app_example",
+			"path": "./packages/hasura_connect/example"
+		},
+		{
+			"name": "project",
+			"path": "."
+		}
+		
+	],
+	"settings": {
+		"dart.flutterSdkPath": "./packages/hasura_connect/example/fvm/flutter_sdk"
+	}
+}
