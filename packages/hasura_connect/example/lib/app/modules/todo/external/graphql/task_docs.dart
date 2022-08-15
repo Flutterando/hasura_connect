@@ -23,4 +23,17 @@ abstract class TaskDocs {
     }
     ''';
   }
+
+  static String delete() {
+    return r'''
+    mutation DeleteTask($id: Int) {
+      delete_todo(where: {id: {_eq: $id}}) {
+        returning {
+          id
+          todo
+        }
+      }
+    }
+    ''';
+  }
 }

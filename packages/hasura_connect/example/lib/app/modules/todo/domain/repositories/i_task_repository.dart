@@ -7,4 +7,5 @@ import '../entities/task.dart';
 abstract class ITaskRepository {
   Future<Either<Failure, Stream<List<Task>>>> watch();
   Future<Either<Failure, Task>> create(IParams params);
+  Future<Either<Failure, Task>> delete(IParams params);
 }

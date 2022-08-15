@@ -44,4 +44,15 @@ class TaskDatasource implements ITaskDatasource {
     final task = TaskMapper.fromJson(data).first;
     return task;
   }
+
+  @override
+  Future<Task> delete(IParams params) async {
+    final createResult = await connect.mutation(
+      TaskDocs.delete(),
+      variables: params.toMap(),
+    );
+    final data = createResult["data"]["delete_todo"]["returning"];
+    final task = TaskMapper.fromJson(data).first;
+    return task;
+  }
 }

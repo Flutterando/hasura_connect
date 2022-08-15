@@ -27,4 +27,10 @@ class TaskRepository implements ITaskRepository {
     final result = await datasource.create(params);
     return Right(result);
   }
+
+  @override
+  Future<Either<Failure, Task>> delete(IParams params) async {
+    final result = await datasource.delete(params);
+    return Right(result);
+  }
 }

@@ -6,6 +6,8 @@ import 'package:example/app/modules/todo/domain/usecases/interfaces/i_create_tas
 import 'package:flutter_modular/flutter_modular.dart';
 
 import '../todo/domain/repositories/i_task_repository.dart';
+import '../todo/domain/usecases/delete_task.dart';
+import '../todo/domain/usecases/interfaces/i_delete_task.dart';
 import '../todo/domain/usecases/interfaces/i_watch_task.dart';
 import '../todo/domain/usecases/watch_task.dart';
 import '../todo/external/datasources/task_datasource.dart';
@@ -22,7 +24,8 @@ class HomeModule extends Module {
     Bind<ITaskRepository>((i) => TaskRepository(i())),
     Bind<IWatchTask>((i) => (WatchTask(i()))),
     Bind<ICreateTask>((i) => CreateTask(i())),
-    Bind((i) => TaskStore(i(), i())),
+    Bind<IDeleteTask>((i) => DeleteTask(i())),
+    Bind((i) => TaskStore(i(), i(), i())),
   ];
 
   @override

@@ -1,7 +1,6 @@
 import 'package:example/app/core/exceptions/failure.dart';
 import 'package:example/app/modules/home/states/task_state.dart';
 import 'package:example/app/modules/home/stores/task_store.dart';
-import 'package:example/app/modules/todo/domain/entities/task.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_triple/flutter_triple.dart';
@@ -86,6 +85,14 @@ class HomePageState extends State<HomePage> {
               final task = listTasks[index];
               return ListTile(
                 title: Text('${task.id} - ${task.title}'),
+                trailing: IconButton(
+                  onPressed: () {
+                    store.deleteTask(task.id);
+                  },
+                  icon: Icon(
+                    Icons.delete,
+                  ),
+                ),
               );
             },
           );
