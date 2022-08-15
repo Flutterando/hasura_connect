@@ -1,6 +1,8 @@
 import 'package:example/app/modules/home/home_Page.dart';
 import 'package:example/app/modules/home/home_store.dart';
 import 'package:example/app/modules/home/stores/task_store.dart';
+import 'package:example/app/modules/todo/domain/usecases/create_task.dart';
+import 'package:example/app/modules/todo/domain/usecases/interfaces/i_create_task.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
 import '../todo/domain/repositories/i_task_repository.dart';
@@ -19,7 +21,8 @@ class HomeModule extends Module {
     Bind<ITaskDatasource>((i) => TaskDatasource(i())),
     Bind<ITaskRepository>((i) => TaskRepository(i())),
     Bind<IWatchTask>((i) => (WatchTask(i()))),
-    Bind((i) => TaskStore(i())),
+    Bind<ICreateTask>((i) => CreateTask(i())),
+    Bind((i) => TaskStore(i(), i())),
   ];
 
   @override

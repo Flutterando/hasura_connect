@@ -22,11 +22,53 @@ class HomePageState extends State<HomePage> {
     store.watchTasks();
   }
 
+  void createTaskDialog() {
+    var taskDescription = '';
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Criar nova tarefa"),
+          content: TextField(
+            onChanged: (value) {
+              taskDescription = value;
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                store.createTask(taskDescription);
+                Navigator.pop(context);
+              },
+              child: Text('Criar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            onPressed: () {
+              createTaskDialog();
+            },
+            icon: Icon(
+              Icons.add,
+            ),
+          ),
+        ],
       ),
       body: ScopedBuilder<TaskStore, Failure, TaskState>.transition(
         store: store,
@@ -36,14 +78,18 @@ class HomePageState extends State<HomePage> {
         onError: (context, error) => Center(
           child: Text('Deu Ruim'),
         ),
-        onState: (context, state) => ListView.builder(
-            itemCount: state.tasks.length,
+        onState: (context, state) {
+          final listTasks = state.tasks;
+          return ListView.builder(
+            itemCount: listTasks.length,
             itemBuilder: (context, index) {
-              final task = state.tasks[index];
+              final task = listTasks[index];
               return ListTile(
-                title: Text(task.title),
+                title: Text('${task.id} - ${task.title}'),
               );
-            }),
+            },
+          );
+        },
       ),
     );
   }

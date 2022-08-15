@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart' hide Task;
 
 import 'package:example/app/core/exceptions/failure.dart';
+import 'package:example/app/modules/todo/domain/params/i_params.dart';
 import 'package:example/app/modules/todo/domain/repositories/i_task_repository.dart';
 
 import '../../domain/entities/task.dart';
@@ -19,5 +20,11 @@ class TaskRepository implements ITaskRepository {
     } on WatchTaskSnapshotFailure catch (failure) {
       return Left(failure);
     }
+  }
+
+  @override
+  Future<Either<Failure, Task>> create(IParams params) async {
+    final result = await datasource.create(params);
+    return Right(result);
   }
 }
