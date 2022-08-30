@@ -19,6 +19,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutterando_analysis: 
+    git: https://github.com/Flutterando/flutterando_analysis.git
 
 flutter:
   uses-material-design: true

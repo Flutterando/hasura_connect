@@ -1,8 +1,9 @@
-// ignore_for_file: leading_newlines_in_multiline_strings, unnecessary_raw_strings
+// ignore_for_file: leading_newlines_in_multiline_strings,
+// unnecessary_raw_strings
 
 import 'dart:convert';
 
-const stringJsonReponse = r''' 
+const stringJsonReponse = ''' 
 {
   "data": {
     "author": [

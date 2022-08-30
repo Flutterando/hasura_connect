@@ -32,6 +32,6 @@ Future main() async {
   await Future.delayed(const Duration(seconds: 5));
   snapshot.close();
   snapshot2.close();
-  subscription.cancel();
-  subscription2.cancel();
+  await subscription.cancel();
+  await subscription2.cancel();
 }

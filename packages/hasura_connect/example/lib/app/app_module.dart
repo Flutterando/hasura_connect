@@ -6,7 +6,7 @@ class AppModule extends Module {
   @override
   final List<Bind> binds = [
     Bind.lazySingleton(
-        (i) => HasuraConnect('https://bwolfdev.herokuapp.com/v1/graphql')),
+        (i) => HasuraConnect('https://bwolfdev.herokuapp.com/v1/graphql'),),
   ];
 
   @override

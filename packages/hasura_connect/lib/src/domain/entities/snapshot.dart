@@ -10,7 +10,7 @@ class Snapshot<T> extends Stream<T> implements EventSink<T> {
   late Stream<T> _rootStream;
   late Query _query;
   Query get query => _query;
-  final _WrapperStartWith<T> _wrapper = _WrapperStartWith<T>();
+  final WrapperStartWith<T> _wrapper = WrapperStartWith<T>();
   final void Function(Snapshot)? closeConnection;
   final void Function(Snapshot)? changeVariablesF;
 
@@ -91,14 +91,14 @@ class Snapshot<T> extends Stream<T> implements EventSink<T> {
 class StartWithStreamTransformer<T> extends StreamTransformerBase<T, T> {
   final StreamTransformer<T, T> transformer;
 
-  StartWithStreamTransformer(_WrapperStartWith<T> wrapper)
+  StartWithStreamTransformer(WrapperStartWith<T> wrapper)
       : transformer = _buildTransformer<T>(wrapper);
 
   @override
   Stream<T> bind(Stream<T> stream) => transformer.bind(stream);
 
   static StreamTransformer<T, T> _buildTransformer<T>(
-    _WrapperStartWith wrapper,
+    WrapperStartWith wrapper,
   ) {
     return StreamTransformer<T, T>((Stream<T> input, bool cancelOnError) {
       late StreamController<T> controller;
@@ -129,6 +129,6 @@ class StartWithStreamTransformer<T> extends StreamTransformerBase<T, T> {
   }
 }
 
-class _WrapperStartWith<T> {
+class WrapperStartWith<T> {
   T? value;
 }
