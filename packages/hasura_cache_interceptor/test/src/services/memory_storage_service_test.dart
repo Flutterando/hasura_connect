@@ -2,7 +2,7 @@ import 'package:hasura_cache_interceptor/hasura_cache_interceptor.dart';
 import 'package:test/test.dart';
 
 void main() {
-  MemoryStorageService storage = MemoryStorageService();
+  var storage = MemoryStorageService();
 
   setUp(() {
     storage = MemoryStorageService();

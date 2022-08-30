@@ -26,8 +26,7 @@ void main() {
       changeVariablesF: (Snapshot snap) {
         isCalled = true;
       },
-    );
-    snapshot.changeVariables({'header': 'test'});
+    )..changeVariables({'header': 'test'});
     expect(isCalled, true);
     expect(snapshot.query.variables, isNotNull);
   });

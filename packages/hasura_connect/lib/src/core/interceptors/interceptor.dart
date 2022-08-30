@@ -22,7 +22,7 @@ abstract class InterceptorBase extends Interceptor {
   Future<void>? onDisconnected() async {}
 
   @override
-  Future? onError(HasuraError error, HasuraConnect connect) async => error;
+  Future? onError(HasuraError request, HasuraConnect connect) async => request;
 
   @override
   Future? onRequest(Request request, HasuraConnect connect) async => request;

@@ -8,13 +8,12 @@ class HasuraFirebasePerformanceInterceptor extends InterceptorBase {
   final _mapMetric = <int, HttpMetric>{};
 
   @override
-  Future onRequest(Request request, HasuraConnect hasuraConnect) async {
+  Future onRequest(Request request, HasuraConnect connect) async {
     try {
       final metric = FirebasePerformance.instance.newHttpMetric(
         request.url.replaceAll('_', '-'),
         HttpMethod.Post,
-      );
-      metric.requestPayloadSize = request.query.document.length;
+      )..requestPayloadSize = request.query.document.length;
       final size = request.query.document.indexOf('{');
       metric.putAttribute(
         'query',
@@ -29,11 +28,11 @@ class HasuraFirebasePerformanceInterceptor extends InterceptorBase {
         stackTrace: stackTrace,
       );
     }
-    return super.onRequest(request, hasuraConnect);
+    return super.onRequest(request, connect);
   }
 
   @override
-  Future onResponse(Response data, HasuraConnect hasuraConnect) async {
+  Future onResponse(Response data, HasuraConnect connect) async {
     try {
       final metric = _mapMetric[data.request.query.hashCode];
       metric?.httpResponseCode = data.statusCode;
@@ -47,11 +46,11 @@ class HasuraFirebasePerformanceInterceptor extends InterceptorBase {
         stackTrace: stackTrace,
       );
     }
-    return super.onResponse(data, hasuraConnect);
+    return super.onResponse(data, connect);
   }
 
   @override
-  Future onError(HasuraError error, HasuraConnect hasuraConnect) async {
+  Future onError(HasuraError error, HasuraConnect connect) async {
     try {
       final metric = _mapMetric[error.request.query.hashCode];
       metric?.httpResponseCode = 500;
@@ -64,6 +63,6 @@ class HasuraFirebasePerformanceInterceptor extends InterceptorBase {
         stackTrace: stackTrace,
       );
     }
-    return super.onError(error, hasuraConnect);
+    return super.onError(error, connect);
   }
 }

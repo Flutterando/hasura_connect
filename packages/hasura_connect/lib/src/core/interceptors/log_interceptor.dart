@@ -9,8 +9,8 @@ import 'package:hasura_connect/src/presenter/hasura_connect_base.dart';
 
 class LogInterceptor extends Interceptor {
   @override
-  Future onError(HasuraError? error, HasuraConnect connect) async {
-    return error;
+  Future onError(HasuraError? request, HasuraConnect connect) async {
+    return request;
   }
 
   @override
@@ -19,8 +19,8 @@ class LogInterceptor extends Interceptor {
   }
 
   @override
-  Future onResponse(Response? response, HasuraConnect connect) async {
-    return response;
+  Future onResponse(Response? data, HasuraConnect connect) async {
+    return data;
   }
 
   @override

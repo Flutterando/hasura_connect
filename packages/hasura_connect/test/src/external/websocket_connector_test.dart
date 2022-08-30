@@ -18,7 +18,7 @@ void main() {
 
   when(() => websocket.stream).thenAnswer((_) => const Stream.empty());
   when(() => websocket.addUtf8Text([])).thenReturn((List<int> list) {});
-  when(() => websocket.close()).thenAnswer((invocation) => Future.value(0));
+  when(websocket.close).thenAnswer((invocation) => Future.value(0));
   when(() => websocket.closeCode).thenReturn(0);
   when(() => websocket.done).thenAnswer((_) async => 0);
 

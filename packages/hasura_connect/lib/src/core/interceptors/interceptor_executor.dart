@@ -88,8 +88,8 @@ class InterceptorExecutor {
     HasuraConnect connect,
   ) async {
     try {
-      Request _request = request;
-      for (final Interceptor interceptor in interceptors ?? []) {
+      var _request = request;
+      for (final interceptor in interceptors ?? []) {
         final result = await interceptor.onRequest.call(_request, connect);
         if (result is Request) {
           _request = result;
@@ -108,8 +108,8 @@ class InterceptorExecutor {
     HasuraConnect connect,
   ) async {
     try {
-      Response _response = response;
-      for (final Interceptor interceptor in interceptors ?? []) {
+      var _response = response;
+      for (final interceptor in interceptors ?? []) {
         final result = await interceptor.onResponse.call(_response, connect);
         if (result is Response) {
           _response = result;
@@ -132,8 +132,8 @@ class InterceptorExecutor {
     HasuraConnect connect,
   ) async {
     try {
-      HasuraError _error = error;
-      for (final Interceptor interceptor in interceptors ?? []) {
+      var _error = error;
+      for (final interceptor in interceptors ?? []) {
         final result = await interceptor.onError.call(_error, connect);
         if (result is HasuraError) {
           _error = result;

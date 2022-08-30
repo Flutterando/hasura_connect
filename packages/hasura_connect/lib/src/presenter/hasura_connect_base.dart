@@ -1,4 +1,6 @@
-// ignore_for_file: depend_on_referenced_packages, type_annotate_public_apis, avoid_dynamic_calls, cast_nullable_to_non_nullable, avoid_print, invariant_booleans
+// ignore_for_file: depend_on_referenced_packages, type_annotate_public_apis,
+// avoid_dynamic_calls, cast_nullable_to_non_nullable, avoid_print,
+// invariant_booleans
 
 import 'dart:async';
 import 'dart:convert';
@@ -313,6 +315,7 @@ class HasuraConnect {
 
     if (reconnectionAttempt != null && reconnectionAttempt! > 0) {
       if (_numbersOfConnectionAttempts >= reconnectionAttempt!) {
+        // ignore: avoid_print
         print('maximum connection attempt numbers reached');
         _isConnected = false;
         // ignore: unawaited_futures
@@ -341,10 +344,11 @@ class HasuraConnect {
         throw interceptedValue;
       }
       final subscriptionStream = connector
-          .map<Map>((event) => jsonDecode(event))
+          .map<Map>(jsonDecode)
           .listen(normalizeStreamValue);
-      (_init['payload'] as Map)['headers'] = request.headers;
+      (_init['payload']! as Map)['headers'] = request.headers;
       sendToWebSocketServer(jsonEncode(_init));
+      // ignore: avoid_print
       subscriptionStream.onError(print);
       await connector.done;
       await subscriptionStream.cancel();
@@ -354,14 +358,12 @@ class HasuraConnect {
         return;
       }
       await Future.delayed(const Duration(milliseconds: 3000));
-      // ignore: unawaited_futures
-      _connect();
+      await _connect();
     } catch (e) {
-      if (_disconnectionFlag) {
+      if (_disconnectionFlag == false) {
         return;
       }
-      // ignore: unawaited_futures
-      _connect();
+      await _connect();
     }
   }
 

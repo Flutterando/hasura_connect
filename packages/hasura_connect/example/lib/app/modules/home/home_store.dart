@@ -8,7 +8,7 @@ class HomeStore extends StreamStore<Exception, List<Books>> {
 
   Future<void> loadData() async {
     setLoading(true);
-    var result = await hasuraConnect.query('''
+    final result = await hasuraConnect.query('''
     query getBooks {
         books {
           id
@@ -16,7 +16,7 @@ class HomeStore extends StreamStore<Exception, List<Books>> {
         }
       }''');
 
-    var listBooks =
+    final listBooks =
         (result['data']['books'] as List).map((e) => Books.fromMap(e)).toList();
 
     update(listBooks);

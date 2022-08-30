@@ -1,5 +1,7 @@
 import 'package:hasura_connect/src/domain/models/query.dart';
+import 'package:meta/meta.dart';
 
+@immutable
 class Request {
   final Map<String, String> headers = {
     'Content-type': 'application/json',
@@ -33,10 +35,11 @@ class Request {
   }
 
   @override
-  bool operator ==(Object o) {
-    if (identical(this, o)) return true;
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
 
-    return o is Request && o.url == url && o.query == query && o.type == type;
+    return other is Request && other.url == url && other.query == query &&
+    other.type == type;
   }
 
   @override

@@ -11,14 +11,15 @@ class CacheInterceptor extends InterceptorBase implements Interceptor {
 
   @override
   Future onError(HasuraError error, HasuraConnect connect) async {
-    bool isConnectionError = [
+    var isConnectionError = [
       'Connection Rejected',
       'Websocket Error',
     ].contains(error.message);
 
-    isConnectionError = isConnectionError || error.message.contains('No address associated with hostname, errno = 7');
+    isConnectionError = isConnectionError ||
+    error.message.contains('No address associated with hostname, errno = 7');
 
-    final String key = _generateKey(error.request);
+    final key = _generateKey(error.request);
     final containsCache = await _storage.containsKey(key);
     if (isConnectionError && containsCache) {
       final cachedData = await _storage.get(key);
@@ -33,22 +34,23 @@ class CacheInterceptor extends InterceptorBase implements Interceptor {
 
   @override
   Future onResponse(Response data, HasuraConnect connect) async {
-    final String key = _generateKey(data.request);
-    _storage.put(key, data.data);
+    final key = _generateKey(data.request);
+    await _storage.put(key, data.data);
     return data;
   }
 
   @override
   Future<void> onSubscription(Request request, Snapshot snapshot) async {
-    final String key = _generateKey(request);
+    final key = _generateKey(request);
 
     final containsCache = await _storage.containsKey(key);
     if (containsCache) {
       final cachedData = await _storage.get(key);
       snapshot.add(cachedData);
     }
-    final subscription = snapshot.listen((data) => _updateSubscriptionCache(key, data));
-    snapshot.listen((_) {}, onDone: () => subscription.cancel());
+    final subscription = snapshot.listen((data)
+    => _updateSubscriptionCache(key, data),);
+    snapshot.listen((_) {}, onDone: subscription.cancel);
   }
 
   Future _updateSubscriptionCache(String key, dynamic data) async {
@@ -60,8 +62,9 @@ class CacheInterceptor extends InterceptorBase implements Interceptor {
   }
 
   String _generateKey(Request request) {
-    final keyIsNullOrEmpty = request.query.key == null || request.query.key!.isEmpty;
-    final String key = const Uuid().v5(
+    final keyIsNullOrEmpty = request.query.key == null ||
+    request.query.key!.isEmpty;
+    final key = const Uuid().v5(
       namespaceKey,
       '${request.url}: ${keyIsNullOrEmpty ? request.query : request.query.key}',
     );

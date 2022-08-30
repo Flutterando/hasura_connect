@@ -1,6 +1,6 @@
-import 'package:flutter_modular/flutter_modular.dart';
 import 'package:example/app/modules/home/home_store.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_triple/flutter_triple.dart';
 
 class HomePage extends StatefulWidget {
@@ -27,10 +27,10 @@ class HomePageState extends State<HomePage> {
       ),
       body: ScopedBuilder<HomeStore, Exception, List<Books>>.transition(
         store: store,
-        onLoading: (_) => Center(
+        onLoading: (_) => const Center(
           child: CircularProgressIndicator(),
         ),
-        onError: (context, error) => Center(
+        onError: (context, error) => const Center(
           child: Text('Deu Ruim'),
         ),
         onState: (context, state) => ListView.builder(
