@@ -24,6 +24,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   lint: ^1.0.0
+  flutterando_analysis: 
+    git: https://github.com/Flutterando/flutterando_analysis.git
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -1,7 +1,7 @@
 # This file configures the analyzer to use the lint rule set from `package:lint`
 
 # For apps, use the default set
-include: package:lint/analysis_options.yaml
+include: package:flutterando_analysis/flutter_package.yaml
 
 # For lint rules and documentation, see http://dart-lang.github.io/linter/lints.
 # Uncomment to specify additional rules.
