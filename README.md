@@ -399,8 +399,8 @@ Flutterando Community
 <!-- ACKNOWLEDGMENTS -->
 ## Contributors 
 
-<a href="https://github.com/flutterando/asuka/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=flutterando/asuka" />
+<a href="https://github.com/flutterando/hasura_connect/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=flutterando/hasura_connect" />
 </a>
 <!-- Bot para Lista de contribuidores - https://allcontributors.org/  -->
 <!-- Opção (utilizada no momento): https://contrib.rocks/preview?repo=flutterando%2Fasuka -->
