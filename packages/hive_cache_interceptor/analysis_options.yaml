@@ -9,6 +9,8 @@ include: package:flutterando_analysis/flutter_package.yaml
 linter:
   rules:
     prefer_single_quotes: true
+    public_member_api_docs: false
+
     
 
 analyzer:
