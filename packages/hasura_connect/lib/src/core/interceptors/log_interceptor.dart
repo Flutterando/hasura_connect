@@ -7,6 +7,8 @@ import 'package:hasura_connect/src/domain/errors/errors.dart';
 import 'package:hasura_connect/src/domain/models/request.dart';
 import 'package:hasura_connect/src/presenter/hasura_connect_base.dart';
 
+///The class [LogInterceptor] is responsible for creating a log
+///for [onConnected], [onDisconnected] and [onTryAgain] methods
 class LogInterceptor extends Interceptor {
   @override
   Future onError(HasuraError? request, HasuraConnect connect) async {
