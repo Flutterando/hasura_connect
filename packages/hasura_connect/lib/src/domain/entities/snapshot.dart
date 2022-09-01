@@ -5,17 +5,27 @@ import 'dart:async';
 import 'package:hasura_connect/src/domain/models/query.dart';
 import 'package:meta/meta.dart';
 
+///Class [Snapshot] extends [Stream] and implements [EventSink].
+///The class implements a new method called [changeVariables]
 class Snapshot<T> extends Stream<T> implements EventSink<T> {
   late StreamController _controller;
   late Stream<T> _rootStream;
   late Query _query;
+
+  /// Variable [query] type [Query]
   Query get query => _query;
   final WrapperStartWith<T> _wrapper = WrapperStartWith<T>();
+
+  ///Void Function Snapshot [closeConnection]
   final void Function(Snapshot)? closeConnection;
+
+  ///Void Function Snapshot [changeVariablesF]
   final void Function(Snapshot)? changeVariablesF;
 
+  ///Variable [value] type [T]
   T? get value => _wrapper.value;
 
+  ///Class [Snapshot] constructor
   Snapshot({
     required Query query,
     Stream<T>? rootStream,
@@ -30,6 +40,11 @@ class Snapshot<T> extends Stream<T> implements EventSink<T> {
     _rootStream = rootStream ??
         _controller.stream.transform(StartWithStreamTransformer<T>(_wrapper));
   }
+
+  ///The method [changeVariables] receives a [Map]
+  ///the query [variables] will copy the instantiated [variables]
+  ///if [changeVariablesF] is different from null, runs [changeVariablesF]
+  ///call method
   Future changeVariables(Map<String, dynamic> variables) async {
     _query = _query.copyWith(variables: variables);
     if (changeVariablesF != null) {
@@ -88,9 +103,13 @@ class Snapshot<T> extends Stream<T> implements EventSink<T> {
   }
 }
 
+///Class [StartWithStreamTransformer] extends [StreamTransformerBase]
+///implements [bind] in accordance with is necessary
 class StartWithStreamTransformer<T> extends StreamTransformerBase<T, T> {
+  ///Variable [transformer] type [StreamTransformer]
   final StreamTransformer<T, T> transformer;
 
+  ///[StartWithStreamTransformer] constructor
   StartWithStreamTransformer(WrapperStartWith<T> wrapper)
       : transformer = _buildTransformer<T>(wrapper);
 
@@ -129,6 +148,8 @@ class StartWithStreamTransformer<T> extends StreamTransformerBase<T, T> {
   }
 }
 
+/// Class [WrapperStartWith] responsible for acting as a wrapper
 class WrapperStartWith<T> {
+  ///Variable [value] type [T]
   T? value;
 }

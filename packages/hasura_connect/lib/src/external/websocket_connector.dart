@@ -3,6 +3,7 @@ import 'package:hasura_connect/hasura_connect.dart';
 import 'package:hasura_connect/src/domain/entities/connector.dart';
 import 'package:hasura_connect/src/infra/datasources/connector_datasource.dart';
 
+///Class [WebsocketConnector] implements the interface [ConnectorDatasource]
 class WebsocketConnector implements ConnectorDatasource {
   final WebSocketWrapper? wrapper;
 
