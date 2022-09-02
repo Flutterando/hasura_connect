@@ -7,12 +7,8 @@ import 'package:hasura_connect/src/infra/datasources/request_datasource.dart';
 import 'package:http/http.dart' as http;
 
 ///Class [PostHttpRequest] implements the interface [RequestDatasource]
-///implements the [post] method:
-///Opens a try/catch bloc, tries to receive the response of method [post]
-///from client, if the response status code is 200, it creates a [Map] json
-///and [jsonDecode] the response's body, if there is a key errors in the json,
-///throws a [HasuraRequestError.fromJson] parsing the errors and the request
-///returns a [Response] with data, status code and request
+///implements the [post] method
+
 class PostHttpRequest implements RequestDatasource {
   ///creates a function [clientFactory] type [http.Client]
   final http.Client Function() clientFactory;
@@ -20,6 +16,11 @@ class PostHttpRequest implements RequestDatasource {
   ///[PostHttpRequest] constructor
   PostHttpRequest(this.clientFactory);
 
+  ///Opens a try/catch bloc, tries to receive the response of method [post]
+  ///from client, if the response status code is 200, it creates a [Map] json
+  ///and [jsonDecode] the response's body, if there is a key errors in the json,
+  ///throws a [HasuraRequestError.fromJson] parsing the errors and the request
+  ///returns a [Response] with data, status code and request
   @override
   Future<Response> post({required Request request}) async {
     final client = clientFactory();

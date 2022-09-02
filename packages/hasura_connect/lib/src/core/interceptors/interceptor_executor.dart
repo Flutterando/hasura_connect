@@ -10,11 +10,11 @@ class InterceptorExecutor {
   /// A list of [Interceptor] is created [interceptors]
   final List<Interceptor>? interceptors;
 
-  /// Contructor for [InterceptorExecutor] receiving an [Interceptor] variable
+  /// Contructor for [InterceptorExecutor]
   const InterceptorExecutor(this.interceptors);
 
-  ///The mothd [call] receives a [ClientResolver] variable
-  ///and checks if the [interceptors] is null or  empty, in this
+  ///The method [call] receives a [ClientResolver] variable
+  ///and checks if the [interceptors] is null or empty, in this
   ///case, it returns the [resolver] value.
   ///If [interceptors] is not null, the method checks the [resolver] type,
   ///is it's a [Request] it returns the method [_executeRequestInterceptors]

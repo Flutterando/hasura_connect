@@ -8,11 +8,7 @@ import 'package:hasura_connect/src/infra/datasources/connector_datasource.dart';
 
 ///Class [ConnectorRepositoryImpl] implements the interface
 ///[ConnectorRepository]
-///implements the [getConnector] method:
-///the method receives the result of [datasource], and return a [Right]
-///with the result, if an [HasuraError] occurs, returns [Left] with the error
-///if other error occurs, returns a Left [DatasourceError] with the error
-///and [Request]
+///implements the method [getConnector]
 class ConnectorRepositoryImpl implements ConnectorRepository {
   ///variable [datasource] type [ConnectorDatasource]
   final ConnectorDatasource datasource;
@@ -20,6 +16,10 @@ class ConnectorRepositoryImpl implements ConnectorRepository {
   ///[ConnectorRepositoryImpl] constructor
   ConnectorRepositoryImpl({required this.datasource});
 
+///Receives the result of [datasource], and return a [Right]
+///with the result, if an [HasuraError] occurs, returns [Left] with the error
+///if other error occurs, returns a Left [DatasourceError] with the error
+///and [Request]
   @override
   Future<Either<HasuraError, Connector>> getConnector(String url) async {
     try {

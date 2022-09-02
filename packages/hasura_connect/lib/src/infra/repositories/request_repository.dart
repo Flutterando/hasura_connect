@@ -7,11 +7,7 @@ import 'package:hasura_connect/src/infra/datasources/request_datasource.dart';
 
 ///Class [RequestRepositoryImpl] implements the interface
 ///[RequestRepository]
-///implements the [sendRequest] method:
-//////the method receives the result of [datasource], and return a [Right]
-///with the result, if an [HasuraError] occurs, returns [Left] with the error
-///if other error occurs, returns a Left [DatasourceError] with the error and 
-///[Request]
+///implements the method [sendRequest]
 class RequestRepositoryImpl implements RequestRepository {
   ///variable [datasource] type [RequestDatasource]
 
@@ -19,7 +15,11 @@ class RequestRepositoryImpl implements RequestRepository {
 
   ///[RequestRepositoryImpl] constructor
   RequestRepositoryImpl({required this.datasource});
-
+  
+///Receives the result of [datasource], and return a [Right]
+///with the result, if an [HasuraError] occurs, returns [Left] with the error
+///if other error occurs, returns a Left [DatasourceError] with the error and 
+///[Request]
   @override
   Future<Either<HasuraError, Response>> sendRequest({
     required Request request,

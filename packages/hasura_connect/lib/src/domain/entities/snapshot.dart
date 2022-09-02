@@ -1,5 +1,3 @@
-// ignore_for_file: depend_on_referenced_packages
-
 import 'dart:async';
 
 import 'package:hasura_connect/src/domain/models/query.dart';
@@ -42,7 +40,8 @@ class Snapshot<T> extends Stream<T> implements EventSink<T> {
   }
 
   ///The method [changeVariables] receives a [Map]
-  ///the query [variables] will copy the instantiated [variables]
+  ///query value will be it's own value but setting [variables] as [variables]
+  ///received
   ///if [changeVariablesF] is different from null, runs [changeVariablesF]
   ///call method
   Future changeVariables(Map<String, dynamic> variables) async {

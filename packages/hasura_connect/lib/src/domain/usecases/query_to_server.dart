@@ -5,7 +5,7 @@ import 'package:hasura_connect/src/domain/models/request.dart';
 import 'package:hasura_connect/src/domain/repositories/request_repository.dart';
 
 ///The [QueryToServer] class is an abstract class acting as
-///the interface.
+///an interface.
 abstract class QueryToServer {
   ///Method [call] signature
   Future<Either<HasuraError, Response>> call({required Request request});
@@ -13,13 +13,7 @@ abstract class QueryToServer {
 
 ///Class [QueryToServerImpl] implements the interface
 ///[QueryToServer]
-//////implements the [call] method, checks if the request query is valid, if
-///invalid, returns a [InvalidRequestError]
-///else if the request query document don't start with query, will return
-///a [InvalidRequestError], else if
-///request type is different from query, returns a
-///[InvalidRequestError], otherwise, will result of the [repository]
-///send request method
+//////implements the method [call]
 class QueryToServerImpl implements QueryToServer {
   ///Variable [repository] type [RequestRepository]
   final RequestRepository repository;
@@ -27,6 +21,13 @@ class QueryToServerImpl implements QueryToServer {
   /// [QueryToServerImpl] constructor
   QueryToServerImpl(this.repository);
 
+  ///checks if the request query is valid, if
+  ///invalid, returns a [InvalidRequestError]
+  ///else if the request query document don't start with query, will return
+  ///an [InvalidRequestError], else if
+  ///request type is different from query, returns an
+  ///[InvalidRequestError], otherwise, will return the [repository]
+  ///send request method
   @override
   Future<Either<HasuraError, Response>> call({required Request request}) async {
     if (!request.query.isValid) {

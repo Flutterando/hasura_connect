@@ -3,7 +3,7 @@ import 'package:meta/meta.dart';
 
 ///Class [Request]
 /// a request object, overrides the [==] operator and the hashcode
-/// usign the url, query and type hashcode
+/// using the url, query and type hashcode
 @immutable
 class Request {
   ///variable [headers] setting the content type and accept for the

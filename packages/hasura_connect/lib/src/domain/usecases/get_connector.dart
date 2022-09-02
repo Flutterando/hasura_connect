@@ -13,9 +13,7 @@ abstract class GetConnector {
 }
 
 ///Class [GetConnectorImpl] implements the [GetConnector] interface
-///implements the method [call] which will check if the url received
-///is valid, if it's valid, will return the repository.getConnector call
-///otherwise, Will return a [Left] with a [InvalidRequestError] error.
+///implements the method [call]
 class GetConnectorImpl implements GetConnector {
   ///Variable [repository] type [ConnectorRepository]
   final ConnectorRepository repository;
@@ -23,6 +21,9 @@ class GetConnectorImpl implements GetConnector {
   ///[GetConnectorImpl] constructor
   GetConnectorImpl(this.repository);
 
+  ///check if the url received
+  ///is valid, if it's valid, will return the repository.getConnector call
+  ///otherwise, Will return a [Left] with a [InvalidRequestError] error.
   @override
   Future<Either<HasuraError, Connector>> call(String url) async {
     if (!validator.isURL(url)) {

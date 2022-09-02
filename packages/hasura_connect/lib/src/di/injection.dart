@@ -1,7 +1,7 @@
 List _dependencies = [];
 
 ///The method [register] receives a [dynamic] variable called [bind]
-///when called, it adds the [bind] into the _dependencies [List] using
+///when called, it adds the [bind] into the _dependencies [List]
 void register(dynamic bind) {
   _dependencies.add(bind);
 }

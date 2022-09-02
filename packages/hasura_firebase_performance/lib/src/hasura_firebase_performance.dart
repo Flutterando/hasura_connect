@@ -4,14 +4,14 @@ import 'package:hasura_connect/hasura_connect.dart';
 
 ///Class [HasuraFirebasePerformanceInterceptor]
 ///implements the [onRequest] method.
-///The method receives a request and a [HasuraConnect] builds and starts a 
-///[HttpMetric]. it returns a [onRequest].
 class HasuraFirebasePerformanceInterceptor extends InterceptorBase {
   /// [HasuraFirebasePerformanceInterceptor] constructor 
   HasuraFirebasePerformanceInterceptor();
 
   final _mapMetric = <int, HttpMetric>{};
 
+///Receives a request and a [HasuraConnect] builds and starts a 
+///[HttpMetric]. it returns an [onRequest].
   @override
   Future onRequest(Request request, HasuraConnect connect) async {
     try {
@@ -26,7 +26,6 @@ class HasuraFirebasePerformanceInterceptor extends InterceptorBase {
       );
       _mapMetric[request.query.hashCode] = metric;
       await metric.start();
-      // ignore: avoid_catches_without_on_clauses
     } catch (e, stackTrace) {
       debugPrintStack(
         label: e.toString(),
@@ -44,7 +43,6 @@ class HasuraFirebasePerformanceInterceptor extends InterceptorBase {
       metric?.responsePayloadSize = data.data.toString().length;
       await metric?.stop();
       _mapMetric.remove(data.request.query.hashCode);
-      // ignore: avoid_catches_without_on_clauses
     } catch (e, stackTrace) {
       debugPrintStack(
         label: e.toString(),
@@ -61,7 +59,6 @@ class HasuraFirebasePerformanceInterceptor extends InterceptorBase {
       metric?.httpResponseCode = 500;
       await metric?.stop();
       _mapMetric.remove(error.request.query.hashCode);
-      // ignore: avoid_catches_without_on_clauses
     } catch (e, stackTrace) {
       debugPrintStack(
         label: e.toString(),

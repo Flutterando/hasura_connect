@@ -2,7 +2,7 @@ import 'package:hasura_cache_interceptor/src/services/storage_service_interface.
 
 /// The class [MemoryStorageService] implements [IStorageService]
 class MemoryStorageService implements IStorageService {
-  /// The variable [db] is created and an empty dynamic, dynamic [Map],
+  /// The variable [db] is created as an empty dynamic, dynamic [Map],
   /// responsible for storing the key
   final db = {};
 

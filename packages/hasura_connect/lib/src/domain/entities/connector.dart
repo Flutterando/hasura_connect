@@ -16,7 +16,7 @@ class Connector extends Stream {
   ///Creates the int Function [closeCodeFunction]
   final int Function()? closeCodeFunction;
 
-  ///Creates the int [closeCode], it checks if [closeCodeFunction] is different
+  ///Creates a get to [closeCode], it checks if [closeCodeFunction] is different
   ///from null, if yes, calls [closeCodeFunction] else the value will be 0
   int get closeCode => closeCodeFunction != null ? closeCodeFunction!() : 0;
 

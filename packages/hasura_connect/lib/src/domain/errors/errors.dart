@@ -50,7 +50,7 @@ class HasuraRequestError extends HasuraError {
         request: request,
       );
 
-  ///Method [HasuraRequestError.fromJson]
+  ///Object [HasuraRequestError.fromJson]
   ///Receives a [json] and a required [request]
   ///Converts the error received in json format to a [HasuraRequestError]
   ///Overrides [toString] as a HasuraRequestError error with the message
