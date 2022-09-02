@@ -27,7 +27,8 @@ class MutationToServerImpl implements MutationToServer {
   ///invalid, returns a [InvalidRequestError]
   ///else if the request query document don't start with mutation, will return
   ///a [InvalidRequestError], else if
-  ///the request query key is null or empty, returns a [InvalidRequestError], else
+  ///the request query key is null or empty, returns a [InvalidRequestError],
+  ///else
   ///if request type is different from mutation, returns a
   ///[InvalidRequestError], else, if the url is invalid returns a
   ///[InvalidRequestError]
