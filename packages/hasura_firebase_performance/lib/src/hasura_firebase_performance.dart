@@ -2,7 +2,12 @@ import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hasura_connect/hasura_connect.dart';
 
+///Class [HasuraFirebasePerformanceInterceptor]
+///implements the [onRequest] method.
+///The method receives a request and a [HasuraConnect] builds and starts a 
+///[HttpMetric]. it returns a [onRequest].
 class HasuraFirebasePerformanceInterceptor extends InterceptorBase {
+  /// [HasuraFirebasePerformanceInterceptor] constructor 
   HasuraFirebasePerformanceInterceptor();
 
   final _mapMetric = <int, HttpMetric>{};
