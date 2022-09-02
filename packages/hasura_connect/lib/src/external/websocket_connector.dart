@@ -4,9 +4,14 @@ import 'package:hasura_connect/src/domain/entities/connector.dart';
 import 'package:hasura_connect/src/infra/datasources/connector_datasource.dart';
 
 ///Class [WebsocketConnector] implements the interface [ConnectorDatasource]
+///implements the [websocketConnector] method which is responsible for
+///connect the websocket
+///in case of error, throws a [ConnectionError]
 class WebsocketConnector implements ConnectorDatasource {
+  ///Variable [wrapper] type [WebSocketWrapper]
   final WebSocketWrapper? wrapper;
 
+  ///[WebsocketConnector] constructor
   WebsocketConnector(this.wrapper);
 
   @override
@@ -34,7 +39,10 @@ class WebsocketConnector implements ConnectorDatasource {
   }
 }
 
+///The [WebSocketWrapper] class is an abstract class acting as
+///an interface.
 abstract class WebSocketWrapper {
+  ///Method [connect] signature
   Future<WebSocket> connect(String url);
 }
 

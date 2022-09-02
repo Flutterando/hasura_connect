@@ -1,7 +1,3 @@
-// ignore_for_file: depend_on_referenced_packages, type_annotate_public_apis,
-// avoid_dynamic_calls, cast_nullable_to_non_nullable, avoid_print,
-// invariant_booleans
-
 import 'dart:async';
 import 'dart:convert';
 
@@ -23,11 +19,18 @@ import 'package:hasura_connect/src/domain/usecases/query_to_server.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 
+///Base Class [HasuraConnect]
 class HasuraConnect {
   @visibleForTesting
+
+  /// [controller] variable receiving a StreamController.broadcast()
   final controller = StreamController.broadcast();
+
+  /// [url] variable type [String]
   final String url;
   @visibleForTesting
+
+  /// [snapmap] variable type [Map]
   final Map<String, Snapshot> snapmap = {};
   final KeyGenerator _keyGenerator = KeyGenerator();
   late InterceptorExecutor _interceptorExecutor;
@@ -40,15 +43,24 @@ class HasuraConnect {
     'type': 'connection_init'
   };
 
+  ///[isConnected] variable type [bool]
+
   bool get isConnected => _isConnected;
   int _numbersOfConnectionAttempts = 0;
 
   Connector? _connector;
 
   late StreamSubscription _subscription;
+
+  ///[reconnectionAttempt] variable type [int]
+
   final int? reconnectionAttempt;
+
+  ///[headers] variable type [Map]
+
   final Map<String, String>? headers;
 
+  /// [HasuraConnect] constructor
   HasuraConnect(
     this.url, {
     this.reconnectionAttempt,
@@ -66,9 +78,10 @@ class HasuraConnect {
         .where((data) => snapmap.containsKey(data['id']))
         .listen(rootStreamListener);
   }
-
+///Method [rootStreamListener]
+///Receives a [data] and creates a [Snapshot]
   @visibleForTesting
-  void rootStreamListener(data) {
+  void rootStreamListener(dynamic data) {
     final snapshot = snapmap[data['id']];
     if (snapshot == null) return;
 
@@ -288,7 +301,9 @@ class HasuraConnect {
     if (isConnected) sendToWebSocketServer(jsonEncode(stop));
     if (isConnected) sendToWebSocketServer(querySubscription(snapshot.query));
   }
-
+///Method [sendToWebSocketServer]
+///Receives an [input], verifies if [_connector] is different from
+///null, in this case, will add into the [_connector] the [input]
   @visibleForTesting
   void sendToWebSocketServer(String input) {
     if (_connector != null) {
@@ -343,9 +358,8 @@ class HasuraConnect {
       } else if (interceptedValue is HasuraError) {
         throw interceptedValue;
       }
-      final subscriptionStream = connector
-          .map<Map>(jsonDecode)
-          .listen(normalizeStreamValue);
+      final subscriptionStream =
+          connector.map<Map>(jsonDecode).listen(normalizeStreamValue);
       (_init['payload']! as Map)['headers'] = request.headers;
       sendToWebSocketServer(jsonEncode(_init));
       // ignore: avoid_print
@@ -367,6 +381,8 @@ class HasuraConnect {
     }
   }
 
+///Method [querySubscription]
+///receives a [query] and convert it to json format
   @visibleForTesting
   String querySubscription(Query query) {
     return jsonEncode({
@@ -379,6 +395,9 @@ class HasuraConnect {
     });
   }
 
+///Method [normalizeStreamValue]
+///Receives a [data] and check the next steps depending on
+///the [data] values
   @visibleForTesting
   Future<void> normalizeStreamValue(Map data) async {
     if (data['type'] == 'data' || data['type'] == 'error') {
@@ -419,7 +438,9 @@ class HasuraConnect {
     await _interceptorExecutor.onDisconnect();
     _connector = null;
   }
-
+///Method [dispose]
+///Closes the [controller],cancels the [_subscription] and [disconnect] from
+///Hasura
   @mustCallSuper
   Future dispose() async {
     await controller.close();

@@ -5,7 +5,7 @@ import 'package:hasura_connect/src/domain/repositories/connector_repository.dart
 import 'package:string_validator/string_validator.dart' as validator;
 
 ///The [GetConnector] class is an abstract class acting as
-///the interface.
+///an interface.
 abstract class GetConnector {
   ///Method [call] signature
 
