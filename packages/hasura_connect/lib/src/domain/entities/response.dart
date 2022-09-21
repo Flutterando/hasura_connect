@@ -3,12 +3,21 @@ import 'package:hasura_connect/hasura_connect.dart';
 import 'package:hasura_connect/src/domain/models/request.dart';
 import 'package:meta/meta.dart';
 
+///Class [Response] overrides the operator [==]
 @immutable
 class Response {
+  /// variable [data] type [Map]
   final Map data;
+
+  /// variable [statusCode] type [int]
+
   final int statusCode;
+
+  /// variable [request] type [Request]
+
   final Request request;
 
+  /// [Response] class constructor
   const Response({
     required this.data,
     required this.statusCode,

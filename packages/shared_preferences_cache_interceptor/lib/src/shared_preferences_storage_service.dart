@@ -4,12 +4,16 @@ import 'dart:convert';
 import 'package:hasura_cache_interceptor/hasura_cache_interceptor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+///Class [SharedPreferencesStorageService] implements [IStorageService]
+///Creates a shared preferences storage service
 class SharedPreferencesStorageService implements IStorageService {
   final _instance = Completer<SharedPreferences>();
 
+  ///Creates a [SharedPreferencesStorageService] with a not named function
   factory SharedPreferencesStorageService() =>
       SharedPreferencesStorageService._();
 
+  ///Tests the [SharedPreferencesStorageService] receiving an [instance]
   factory SharedPreferencesStorageService.test(SharedPreferences instance) =>
       SharedPreferencesStorageService._(instance);
 

@@ -4,14 +4,18 @@ import 'package:hasura_cache_interceptor/hasura_cache_interceptor.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
+///Class [HiveStorageService]
+///creates a hive storage service
 class HiveStorageService implements IStorageService {
+  ///[boxName] variable
   final String boxName;
 
   final _box = Completer<Box>();
-
+///[HiveStorageService] for storage-box
   factory HiveStorageService([String boxName = 'storage-box']) =>
       HiveStorageService._(boxName);
 
+///Tests the [HiveStorageService] object
   factory HiveStorageService.test(Box box) =>
       HiveStorageService._('test-box', box);
 

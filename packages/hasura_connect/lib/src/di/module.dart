@@ -9,6 +9,9 @@ import 'package:hasura_connect/src/infra/repositories/connector_repository.dart'
 import 'package:hasura_connect/src/infra/repositories/request_repository.dart';
 import 'package:http/http.dart';
 
+///The method [startModule] receives a [Client] and a [WebSocketWrapper].
+///It's responsible for starting the modules for external, repository and
+/// usecases
 void startModule([Client Function()? client, WebSocketWrapper? wrapper]) {
   //external
   sl.register(client ?? () => Client());

@@ -3,11 +3,18 @@ import 'package:hasura_connect/hasura_connect.dart';
 import 'package:hasura_connect/src/domain/entities/connector.dart';
 import 'package:hasura_connect/src/infra/datasources/connector_datasource.dart';
 
+///Class [WebsocketConnector] implements the interface [ConnectorDatasource]
+///implements the method [websocketConnector]
 class WebsocketConnector implements ConnectorDatasource {
+  ///Variable [wrapper] type [WebSocketWrapper]
   final WebSocketWrapper? wrapper;
 
+  ///[WebsocketConnector] constructor
   WebsocketConnector(this.wrapper);
 
+  ///Responsible for
+  ///connecting the websocket
+  ///in case of error, throws a [ConnectionError]
   @override
   Future<Connector> websocketConnector(String url) async {
     try {
@@ -33,7 +40,10 @@ class WebsocketConnector implements ConnectorDatasource {
   }
 }
 
+///The [WebSocketWrapper] class is an abstract class acting as
+///an interface.
 abstract class WebSocketWrapper {
+  ///Method [connect] signature
   Future<WebSocket> connect(String url);
 }
 
