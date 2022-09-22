@@ -78,7 +78,7 @@ The hasura_connect is designed to facilitate Hasura's integration with Flutter a
 ## Sponsors
 
 <a href="https://fteam.dev">
-    <img src="images/sponsor-logo.png" alt="Logo" width="180">
+    <img src="https://raw.githubusercontent.com/Flutterando/hasura_connect/master/images/sponsor-logo.png" alt="Logo" width="180">
   </a>
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -409,7 +409,7 @@ Flutterando Community
 <br>
 <p align="center">
   <a href="https://www.flutterando.com.br">
-    <img width="110px" src="images/logo-flutterando.png">
+    <img width="110px" src="https://raw.githubusercontent.com/Flutterando/hasura_connect/master/images/logo-flutterando.png">
   </a>
   <p align="center">
     Built and maintained by <a href="https://www.flutterando.com.br">Flutterando</a>.
