@@ -101,7 +101,7 @@ a) Add in your pubspec.yaml:
    
 b)    or use slidy:
    ```sh
-   slidy install hasura_connect, hasura_connect_interceptor
+   slidy install hasura_connect, hasura_cache_interceptor
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

@@ -70,7 +70,7 @@
 <br>
 
 
-Hasura Connect Cache Interceptor using a Hive package.
+Hasura Connect Cache Interceptor using the Hive package.
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -89,7 +89,7 @@ Hasura Connect Cache Interceptor using a Hive package.
 <!-- GETTING STARTED -->
 ## Getting Started
 
-To install Hasura Connect and Hasura Firebase Performance in your project you can follow the instructions below:
+To install Hasura Connect and Hive Cache Interceptor in your project you can follow the instructions below:
 
 
 a) Add in your pubspec.yaml:
@@ -122,7 +122,13 @@ final hasura = HasuraConnect(
   httpClient: httpClient,
 )
 ```
-_For more examples, please refer to the 🚧 [Documentation](https://example.com) - Currently being updated 🚧 .
+
+## Official Implementations
+
+- Using Hive [[hasura_hive_cache_interceptor]](https://pub.dev/packages/hive_cache_interceptor)
+
+
+For more examples, please refer to the 🚧 [Documentation](https://example.com) - Currently being updated 🚧 .
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
