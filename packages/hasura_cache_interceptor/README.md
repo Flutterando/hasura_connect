@@ -88,7 +88,7 @@ Implements in memory cache interceptors for Hasura_Connect and provides interfac
 <!-- GETTING STARTED -->
 ## Getting Started
 
-To install Hasura Connect in your project you can follow the instructions below:
+To install Hasura Connect and Hasura Cache Interceptor in your project you can follow the instructions below:
 
 * In Memory Cache (without persistence)
 
