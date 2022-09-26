@@ -27,12 +27,12 @@
 
 <!--  SHIELDS  ---->
 
-[![License](https://img.shields.io/github/license/flutterando/hasura_connect?style=plastic)](https://github.com/Flutterando/hasura_connect/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/Flutterando/hasura_connect?style=plastic)](https://github.com/Flutterando/hasura_connect/blob/master/packages/hasura_connect/LICENSE)
 [![Pub Points](https://img.shields.io/pub/points/hasura_connect?label=pub%20points&style=plastic)](https://pub.dev/packages/hasura_connect/score)
 [![Contributors](https://img.shields.io/github/contributors/flutterando/hasura_connect?style=plastic)](https://github.com/Flutterando/hasura_connect/graphs/contributors)
 [![Forks](https://img.shields.io/github/forks/flutterando/hasura_connect?color=yellowgreen&logo=github&style=plastic)](https://github.com/Flutterando/hasura_connect/graphs/contributors)
 
-[![Pub Publisher](https://img.shields.io/pub/publisher/uno?style=plastic)](https://pub.dev/publishers/flutterando.com.br/packages)
+[![Pub Publisher](https://img.shields.io/pub/publisher/hasura_connect?style=plastic)](https://pub.dev/publishers/flutterando.com.br/packages)
 [![Flutterando Youtube](https://img.shields.io/youtube/channel/subscribers/UCplT2lzN6MHlVHHLt6so39A?color=blue&label=Flutterando&logo=YouTube&logoColor=red&style=plastic)](https://www.youtube.com/flutterando)
 </div>
 
