@@ -319,6 +319,24 @@ _For more examples, please refer to the 🚧 [Documentation](https://example.com
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## Common Errors
+
+- Query data returned not decoded to utf-8. 
+
+Fix:
+
+```dart
+import 'dart:convert';
+
+extension Utf8convert on String {
+  String  _utf8convert() {
+    List<int> bytes = this.toString().codeUnits;
+    return utf8.decode(bytes);
+  }
+  String get utf8convert => _utf8convert();
+}
+``` 
+
 
 
 <!-- ROADMAP -->
