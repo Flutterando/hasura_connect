@@ -178,8 +178,6 @@ snapshot.changeVariable({"limit": 20});
 
 ## Execute a Query from a Document
 
-Variables maintain the integrity of Querys, see an example:
-
 ```dart
 Future query(
     String document, {
@@ -193,6 +191,29 @@ Future query(
         key: _key,
         headers: headers,
         document: document.trimLeft(),
+        variables: variables,
+      ),
+    );
+  }
+```
+
+## Execute a Subscription from a Document
+
+```dart
+ Future<Snapshot> subscription(
+    String document, {
+    String? key,
+    Map<String, dynamic>? variables,
+    Map<String, String>? headers,
+  }) async {
+    final _document = document.trim();
+    final _key = key ?? _keyGenerator.generateBase(document);
+
+    return executeSubscription(
+      Query(
+        key: _key,
+        headers: headers,
+        document: _document,
         variables: variables,
       ),
     );

@@ -281,25 +281,37 @@ class HasuraConnect {
   ///Execute a Subscription from a Query
   Future<Snapshot> executeSubscription(Query query) async {
     Snapshot snapshot;
+  ///if the snapmap contains the same key as the [query], returns
+  ///the snapmap with the query key.
+  
     if (snapmap.containsKey(query.key)) {
       return snapmap[query.key]!;
     } else {
+  ///Get the snapshot subscription from it's usecase,
       final usecase = sl.get<GetSnapshotSubscription>();
+  ///creates a request type subscription
       final request = Request(
         url: url,
         type: RequestType.subscription,
         query: query,
       );
+  ///Receives the resulto from usecase
       final result = usecase(
         closeConnection: _removeSnapshot,
         changeVariables: _changeVariables,
         request: request,
       );
+  ///The snapshot receives either the error or the snapshot
       snapshot = result.fold((l) => throw l, (s) => s);
+  ///the snapmap with the query key receives the snapshot
       snapmap[query.key!] = snapshot;
+  ///Execute the interceptor on subscription with the request and snapshot 
       await _interceptorExecutor.onSubscription(request, snapshot);
     }
 
+  ///If the snapmap keys is not empty and it's not connected, connects
+  ///else if is connected, the input receives the query subscription and
+  ///send it to web socker server
     if (snapmap.keys.isNotEmpty && !_isConnected) {
       // ignore: unawaited_futures
       _connect();
@@ -308,6 +320,7 @@ class HasuraConnect {
       final input = querySubscription(snapshot.query);
       sendToWebSocketServer(input);
     }
+  /// returns the snapshot
     return snapshot;
   }
 ///Removes the snapshot
