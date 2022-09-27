@@ -228,24 +228,28 @@ class HasuraConnect {
 
   ///Execute a Mutation from a Query
   Future executeMutation(Query query) async {
+  ///Receives the usecase to get the mutation to server
     final usecase = sl.get<MutationToServer>();
-
+  ///Receives header values, otherwise start variable as null
     final _headers = Map<String, String>.from(headers ?? {});
+  ///If the query headers are different from null, add the query headers into headers
     if (query.headers != null) {
       _headers.addAll(query.headers!);
     }
-
+  ///Creates a request type mutation
     var request = Request(
       headers: _headers,
       type: RequestType.mutation,
       url: url,
       query: query,
     );
-
+  ///Interceptor execute a client resolver request
     final interceptedValue = await _interceptorExecutor(
       ClientResolver.request(request, this),
     );
-
+  ///if the intercepted value is a response, returns the intercepted value
+  ///if intercepted value is a [HasuraError], throws the intercepted value
+  ///else, the request value will receive the intercepted value
     if (interceptedValue is Response) {
       return interceptedValue;
     } else if (interceptedValue is HasuraError) {
@@ -253,8 +257,9 @@ class HasuraConnect {
     } else {
       request = interceptedValue;
     }
-
+  ///receives the result from usecase
     final result = await usecase(request: request);
+  /// returns either the intercept error data, or the interceptor response data
     return (await result.fold(_interceptError, _interceptResponse)).data;
   }
 

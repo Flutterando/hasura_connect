@@ -220,6 +220,29 @@ Future query(
   }
 ```
 
+## Execute a Mutation from a Document
+
+```dart
+  Future mutation(
+    String document, {
+    Map<String, dynamic>? variables,
+    bool tryAgain = true,
+    String? key,
+    Map<String, String>? headers,
+  }) async {
+    final _key = key ?? _keyGenerator.randomString(15);
+
+    return executeMutation(
+      Query(
+        key: _key,
+        headers: headers,
+        document: document.trimLeft(),
+        variables: variables,
+      ),
+    );
+  }
+```
+
 ## INTERCEPTORS
 
 This is a good strategy to control the flow of requests. With that we can create interceptors for logs or cache for example. The community has already provided some interceptors for caching. Interceptors are highly customizable.
