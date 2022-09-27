@@ -176,6 +176,29 @@ Snapshot snapshot = await hasuraConnect.subscription(docSubscription, variables:
 snapshot.changeVariable({"limit": 20});
 ``` 
 
+## Execute a Query from a Document
+
+Variables maintain the integrity of Querys, see an example:
+
+```dart
+Future query(
+    String document, {
+    String? key,
+    Map<String, dynamic>? variables,
+    Map<String, String>? headers,
+  }) async {
+    final _key = key ?? _keyGenerator.generateBase(document);
+    return executeQuery(
+      Query(
+        key: _key,
+        headers: headers,
+        document: document.trimLeft(),
+        variables: variables,
+      ),
+    );
+  }
+```
+
 ## INTERCEPTORS
 
 This is a good strategy to control the flow of requests. With that we can create interceptors for logs or cache for example. The community has already provided some interceptors for caching. Interceptors are highly customizable.
