@@ -74,6 +74,7 @@ The hasura_connect is designed to facilitate Hasura's integration with Flutter a
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+
 <!-- SPONSORS -->
 ## Sponsors
 
@@ -175,6 +176,73 @@ Snapshot snapshot = await hasuraConnect.subscription(docSubscription, variables:
 //change values of variables for PAGINATIONS
 snapshot.changeVariable({"limit": 20});
 ``` 
+
+## Execute a Query from a Document
+
+```dart
+Future query(
+    String document, {
+    String? key,
+    Map<String, dynamic>? variables,
+    Map<String, String>? headers,
+  }) async {
+    final _key = key ?? _keyGenerator.generateBase(document);
+    return executeQuery(
+      Query(
+        key: _key,
+        headers: headers,
+        document: document.trimLeft(),
+        variables: variables,
+      ),
+    );
+  }
+```
+
+## Execute a Subscription from a Document
+
+```dart
+ Future<Snapshot> subscription(
+    String document, {
+    String? key,
+    Map<String, dynamic>? variables,
+    Map<String, String>? headers,
+  }) async {
+    final _document = document.trim();
+    final _key = key ?? _keyGenerator.generateBase(document);
+
+    return executeSubscription(
+      Query(
+        key: _key,
+        headers: headers,
+        document: _document,
+        variables: variables,
+      ),
+    );
+  }
+```
+
+## Execute a Mutation from a Document
+
+```dart
+  Future mutation(
+    String document, {
+    Map<String, dynamic>? variables,
+    bool tryAgain = true,
+    String? key,
+    Map<String, String>? headers,
+  }) async {
+    final _key = key ?? _keyGenerator.randomString(15);
+
+    return executeMutation(
+      Query(
+        key: _key,
+        headers: headers,
+        document: document.trimLeft(),
+        variables: variables,
+      ),
+    );
+  }
+```
 
 ## INTERCEPTORS
 
