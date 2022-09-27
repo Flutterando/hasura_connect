@@ -74,6 +74,7 @@ The hasura_connect is designed to facilitate Hasura's integration with Flutter a
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+
 <!-- SPONSORS -->
 ## Sponsors
 
