@@ -31,7 +31,7 @@ class PostHttpRequest implements RequestDatasource {
         headers: request.headers,
       );
       if (response.statusCode == 200) {
-        final Map json = response.body;
+        final Map json = jsonDecode(response.body);
         if (json.containsKey('errors')) {
           throw HasuraRequestError.fromJson(
             json['errors'][0],
