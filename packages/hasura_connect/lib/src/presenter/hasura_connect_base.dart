@@ -38,7 +38,9 @@ class HasuraConnect {
   bool _disconnectionFlag = false;
   final _init = {
     'payload': {
-      'headers': {'content-type': 'application/json'}
+      'headers': {
+        'content-type': 'application/json'
+      }
     },
     'type': 'connection_init'
   };
@@ -71,12 +73,7 @@ class HasuraConnect {
     startModule(httpClientFactory);
     _interceptorExecutor = InterceptorExecutor(interceptors);
 
-    _subscription = controller.stream
-        .where((data) => data is Map)
-        .map((data) => data as Map)
-        .where((data) => data.containsKey('id'))
-        .where((data) => snapmap.containsKey(data['id']))
-        .listen(rootStreamListener);
+    _subscription = controller.stream.where((data) => data is Map).map((data) => data as Map).where((data) => data.containsKey('id')).where((data) => snapmap.containsKey(data['id'])).listen(rootStreamListener);
   }
 
   ///Method [rootStreamListener]
@@ -131,36 +128,38 @@ class HasuraConnect {
     );
   }
 
-///Execute a Query
-///the method receives a type [Query] value
+  ///Execute a Query
+  ///the method receives a type [Query] value
   Future executeQuery(Query query) async {
-///Get the query to server using hasura injection
+    ///Get the query to server using hasura injection
     final usecase = sl.get<QueryToServer>();
 
-///Receive a headers map
+    ///Receive a headers map
     final _headers = Map<String, String>.from(headers ?? {});
 
-///If the headers from the [query] received are different from null
-///the header map will add all the [query] headers
+    ///If the headers from the [query] received are different from null
+    ///the header map will add all the [query] headers
     if (query.headers != null) {
       _headers.addAll(query.headers!);
     }
-///A request type request is created
+
+    ///A request type request is created
     var request = Request(
       headers: _headers,
       type: RequestType.query,
       url: url,
       query: query,
     );
-///[interceptedValue] receives the value from a [ClientResolver] request
+
+    ///[interceptedValue] receives the value from a [ClientResolver] request
 
     final interceptedValue = await _interceptorExecutor(
       ClientResolver.request(request, this),
     );
 
-/// if the [interceptedValue] is a [Response], returns the interceptedValue
-/// if the [interceptedValue] is a [HasuraError], returns the interceptedValue
-/// else, the request will be the [interceptedValue]
+    /// if the [interceptedValue] is a [Response], returns the interceptedValue
+    /// if the [interceptedValue] is a [HasuraError], returns the interceptedValue
+    /// else, the request will be the [interceptedValue]
     if (interceptedValue is Response) {
       return interceptedValue;
     } else if (interceptedValue is HasuraError) {
@@ -169,21 +168,22 @@ class HasuraConnect {
       request = interceptedValue;
     }
 
-///The [result] will receive the data from an interceptError or 
-///interceptResponse
+    ///The [result] will receive the data from an interceptError or
+    ///interceptResponse
     final result = await usecase(request: request);
     return (await result.fold(_interceptError, _interceptResponse)).data;
   }
 
-///Intercepts the response when a [HasuraError] occurs
+  ///Intercepts the response when a [HasuraError] occurs
   Future<Response> _interceptError(HasuraError error) async {
-///Receives the intercepted value from a [ClientResolver] error
+    ///Receives the intercepted value from a [ClientResolver] error
 
     final interceptedValue = await _interceptorExecutor(
       ClientResolver.error(error, this),
     );
-///if the intercepted value is a [Response], return the value
-///else, will throw the intercepted value
+
+    ///if the intercepted value is a [Response], return the value
+    ///else, will throw the intercepted value
     if (interceptedValue is Response) {
       return interceptedValue;
     } else {
@@ -191,14 +191,15 @@ class HasuraConnect {
     }
   }
 
-///Intercepts the reponse when a [Response] occurs
+  ///Intercepts the reponse when a [Response] occurs
   Future<Response> _interceptResponse(Response response) async {
-///Receives the intercepted value from a [ClientResolver] response
+    ///Receives the intercepted value from a [ClientResolver] response
     final interceptedValue = await _interceptorExecutor(
       ClientResolver.response(response, this),
     );
-///if the intercept value is a [Response], returns the intercepted value
-///else, throws the intercepted value
+
+    ///if the intercept value is a [Response], returns the intercepted value
+    ///else, throws the intercepted value
     if (interceptedValue is Response) {
       return interceptedValue;
     } else {
@@ -228,28 +229,33 @@ class HasuraConnect {
 
   ///Execute a Mutation from a Query
   Future executeMutation(Query query) async {
-  ///Receives the usecase to get the mutation to server
+    ///Receives the usecase to get the mutation to server
     final usecase = sl.get<MutationToServer>();
-  ///Receives header values, otherwise start variable as null
+
+    ///Receives header values, otherwise start variable as null
     final _headers = Map<String, String>.from(headers ?? {});
-  ///If the query headers are different from null, add the query headers into headers
+
+    ///If the query headers are different from null, add the query headers into headers
     if (query.headers != null) {
       _headers.addAll(query.headers!);
     }
-  ///Creates a request type mutation
+
+    ///Creates a request type mutation
     var request = Request(
       headers: _headers,
       type: RequestType.mutation,
       url: url,
       query: query,
     );
-  ///Interceptor execute a client resolver request
+
+    ///Interceptor execute a client resolver request
     final interceptedValue = await _interceptorExecutor(
       ClientResolver.request(request, this),
     );
-  ///if the intercepted value is a response, returns the intercepted value
-  ///if intercepted value is a [HasuraError], throws the intercepted value
-  ///else, the request value will receive the intercepted value
+
+    ///if the intercepted value is a response, returns the intercepted value
+    ///if intercepted value is a [HasuraError], throws the intercepted value
+    ///else, the request value will receive the intercepted value
     if (interceptedValue is Response) {
       return interceptedValue;
     } else if (interceptedValue is HasuraError) {
@@ -257,9 +263,11 @@ class HasuraConnect {
     } else {
       request = interceptedValue;
     }
-  ///receives the result from usecase
+
+    ///receives the result from usecase
     final result = await usecase(request: request);
-  /// returns either the intercept error data, or the interceptor response data
+
+    /// returns either the intercept error data, or the interceptor response data
     return (await result.fold(_interceptError, _interceptResponse)).data;
   }
 
@@ -286,37 +294,43 @@ class HasuraConnect {
   ///Execute a Subscription from a Query
   Future<Snapshot> executeSubscription(Query query) async {
     Snapshot snapshot;
-  ///if the snapmap contains the same key as the [query], returns
-  ///the snapmap with the query key.
-  
+
+    ///if the snapmap contains the same key as the [query], returns
+    ///the snapmap with the query key.
+
     if (snapmap.containsKey(query.key)) {
       return snapmap[query.key]!;
     } else {
-  ///Get the snapshot subscription from it's usecase,
+      ///Get the snapshot subscription from it's usecase,
       final usecase = sl.get<GetSnapshotSubscription>();
-  ///creates a request type subscription
+
+      ///creates a request type subscription
       final request = Request(
         url: url,
         type: RequestType.subscription,
         query: query,
       );
-  ///Receives the resulto from usecase
+
+      ///Receives the resulto from usecase
       final result = usecase(
         closeConnection: _removeSnapshot,
         changeVariables: _changeVariables,
         request: request,
       );
-  ///The snapshot receives either the error or the snapshot
+
+      ///The snapshot receives either the error or the snapshot
       snapshot = result.fold((l) => throw l, (s) => s);
-  ///the snapmap with the query key receives the snapshot
+
+      ///the snapmap with the query key receives the snapshot
       snapmap[query.key!] = snapshot;
-  ///Execute the interceptor on subscription with the request and snapshot 
+
+      ///Execute the interceptor on subscription with the request and snapshot
       await _interceptorExecutor.onSubscription(request, snapshot);
     }
 
-  ///If the snapmap keys is not empty and it's not connected, connects
-  ///else if is connected, the input receives the query subscription and
-  ///send it to web socker server
+    ///If the snapmap keys is not empty and it's not connected, connects
+    ///else if is connected, the input receives the query subscription and
+    ///send it to web socker server
     if (snapmap.keys.isNotEmpty && !_isConnected) {
       // ignore: unawaited_futures
       _connect();
@@ -325,26 +339,37 @@ class HasuraConnect {
       final input = querySubscription(snapshot.query);
       sendToWebSocketServer(input);
     }
-  /// returns the snapshot
+
+    /// returns the snapshot
     return snapshot;
   }
-///Removes the snapshot
+
+  ///Removes the snapshot
   void _removeSnapshot(Snapshot snapshot) {
-    final stop = {'id': snapshot.query.key, 'type': 'stop'};
-///removes the snapshot from [snapmap]
+    final stop = {
+      'id': snapshot.query.key,
+      'type': 'stop'
+    };
+
+    ///removes the snapshot from [snapmap]
     snapmap.remove(snapshot.query.key);
-///if connected, send the stop do the web socket server as json
-///if the keys in [snapmap] are empty, disconnects
+
+    ///if connected, send the stop do the web socket server as json
+    ///if the keys in [snapmap] are empty, disconnects
     if (isConnected) sendToWebSocketServer(jsonEncode(stop));
     if (snapmap.keys.isEmpty) disconnect();
   }
 
   ///Change the variables in a snapshot
   Future _changeVariables(Snapshot snapshot) async {
-    final stop = {'id': snapshot.query.key, 'type': 'stop'};
-  ///if connected, send to the web socketw server a stop request as json
-  ///is connected, send to the web socketw server a query subscription with
-  ///the snapshot query
+    final stop = {
+      'id': snapshot.query.key,
+      'type': 'stop'
+    };
+
+    ///if connected, send to the web socketw server a stop request as json
+    ///is connected, send to the web socketw server a query subscription with
+    ///the snapshot query
     if (isConnected) sendToWebSocketServer(jsonEncode(stop));
     if (isConnected) sendToWebSocketServer(querySubscription(snapshot.query));
   }
@@ -359,34 +384,37 @@ class HasuraConnect {
     }
   }
 
-///Renew the connector in case of null
+  ///Renew the connector in case of null
   Future<void> _renewConnector() async {
-///if conector is null, get the connector from it's usecase
-///receives the result, set the connector with the result
-///if it returns a error, throw the error, otherwise
-///returns the connector
+    ///if conector is null, get the connector from it's usecase
+    ///receives the result, set the connector with the result
+    ///if it returns a error, throw the error, otherwise
+    ///returns the connector
     if (_connector == null) {
       final usecase = sl.get<GetConnector>();
       final result = await usecase(url);
       _connector = result.fold((l) => throw l, (c) => c);
     }
   }
-///Completes the connection
+
+  ///Completes the connection
   Future<void> _connect() async {
     await _renewConnector();
-///if the connector is null, returns the method, else
+
+    ///if the connector is null, returns the method, else
     if (_connector == null) {
       return;
     }
     final connector = _connector!;
     _disconnectionFlag = false;
-/// if the reconnection attempt is different from null or bigger
-///than 0, checks the number of connection attempts
+
+    /// if the reconnection attempt is different from null or bigger
+    ///than 0, checks the number of connection attempts
     if (reconnectionAttempt != null && reconnectionAttempt! > 0) {
-/// if the number of connection attempts is bigger or equal to reconnection 
-/// attempts, is connected is false, disconnects and set the number of
-/// connection attempts to 0, otherwise, add more one number of connection
-/// attempts
+      /// if the number of connection attempts is bigger or equal to reconnection
+      /// attempts, is connected is false, disconnects and set the number of
+      /// connection attempts to 0, otherwise, add more one number of connection
+      /// attempts
       if (_numbersOfConnectionAttempts >= reconnectionAttempt!) {
         // ignore: avoid_print
         print('maximum connection attempt numbers reached');
@@ -411,30 +439,36 @@ class HasuraConnect {
     );
 
     try {
-///if the intercepted value is a [Request], add to the request
-///header the intercepted value headers, is the value is a
-///[HasuraError], throws the intercepted value
+      ///if the intercepted value is a [Request], add to the request
+      ///header the intercepted value headers, is the value is a
+      ///[HasuraError], throws the intercepted value
       if (interceptedValue is Request) {
         request.headers.addAll(interceptedValue.headers);
       } else if (interceptedValue is HasuraError) {
         throw interceptedValue;
       }
-///Send a map with the payload value to init the web socket server
+
+      ///Send a map with the payload value to init the web socket server
       final subscriptionStream =
-          connector.map<Map>(jsonDecode).listen(normalizeStreamValue);
+          // ignore: unnecessary_lambdas
+          connector.map<Map>((data) => jsonDecode(data)).listen(normalizeStreamValue);
       (_init['payload']! as Map)['headers'] = request.headers;
       sendToWebSocketServer(jsonEncode(_init));
       // ignore: avoid_print
       subscriptionStream.onError(print);
-///Await the connector finish
+
+      ///Await the connector finish
       await connector.done;
-///Cancels the subscription stream
+
+      ///Cancels the subscription stream
       await subscriptionStream.cancel();
-///Sets the variable as false
+
+      ///Sets the variable as false
       _isConnected = false;
-///the disconnection flag is equal to false, return the method
-///is the try/catch receives an error, check if the disconnection flag is equal to false
-///returns the methods, otherwise, connects
+
+      ///the disconnection flag is equal to false, return the method
+      ///is the try/catch receives an error, check if the disconnection flag is equal to false
+      ///returns the methods, otherwise, connects
       if (_disconnectionFlag) {
         return;
       }
@@ -494,7 +528,9 @@ class HasuraConnect {
       snapmap[key]?.close();
     }
     snapmap.clear();
-    final disconect = {'type': 'connection_terminate'};
+    final disconect = {
+      'type': 'connection_terminate'
+    };
     if (_isConnected) {
       sendToWebSocketServer(jsonEncode(disconect));
     }

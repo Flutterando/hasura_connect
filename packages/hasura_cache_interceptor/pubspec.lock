@@ -7,14 +7,14 @@ packages:
       name: _fe_analyzer_shared
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "41.0.0"
+    version: "40.0.0"
   analyzer:
     dependency: transitive
     description:
       name: analyzer
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.2.0"
+    version: "4.1.0"
   args:
     dependency: transitive
     description:
@@ -92,6 +92,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "6.1.0"
+  flutterando_analysis:
+    dependency: "direct dev"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "0f0b585e011c32775550154ae93261f347200f30"
+      url: "https://github.com/Flutterando/flutterando_analysis.git"
+    source: git
+    version: "0.0.1"
   frontend_server_client:
     dependency: transitive
     description:
@@ -387,4 +396,4 @@ packages:
     source: hosted
     version: "3.0.0"
 sdks:
-  dart: ">=2.17.0 <3.0.0"
+  dart: ">=2.16.0 <3.0.0"

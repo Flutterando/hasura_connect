@@ -66,6 +66,7 @@ void main() {
   test('should execute usecase QueryToServer by DI', () async {
     final usecase = sl.get<QueryToServer>();
     final result = await usecase(request: tRequestQuery);
+    expect(result.isRight, true);
     expect(result.right, isA<Response>());
   });
   test('should execute usecase MutationToServer by DI', () async {

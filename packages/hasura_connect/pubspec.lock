@@ -91,7 +91,7 @@ packages:
       name: either_dart
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.3"
+    version: "0.2.0"
   file:
     dependency: transitive
     description:
@@ -99,6 +99,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "6.1.2"
+  flutterando_analysis:
+    dependency: "direct dev"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "0f0b585e011c32775550154ae93261f347200f30"
+      url: "https://github.com/Flutterando/flutterando_analysis.git"
+    source: git
+    version: "0.0.1"
   frontend_server_client:
     dependency: transitive
     description:

@@ -1,3 +1,6 @@
+// ignore_for_file: prefer_single_quotes
+
+
 import 'package:hasura_cache_interceptor/src/cache_interceptor.dart';
 import 'package:hasura_cache_interceptor/src/services/storage_service_interface.dart';
 import 'package:hasura_connect/hasura_connect.dart';
@@ -173,7 +176,7 @@ void main() {
         CacheInterceptor.namespaceKey,
         '${requestMock.url}: ${requestMock.query}',
       );
-      final cacheMock = {key: '{"cache_mock_key": "cache_mock_value"}'};
+      final cacheMock = {key: {'cache_mock_key': 'cache_mock_value'}};
 
       final responseMock = {'mock_key': 'mock_value'};
 
@@ -185,7 +188,7 @@ void main() {
         (realInvocation) async {
           final key = realInvocation.positionalArguments[0];
           final value = realInvocation.positionalArguments[1];
-          cacheMock[key] = value;
+          cacheMock[key] =  value;
         },
       );
 
