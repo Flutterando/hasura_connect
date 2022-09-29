@@ -453,7 +453,11 @@ class HasuraConnect {
       ///Send a map with the payload value to init the web socket server
       final subscriptionStream =
           // ignore: unnecessary_lambdas
-          connector.map<Map>((data) => jsonDecode(data)).listen(normalizeStreamValue);
+
+          connector
+              .map<Map>((data) => jsonDecode(data))
+              .listen(normalizeStreamValue);
+              
       (_init['payload']! as Map)['headers'] = request.headers;
       sendToWebSocketServer(jsonEncode(_init));
       // ignore: avoid_print

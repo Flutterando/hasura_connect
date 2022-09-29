@@ -5,6 +5,7 @@ List _dependencies = [];
 void register(dynamic bind) {
   _dependencies.add(bind);
 }
+
 ///When the method [cleanModule] is called, it clears the _dependencies [List]
 void cleanModule() {
   _dependencies.clear();
