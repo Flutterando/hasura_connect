@@ -15,11 +15,11 @@ class RequestRepositoryImpl implements RequestRepository {
 
   ///[RequestRepositoryImpl] constructor
   RequestRepositoryImpl({required this.datasource});
-  
-///Receives the result of [datasource], and return a [Right]
-///with the result, if an [HasuraError] occurs, returns [Left] with the error
-///if other error occurs, returns a Left [DatasourceError] with the error and 
-///[Request]
+
+  ///Receives the result of [datasource], and return a [Right]
+  ///with the result, if an [HasuraError] occurs, returns [Left] with the error
+  ///if other error occurs, returns a Left [DatasourceError] with the error and
+  ///[Request]
   @override
   Future<Either<HasuraError, Response>> sendRequest({
     required Request request,

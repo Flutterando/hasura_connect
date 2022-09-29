@@ -28,9 +28,10 @@ void main() {
         'test 3',
       ]),
     );
-    snapshot..add('test 1')
-    ..add('test 2')
-    ..add('test 3');
+    snapshot
+      ..add('test 1')
+      ..add('test 2')
+      ..add('test 3');
   });
 
   test('should throw InvalidRequestError if Query.document is invalid', () {

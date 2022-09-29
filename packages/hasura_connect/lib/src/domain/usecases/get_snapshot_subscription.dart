@@ -19,15 +19,15 @@ abstract class GetSnapshotSubscription {
 ///[GetSnapshotSubscription]
 ///implements the method [call]
 class GetSnapshotSubscriptionImpl implements GetSnapshotSubscription {
-///checks if the request query is valid, if 
-///invalid, returns a [InvalidRequestError]
-///else if the request query document don't start with subscription, will return
-///a [InvalidRequestError], else if
-///the request query key is null or empty, returns a [InvalidRequestError], else
-///if request type is different from subscription, returns a 
-///[InvalidRequestError], else, if the url is invalid returns a
-///[InvalidRequestError]
-///otherwise, will return a Right [Snapshot]
+  ///checks if the request query is valid, if
+  ///invalid, returns a [InvalidRequestError]
+  ///else if the request query document don't start with subscription, will return
+  ///a [InvalidRequestError], else if
+  ///the request query key is null or empty, returns a [InvalidRequestError], else
+  ///if request type is different from subscription, returns a
+  ///[InvalidRequestError], else, if the url is invalid returns a
+  ///[InvalidRequestError]
+  ///otherwise, will return a Right [Snapshot]
   @override
   Either<HasuraError, Snapshot> call({
     required Request request,

@@ -34,8 +34,8 @@ class Query {
   @override
   String toString() => jsonEncode(toJson());
 
-///The method [copyWith] will copy [Query] into a new object, changing the 
-///variable values
+  ///The method [copyWith] will copy [Query] into a new object, changing the
+  ///variable values
   Query copyWith({
     String? document,
     Map<String, dynamic>? variables,
