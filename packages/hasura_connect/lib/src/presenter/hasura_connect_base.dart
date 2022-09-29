@@ -38,7 +38,9 @@ class HasuraConnect {
   bool _disconnectionFlag = false;
   final _init = {
     'payload': {
-      'headers': {'content-type': 'application/json'}
+      'headers': {
+        'content-type': 'application/json'
+      }
     },
     'type': 'connection_init'
   };
@@ -71,12 +73,9 @@ class HasuraConnect {
     startModule(httpClientFactory);
     _interceptorExecutor = InterceptorExecutor(interceptors);
 
-    _subscription = controller.stream
-        .where((data) => data is Map)
-        .map((data) => data as Map)
-        .where((data) => data.containsKey('id'))
-        .where((data) => snapmap.containsKey(data['id']))
-        .listen(rootStreamListener);
+    _subscription = controller.stream.where((data) => data is Map).map((data) 
+    => data as Map,).where((data) => data.containsKey('id')).where((data) 
+    => snapmap.containsKey(data['id']),).listen(rootStreamListener);
   }
 
   ///Method [rootStreamListener]
@@ -349,7 +348,10 @@ class HasuraConnect {
 
   ///Removes the snapshot
   void _removeSnapshot(Snapshot snapshot) {
-    final stop = {'id': snapshot.query.key, 'type': 'stop'};
+    final stop = {
+      'id': snapshot.query.key,
+      'type': 'stop'
+    };
 
     ///removes the snapshot from [snapmap]
     snapmap.remove(snapshot.query.key);
@@ -362,7 +364,10 @@ class HasuraConnect {
 
   ///Change the variables in a snapshot
   Future _changeVariables(Snapshot snapshot) async {
-    final stop = {'id': snapshot.query.key, 'type': 'stop'};
+    final stop = {
+      'id': snapshot.query.key,
+      'type': 'stop'
+    };
 
     ///if connected, send to the web socketw server a stop request as json
     ///is connected, send to the web socketw server a query subscription with
@@ -448,9 +453,11 @@ class HasuraConnect {
       ///Send a map with the payload value to init the web socket server
       final subscriptionStream =
           // ignore: unnecessary_lambdas
+
           connector
               .map<Map>((data) => jsonDecode(data))
               .listen(normalizeStreamValue);
+              
       (_init['payload']! as Map)['headers'] = request.headers;
       sendToWebSocketServer(jsonEncode(_init));
       // ignore: avoid_print
@@ -527,7 +534,9 @@ class HasuraConnect {
       snapmap[key]?.close();
     }
     snapmap.clear();
-    final disconect = {'type': 'connection_terminate'};
+    final disconect = {
+      'type': 'connection_terminate'
+    };
     if (_isConnected) {
       sendToWebSocketServer(jsonEncode(disconect));
     }
