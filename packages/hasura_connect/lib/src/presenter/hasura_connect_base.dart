@@ -73,7 +73,9 @@ class HasuraConnect {
     startModule(httpClientFactory);
     _interceptorExecutor = InterceptorExecutor(interceptors);
 
-    _subscription = controller.stream.where((data) => data is Map).map((data) => data as Map).where((data) => data.containsKey('id')).where((data) => snapmap.containsKey(data['id'])).listen(rootStreamListener);
+    _subscription = controller.stream.where((data) => data is Map).map((data) 
+    => data as Map,).where((data) => data.containsKey('id')).where((data) 
+    => snapmap.containsKey(data['id']),).listen(rootStreamListener);
   }
 
   ///Method [rootStreamListener]

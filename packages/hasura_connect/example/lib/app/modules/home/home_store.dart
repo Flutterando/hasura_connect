@@ -43,4 +43,11 @@ class Books {
         'id': id,
         'name': name,
       };
+
+    static List<Books>? fromJsonList(List? list) {
+    if (list == null) return null;
+    // ignore: unnecessary_lambdas
+    return list.map((item) => item.cast<String, dynamic>()).map<Books>((e) => 
+    Books.fromMap(e),).toList();
+  }
 }
