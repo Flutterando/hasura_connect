@@ -30,4 +30,10 @@ void main() {
     expect(isCalled, true);
     expect(snapshot.query.variables, isNotNull);
   });
+
+  test('snapshot listen returns a dynamic', () async {
+    final snapshot = Snapshot(query: const Query(document: 'null'));
+   // ignore: avoid_print
+   expect(snapshot.listen(print), isA<dynamic>());
+  });
 }
