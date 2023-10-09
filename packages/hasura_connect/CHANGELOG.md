@@ -1,3 +1,7 @@
+## 5.0.0
+
+- Update to Flutter 3.10.0
+
 ## 4.0.0+4
 
 - Rollback meta version to 1.7.0
