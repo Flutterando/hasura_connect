@@ -146,7 +146,7 @@ packages:
       sha256: "0a48a4e44ec1b6a52eb93b12d129f5b74ee6dbb27703439c965f1bd86f7be59f"
       url: "https://pub.dev"
     source: hosted
-    version: "0.13.0"
+    version: "1.1.0"
   http_parser:
     dependency: transitive
     description:
@@ -194,7 +194,7 @@ packages:
       sha256: "207f9260c7a46946d09619b5ba1caf1fd50faf10fe3bae0176c626dceac5193d"
       url: "https://pub.dev"
     source: hosted
-    version: "1.10.0"
+    version: "1.8.3"
   rx_notifier:
     dependency: transitive
     description:
