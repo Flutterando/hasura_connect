@@ -17,7 +17,7 @@ dependencies:
   http: ^1.1.0
   meta: ^1.10.0
   string_validator: ^1.0.0
-  uuid: ^4.1.0
+  uuid: ^4.3.3
 
 dev_dependencies:  
   lint: ^1.0.0
