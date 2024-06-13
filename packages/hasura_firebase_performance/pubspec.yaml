@@ -8,22 +8,23 @@ homepage: https://github.com/Flutterando/hasura_connect/tree/master/packages/has
 documentation: https://github.com/Flutterando/hasura_connect/blob/master/packages/hasura_firebase_performance/README.md
 
 environment:
-  sdk: ">=2.16.0 <3.0.0"  
+  sdk: ">=3.0.0 <4.0.0"  
 
 dependencies:
-  firebase_performance: ^0.8.2
+  firebase_performance: ^0.10.0+1
   flutter:
     sdk: flutter
   hasura_connect: ^4.0.0+4
 
-# dependency_overrides: 
-#   hasura_connect: 
-#     path: ../hasura_connect
+dependency_overrides: 
+  hasura_connect: 
+    path: ../hasura_connect
+  meta: ^1.15.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  lint: ^1.0.0
+  lint: ^2.3.0
   flutterando_analysis: 
     git: https://github.com/Flutterando/flutterando_analysis.git
 
