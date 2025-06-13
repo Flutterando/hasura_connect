@@ -1,3 +1,13 @@
+# Hasura Connect is being discontinued
+
+We would like to inform the community that Hasura Connect will be discontinued.
+With the evolution of Flutter and modern GraphQL clients, Hasura Connect is no longer aligned with current best practices.
+
+The project will no longer receive updates or bug fixes. The repository will remain read-only for historical reference.
+
+Thank you to everyone who supported and used Hasura Connect over the years!
+
+
 <a name="readme-top"></a>
 
 
